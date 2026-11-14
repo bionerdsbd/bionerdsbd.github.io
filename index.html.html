@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BIO NERDS — স্টুডেন্ট পোর্টাল</title>
+<meta name="theme-color" content="#0b3d2e">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+<script>
+/* ============================================================
+   ⚙️ শুধু এই দুইটা লাইন বদলাতে হবে (Supabase → Project Settings → API থেকে)
+   ============================================================ */
+const SUPABASE_URL = "https://ezmizqrtvlvwoutasmot.supabase.co";
+const SUPABASE_KEY = "sb_publishable_JlaVKWB_fmkjuTEj0lESBg_vD_O__No";
+
+/* কোচিংয়ের তথ্য (আইডি কার্ড আর রেজাল্ট কার্ডে দেখাবে) */
+const COACHING = {
+  name: "BIO NERDS",
+  tagline: "Biology Care for HSC & SSC",
+  address: "আকবর প্যালেস, কর ভবনের বিপরীতে, শর্মা ক্লিনিকের পাশে, কান্দিরপাড়, কুমিল্লা",
+  phones: "01956126878, 01913314303"
+};
+</script>
+<style>
+:root{
+  --g:#0b3d2e; --g2:#13684c; --g3:#1f9d6f; --mint:#e8f6ef; --navy:#13294b;
+  --gold:#f2b632; --ink:#1b2430; --mute:#6b7685; --line:#e3e8ee; --bg:#f4f7f6; --red:#d64545;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:"Hind Siliguri",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+.hidden{display:none!important}
+.brand{font-family:Poppins,sans-serif;font-weight:800;letter-spacing:.5px}
+
+/* login */
+#loginView{min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(160deg,var(--g) 0%,var(--g2) 55%,var(--navy) 100%)}
+.login-top{padding:56px 24px 28px;color:#fff;text-align:center}
+.logo{width:76px;height:76px;border-radius:22px;background:#fff;display:grid;place-items:center;margin:0 auto 14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.logo span{font-family:Poppins;font-weight:800;color:var(--g);font-size:26px}
+.login-top h1{font-size:30px}
+.login-top p{opacity:.85}
+.login-card{background:#fff;border-radius:26px 26px 0 0;padding:28px 22px 30px;flex:1}
+.login-card h2{font-size:21px;margin-bottom:16px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 6px;color:#3a4553}
+input,select,textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;outline:none;font-size:16px}
+input:focus,select:focus,textarea:focus{border-color:var(--g3)}
+textarea{min-height:130px;font-family:ui-monospace,Menlo,monospace;font-size:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:13px 18px;font-weight:700;background:var(--g2);color:#fff;cursor:pointer;width:100%;margin-top:16px;font-size:16px}
+.btn:active{transform:scale(.98)}
+.btn.sec{background:var(--mint);color:var(--g)}
+.btn.ghost{background:transparent;color:var(--g2);border:1.5px solid var(--line)}
+.btn.danger{background:#fdeaea;color:var(--red)}
+.btn.sm{width:auto;padding:8px 12px;font-size:14px;margin-top:0;border-radius:10px}
+.btn[disabled]{opacity:.6}
+.hint{font-size:13px;color:var(--mute);margin-top:12px}
+.err{background:#fdeaea;color:var(--red);padding:10px 12px;border-radius:10px;margin-top:12px;font-size:14px}
+.ok{background:var(--mint);color:var(--g);padding:10px 12px;border-radius:10px;margin-top:12px;font-size:14px}
+.foot{font-size:12.5px;color:var(--mute);text-align:center;margin-top:26px}
+
+/* app shell */
+header.top{position:sticky;top:0;z-index:5;background:var(--g);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px}
+header.top .t{flex:1;min-width:0}
+header.top .t b{display:block;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header.top .t small{opacity:.8}
+.avatar{width:40px;height:40px;border-radius:50%;background:#fff3;display:grid;place-items:center;overflow:hidden;flex:none;font-weight:700}
+.avatar img{width:100%;height:100%;object-fit:cover}
+main{padding:16px 14px 100px;max-width:640px;margin:0 auto}
+nav.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:5}
+nav.bottom button{flex:1;border:0;background:none;padding:6px 2px;font-size:12px;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+nav.bottom button i{font-style:normal;font-size:21px;line-height:1}
+nav.bottom button.on{color:var(--g2);font-weight:700}
+.card{background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.card h3{font-size:17px;margin-bottom:10px}
+.sec-title{font-size:19px;font-weight:700;margin:4px 2px 12px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.muted{color:var(--mute);font-size:14px}
+.chip{display:inline-block;background:var(--mint);color:var(--g);border-radius:20px;padding:2px 10px;font-size:12.5px;font-weight:600}
+.chip.warn{background:#fff4dc;color:#94650a}
+
+.hero{background:linear-gradient(135deg,var(--g2),var(--navy));color:#fff;border-radius:20px;padding:18px;display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.hero .ph{width:78px;height:78px;border-radius:50%;border:3px solid #fff;background:#ffffff22;overflow:hidden;flex:none;display:grid;place-items:center;font-size:28px;font-weight:700}
+.hero .ph img{width:100%;height:100%;object-fit:cover}
+.hero b{font-size:20px;display:block;line-height:1.25}
+.hero small{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#fff;border-radius:16px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.stat b{display:block;font-size:22px;color:var(--g2);font-family:Poppins}
+.stat span{font-size:12.5px;color:var(--mute)}
+
+.res{border-left:5px solid var(--g3)}
+.res .big{font-family:Poppins;font-size:30px;font-weight:800;color:var(--g)}
+.res .big small{font-size:16px;color:var(--mute);font-weight:600}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px;text-align:center}
+.grid4 div{background:var(--bg);border-radius:10px;padding:6px 2px}
+.grid4 b{display:block;font-size:15px}
+.grid4 span{font-size:11.5px;color:var(--mute)}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g3),var(--g2))}
+
+.merit li{list-style:none;display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.merit li:last-child{border:0}
+.merit .rk{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--bg);flex:none}
+.merit .r1{background:#ffe89a}.merit .r2{background:#e5e9ef}.merit .r3{background:#f6d3b5}
+.merit .mph{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none}
+.merit .me{background:var(--mint);border-radius:12px}
+.merit .mk{margin-left:auto;font-family:Poppins;font-weight:800;color:var(--g)}
+
+.notice{border-left:5px solid var(--gold)}
+.notice p{white-space:pre-wrap;margin-top:4px}
+canvas.preview{width:100%;height:auto;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl td,.tbl th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.tbl th{font-size:12.5px;color:var(--mute);font-weight:600}
+.pwlist{background:var(--bg);border-radius:10px;padding:10px;font-family:ui-monospace,monospace;font-size:13px;white-space:pre-wrap;max-height:220px;overflow:auto;margin-top:8px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:50;max-width:90%;text-align:center}
+.spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--g2);border-radius:50%;animation:s .8s linear infinite;margin:30px auto}
+@keyframes s{to{transform:rotate(360deg)}}
+.wa{background:#25d366;color:#fff;border-radius:8px;padding:5px 9px;font-size:12.5px;text-decoration:none;font-weight:700;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<!-- ============ লগইন ============ -->
+<section id="loginView" class="hidden">
+  <div class="login-top">
+    <div class="logo"><span>BN</span></div>
+    <h1 class="brand" id="lgName">BIO NERDS</h1>
+    <p>স্টুডেন্ট পোর্টাল</p>
+  </div>
+  <div class="login-card">
+    <h2>লগইন করো</h2>
+    <form id="loginForm" autocomplete="on">
+      <label for="lgRoll">রোল নম্বর</label>
+      <input id="lgRoll" inputmode="numeric" autocomplete="username" placeholder="যেমন 27001" required>
+      <label for="lgPass">পাসওয়ার্ড</label>
+      <input id="lgPass" type="password" autocomplete="current-password" placeholder="পাসওয়ার্ড" required>
+      <button class="btn" type="submit" id="lgBtn">লগইন</button>
+      <div id="lgErr" class="err hidden"></div>
+    </form>
+    <p class="hint">প্রথমবার লগইন? পাসওয়ার্ড হলো তোমার ফোন নম্বরের শেষ ৬ ডিজিট। পাসওয়ার্ড ভুলে গেলে কোচিংয়ে যোগাযোগ করো।</p>
+    <div class="foot" id="lgFoot"></div>
+  </div>
+</section>
+
+<!-- ============ পাসওয়ার্ড বদল ============ -->
+<section id="pwView" class="hidden">
+  <header class="top"><div class="t"><b>নতুন পাসওয়ার্ড সেট করো</b><small>নিরাপত্তার জন্য প্রথমবার পাসওয়ার্ড বদলাতে হবে</small></div></header>
+  <main>
+    <div class="card">
+      <form id="pwForm">
+        <label>বর্তমান পাসওয়ার্ড</label>
+        <input id="pwOld" type="password" required autocomplete="current-password">
+        <label>নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label>
+        <input id="pwNew" type="password" required minlength="6" autocomplete="new-password">
+        <label>নতুন পাসওয়ার্ড আবার লেখো</label>
+        <input id="pwNew2" type="password" required minlength="6" autocomplete="new-password">
+        <button class="btn" type="submit">সেভ করো</button>
+        <div id="pwErr" class="err hidden"></div>
+      </form>
+      <button class="btn ghost" id="pwCancel" type="button">বাতিল</button>
+    </div>
+  </main>
+</section>
+
+<!-- ============ স্টুডেন্ট অ্যাপ ============ -->
+<section id="stuView" class="hidden">
+  <header class="top">
+    <div class="avatar" id="hdAv"></div>
+    <div class="t"><b id="hdName"></b><small id="hdRoll"></small></div>
+  </header>
+  <main id="stuMain"></main>
+  <nav class="bottom" id="stuNav">
+    <button data-tab="home" class="on"><i>🏠</i>হোম</button>
+    <button data-tab="results"><i>📊</i>রেজাল্ট</button>
+    <button data-tab="merit"><i>🏆</i>মেরিট</button>
+    <button data-tab="id"><i>🪪</i>আইডি</button>
+    <button data-tab="notices"><i>📢</i>নোটিশ</button>
+  </nav>
+</section>
+
+<!-- ============ অ্যাডমিন অ্যাপ ============ -->
+<section id="admView" class="hidden">
+  <header class="top">
+    <div class="avatar">⚙️</div>
+    <div class="t"><b>অ্যাডমিন প্যানেল</b><small id="admSub">BIO NERDS</small></div>
+  </header>
+  <main id="admMain"></main>
+  <nav class="bottom" id="admNav">
+    <button data-tab="students" class="on"><i>👥</i>স্টুডেন্ট</button>
+    <button data-tab="exams"><i>📝</i>পরীক্ষা</button>
+    <button data-tab="anotices"><i>📢</i>নোটিশ</button>
+    <button data-tab="settings"><i>⚙️</i>সেটিংস</button>
+  </nav>
+</section>
+
+<input type="file" id="photoInput" accept="image/*" class="hidden">
+
+<script>
+/* ---------------- সাধারণ ---------------- */
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num = v => (v === null || v === undefined || v === "") ? "-" : (+v % 1 ? (+v).toFixed(2).replace(/0$/,"") : String(+v));
+const fmtDate = d => { if(!d) return ""; const x = new Date(d); return isNaN(x) ? d : x.toLocaleDateString("bn-BD",{day:"numeric",month:"long",year:"numeric"}); };
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+let TOKEN = store.get("bn_token"), ROLE = store.get("bn_role");
+let ME = null, RESULTS = [], PW_FORCED = false;
+
+function toast(msg, ms=2600){
+  const t = document.createElement("div"); t.className="toast"; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(), ms);
+}
+function show(id){
+  ["loginView","pwView","stuView","admView"].forEach(v => $("#"+v).classList.toggle("hidden", v!==id));
+  window.scrollTo(0,0);
+}
+const configured = () => !SUPABASE_URL.includes("PASTE_") && !SUPABASE_KEY.includes("PASTE_");
+
+async function rpc(fn, args={}){
+  const headers = {"Content-Type":"application/json", "apikey": SUPABASE_KEY};
+  if (SUPABASE_KEY.startsWith("eyJ")) headers["Authorization"] = "Bearer " + SUPABASE_KEY;
+  let res;
+  try{
+    res = await fetch(SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/rpc/" + fn, {method:"POST", headers, body: JSON.stringify(args)});
+  }catch(e){ throw new Error("ইন্টারনেট সংযোগ নেই বা সার্ভারে পৌঁছানো যাচ্ছে না"); }
+  const txt = await res.text();
+  let data = null; try{ data = txt ? JSON.parse(txt) : null; }catch(e){}
+  if(!res.ok){
+    const msg = (data && (data.message || data.hint)) || ("সমস্যা হয়েছে (" + res.status + ")");
+    if (msg.includes("SESSION_EXPIRED")) { logoutLocal(); toast("সেশন শেষ, আবার লগইন করো"); throw new Error("আবার লগইন করো"); }
+    throw new Error(msg);
+  }
+  return data;
+}
+function logoutLocal(){ TOKEN=null; ROLE=null; ME=null; store.del("bn_token"); store.del("bn_role"); $("#lgPass").value=""; show("loginView"); }
+async function logout(){ try{ await rpc("logout",{p_token:TOKEN}); }catch(e){} logoutLocal(); }
+
+/* ---------------- লগইন ---------------- */
+$("#lgName").textContent = COACHING.name;
+$("#lgFoot").innerHTML = esc(COACHING.address) + "<br>📞 " + esc(COACHING.phones);
+$("#loginForm").onsubmit = async e => {
+  e.preventDefault();
+  const err = $("#lgErr"); err.classList.add("hidden");
+  if(!configured()){ err.textContent="সাইটটা এখনো Supabase-এর সাথে যুক্ত করা হয়নি (index.html-এর উপরের দুই লাইন)।"; err.classList.remove("hidden"); return; }
+  const b = $("#lgBtn"); b.disabled=true; b.textContent="অপেক্ষা করো...";
+  try{
+    const r = await rpc("login", {p_roll: $("#lgRoll").value.trim(), p_pass: $("#lgPass").value});
+    if(r.error) throw new Error(r.error);
+    TOKEN=r.token; ROLE=r.role; store.set("bn_token",TOKEN); store.set("bn_role",ROLE);
+    if(r.must_change){ PW_FORCED = true; $("#pwOld").value = $("#lgPass").value; show("pwView"); }
+    else start();
+  }catch(ex){ err.textContent=ex.message; err.classList.remove("hidden"); }
+  b.disabled=false; b.textContent="লগইন";
+};
+$("#pwForm").onsubmit = async e => {
+  e.preventDefault();
+  const err=$("#pwErr"); err.classList.add("hidden");
+  if($("#pwNew").value !== $("#pwNew2").value){ err.textContent="দুইবার লেখা নতুন পাসওয়ার্ড মিলছে না"; err.classList.remove("hidden"); return; }
+  try{
+    await rpc("change_password",{p_token:TOKEN,p_old:$("#pwOld").value,p_new:$("#pwNew").value});
+    ["#pwOld","#pwNew","#pwNew2"].forEach(s=>$(s).value="");
+    PW_FORCED = false; toast("পাসওয়ার্ড সেভ হয়েছে ✅"); start();
+  }catch(ex){ err.textContent=ex.message; err.classList.remove("hidden"); }
+};
+$("#pwCancel").onclick = () => PW_FORCED ? logout() : start();
+
+function start(){ if(ROLE==="admin"){ show("admView"); admTab("students"); } else { show("stuView"); loadStudent(); } }
+
+/* ---------------- স্টুডেন্ট ---------------- */
+document.querySelectorAll("#stuNav button").forEach(b => b.onclick = () => stuTab(b.dataset.tab));
+async function loadStudent(){
+  $("#stuMain").innerHTML = '<div class="spin"></div>';
+  try{
+    [ME, RESULTS] = await Promise.all([rpc("me",{p_token:TOKEN}), rpc("my_results",{p_token:TOKEN})]);
+    if(ME.must_change){ PW_FORCED = true; show("pwView"); return; }
+    paintHeader(); stuTab("home");
+  }catch(ex){ $("#stuMain").innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; }
+}
+function initials(n){ return esc((n||"?").trim().charAt(0)); }
+function paintHeader(){
+  $("#hdName").textContent = ME.name;
+  $("#hdRoll").textContent = "রোল " + ME.roll + (ME.batch ? " • " + ME.batch : "");
+  $("#hdAv").innerHTML = ME.photo ? '<img src="'+ME.photo+'" alt="">' : initials(ME.name);
+}
+function stuTab(t){
+  document.querySelectorAll("#stuNav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
+  window.scrollTo(0,0);
+  ({home:stuHome, results:stuResults, merit:stuMerit, id:stuId, notices:stuNotices})[t]();
+}
+function resultCard(r, withShare=true){
+  const pct = r.total_marks ? Math.max(0, Math.min(100, r.marks / r.total_marks * 100)) : 0;
+  return `<div class="card res">
+    <div class="row between"><div><b>${esc(r.title)}</b><div class="muted">${esc(r.subject||"")}${r.subject?" • ":""}${fmtDate(r.exam_date)}</div></div>
+    ${r.rank==1?'<span class="chip">🥇 প্রথম</span>':""}</div>
+    <div class="row between" style="margin-top:8px"><div class="big">${num(r.marks)}<small> / ${num(r.total_marks)}</small></div>
+    <div style="text-align:right"><b style="font-size:20px">#${r.rank}</b><div class="muted">${r.participants} জনের মধ্যে</div></div></div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="grid4">
+      <div><b>${num(r.highest)}</b><span>সর্বোচ্চ</span></div>
+      <div><b>${num(r.average)}</b><span>গড়</span></div>
+      <div><b>${r.correct ?? "-"}</b><span>সঠিক</span></div>
+      <div><b>${r.wrong ?? "-"}</b><span>ভুল</span></div>
+    </div>
+    ${withShare?`<button class="btn sec" onclick="shareResult(${r.exam_id})">📤 রেজাল্ট কার্ড শেয়ার করো</button>`:""}
+  </div>`;
+}
+async function stuHome(){
+  const n = RESULTS.length;
+  const avg = n ? Math.round(RESULTS.reduce((s,r)=>s + (r.total_marks? r.marks/r.total_marks*100 : 0),0)/n) : 0;
+  const best = n ? Math.min(...RESULTS.map(r=>r.rank)) : "-";
+  $("#stuMain").innerHTML = `
+    <div class="hero">
+      <div class="ph">${ME.photo?'<img src="'+ME.photo+'" alt="">':initials(ME.name)}</div>
+      <div style="min-width:0"><b>${esc(ME.name)}</b><small>রোল ${esc(ME.roll)}${ME.batch?" • "+esc(ME.batch):""}</small>
+      <div><button class="btn sm" style="margin-top:8px;background:#fff;color:var(--g)" onclick="$('#photoInput').click()">📷 ${ME.photo?"ছবি বদলাও":"ছবি যোগ করো"}</button></div></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>${n}</b><span>পরীক্ষা দিয়েছ</span></div>
+      <div class="stat"><b>${n?avg+"%":"-"}</b><span>গড় নম্বর</span></div>
+      <div class="stat"><b>${n?"#"+best:"-"}</b><span>সেরা র‍্যাংক</span></div>
+    </div>
+    <div class="sec-title">সর্বশেষ রেজাল্ট</div>
+    ${n ? resultCard(RESULTS[0]) : '<div class="card muted">এখনো কোনো রেজাল্ট আসেনি। পরীক্ষার পর এখানে দেখতে পাবে।</div>'}
+    <div id="homeNotice"></div>
+    <div class="card">
+      <h3>অ্যাকাউন্ট</h3>
+      <div class="muted">${ME.institution?esc(ME.institution)+"<br>":""}${ME.phone?"📞 "+esc(ME.phone):""}</div>
+      <button class="btn ghost" onclick="openChangePw()">🔑 পাসওয়ার্ড বদলাও</button>
+      <button class="btn danger" onclick="logout()">লগআউট</button>
+    </div>`;
+  try{
+    const ns = await rpc("get_notices",{p_token:TOKEN});
+    if(ns.length) $("#homeNotice").innerHTML = '<div class="sec-title">নতুন নোটিশ</div>' + noticeCard(ns[0]);
+  }catch(e){}
+}
+function openChangePw(){ PW_FORCED = false; $("#pwOld").value=""; show("pwView"); }
+function stuResults(){
+  $("#stuMain").innerHTML = '<div class="sec-title">আমার সব রেজাল্ট</div>' +
+    (RESULTS.length ? RESULTS.map(r=>resultCard(r)).join("") : '<div class="card muted">এখনো কোনো রেজাল্ট নেই।</div>');
+}
+async function stuMerit(examId){
+  if(!RESULTS.length){ $("#stuMain").innerHTML='<div class="sec-title">মেরিট লিস্ট</div><div class="card muted">পরীক্ষা দেওয়ার পর মেরিট লিস্ট দেখতে পাবে।</div>'; return; }
+  examId = examId || RESULTS[0].exam_id;
+  $("#stuMain").innerHTML = `<div class="sec-title">🏆 মেরিট লিস্ট</div>
+    <div class="card"><label style="margin-top:0">পরীক্ষা বেছে নাও</label>
+    <select id="mSel">${RESULTS.map(r=>`<option value="${r.exam_id}" ${r.exam_id==examId?"selected":""}>${esc(r.title)} — ${fmtDate(r.exam_date)}</option>`).join("")}</select></div>
+    <div id="mList"><div class="spin"></div></div>`;
+  $("#mSel").onchange = e => stuMerit(+e.target.value);
+  try{
+    const m = await rpc("merit",{p_token:TOKEN,p_exam:examId});
+    const mine = RESULTS.find(r=>r.exam_id==examId);
+    $("#mList").innerHTML = `<div class="card"><h3>টপ ১০ — ${esc(m.exam.title)}</h3><ul class="merit">` +
+      m.top.map(t=>`<li class="${t.roll===ME.roll?"me":""}">
+        <div class="rk ${t.rank<=3?"r"+t.rank:""}">${t.rank<=3?["🥇","🥈","🥉"][t.rank-1]:t.rank}</div>
+        ${t.photo?`<img class="mph" src="${t.photo}" alt="">`:""}
+        <div style="min-width:0"><b>${esc(t.name)}</b><div class="muted">রোল ${esc(t.roll)}${t.institution?" • "+esc(t.institution):""}</div></div>
+        <div class="mk">${num(t.marks)}</div></li>`).join("") + `</ul></div>
+      ${mine && mine.rank>10 ? `<div class="card ok" style="margin:0">তোমার অবস্থান: <b>#${mine.rank}</b> (${num(mine.marks)} নম্বর)। চালিয়ে যাও, পরের বার টপ ১০-এ আসবে! 💪</div>`:""}`;
+  }catch(ex){ $("#mList").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+}
+async function stuId(){
+  $("#stuMain").innerHTML = `<div class="sec-title">🪪 ডিজিটাল আইডি কার্ড</div>
+    <canvas id="idCv" class="preview"></canvas>
+    ${ME.photo?"":'<div class="card ok" style="margin-top:12px">আইডি কার্ডে ছবি দেখাতে আগে হোম থেকে ছবি যোগ করো।</div>'}
+    <button class="btn" onclick="saveCanvas('idCv','ID-${esc(ME.roll)}.png')">⬇️ আইডি কার্ড ডাউনলোড</button>`;
+  await drawId($("#idCv"));
+}
+function noticeCard(n){
+  return `<div class="card notice"><div class="row between"><b>${esc(n.title)}</b>${n.batch?`<span class="chip">${esc(n.batch)}</span>`:""}</div>
+    <div class="muted">${fmtDate(n.created_at)}</div><p>${esc(n.body)}</p></div>`;
+}
+async function stuNotices(){
+  $("#stuMain").innerHTML = '<div class="sec-title">📢 নোটিশ বোর্ড</div><div id="nl"><div class="spin"></div></div>';
+  try{
+    const ns = await rpc("get_notices",{p_token:TOKEN});
+    $("#nl").innerHTML = ns.length ? ns.map(noticeCard).join("") : '<div class="card muted">কোনো নোটিশ নেই।</div>';
+  }catch(ex){ $("#nl").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+}
+
+/* ছবি আপলোড: বর্গাকারে কেটে ছোট করে নেয় */
+$("#photoInput").onchange = async e => {
+  const f = e.target.files[0]; e.target.value=""; if(!f) return;
+  toast("ছবি আপলোড হচ্ছে...");
+  try{
+    const img = await loadImg(URL.createObjectURL(f));
+    const S = 360, c = document.createElement("canvas"); c.width=c.height=S;
+    const s = Math.min(img.width,img.height), ctx=c.getContext("2d");
+    ctx.fillStyle="#fff"; ctx.fillRect(0,0,S,S);
+    ctx.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,S,S);
+    let q=.85, data=c.toDataURL("image/jpeg",q);
+    while(data.length>150000 && q>.3){ q-=.1; data=c.toDataURL("image/jpeg",q); }
+    await rpc("set_photo",{p_token:TOKEN,p_photo:data});
+    ME.photo=data; paintHeader(); stuTab("home"); toast("ছবি সেভ হয়েছে ✅");
+  }catch(ex){ toast(ex.message || "ছবিটা খোলা যায়নি"); }
+};
+function loadImg(src){ return new Promise((ok,no)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=no; i.src=src; }); }
+
+/* ---------------- ক্যানভাস: আইডি কার্ড ও রেজাল্ট কার্ড ---------------- */
+async function fontsReady(){ try{ await Promise.all([document.fonts.load('700 40px "Hind Siliguri"'),document.fonts.load('800 40px Poppins'),document.fonts.load('500 30px "Hind Siliguri"')]); }catch(e){} }
+function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function fitText(ctx,text,maxW,size,weight,family){ do{ ctx.font=`${weight} ${size}px ${family}`; size-=2; }while(ctx.measureText(text).width>maxW && size>14); }
+async function drawPhoto(ctx, x, y, size, round){
+  ctx.save();
+  if(round){ ctx.beginPath(); ctx.arc(x+size/2,y+size/2,size/2,0,Math.PI*2); ctx.clip(); } else { rr(ctx,x,y,size,size*1.2,18); ctx.clip(); }
+  const h = round?size:size*1.2;
+  if(ME.photo){ const img = await loadImg(ME.photo); const s=Math.min(img.width,img.height*size/h);
+    ctx.drawImage(img,(img.width-s)/2,0,s,s*h/size,x,y,size,h); }
+  else { ctx.fillStyle="#dfe9e4"; ctx.fillRect(x,y,size,h); ctx.fillStyle="#13684c"; ctx.font=`700 ${size/2.4}px "Hind Siliguri"`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText((ME.name||"?").trim().charAt(0),x+size/2,y+h/2); }
+  ctx.restore();
+}
+async function drawId(cv){
+  await fontsReady();
+  const W=1012,H=640; cv.width=W; cv.height=H; const c=cv.getContext("2d");
+  c.textAlign="left"; c.textBaseline="alphabetic";
+  rr(c,0,0,W,H,36); c.save(); c.clip();
+  c.fillStyle="#fff"; c.fillRect(0,0,W,H);
+  const g=c.createLinearGradient(0,0,W,0); g.addColorStop(0,"#0b3d2e"); g.addColorStop(1,"#13294b");
+  c.fillStyle=g; c.fillRect(0,0,W,150);
+  c.fillStyle="#f2b632"; c.fillRect(0,150,W,8);
+  c.fillStyle="#fff"; c.font='800 54px Poppins'; c.fillText(COACHING.name,48,84);
+  c.font='500 26px "Hind Siliguri"'; c.globalAlpha=.85; c.fillText("STUDENT ID CARD • "+COACHING.tagline,50,124); c.globalAlpha=1;
+  c.fillStyle="#13684c"; c.globalAlpha=.06; c.beginPath(); c.arc(W-60,H-40,260,0,Math.PI*2); c.fill(); c.globalAlpha=1;
+  c.fillStyle="#13684c"; rr(c,44,192,236,290,22); c.fill();
+  await drawPhoto(c,52,200,220,false);
+  const x=320; c.fillStyle="#1b2430";
+  fitText(c,ME.name,W-x-40,50,700,'"Hind Siliguri"'); c.fillText(ME.name,x,250);
+  const rows=[["রোল",ME.roll],["ব্যাচ",ME.batch||"-"],["প্রতিষ্ঠান",ME.institution||"-"],["মোবাইল",ME.phone||"-"]];
+  rows.forEach((r,i)=>{ const y=315+i*52; c.font='500 26px "Hind Siliguri"'; c.fillStyle="#6b7685"; c.fillText(r[0],x,y);
+    c.fillStyle="#1b2430"; fitText(c,String(r[1]),W-x-200,30,600,'"Hind Siliguri"'); c.fillText(String(r[1]),x+170,y); });
+  c.fillStyle="#13684c"; rr(c,x,500,260,58,14); c.fill(); c.fillStyle="#fff"; c.font='800 32px Poppins'; c.fillText("ROLL "+ME.roll,x+22,540);
+  c.fillStyle="#e8f6ef"; c.fillRect(0,H-62,W,62); c.fillStyle="#0b3d2e"; fitText(c,COACHING.address+"  •  "+COACHING.phones,W-80,22,500,'"Hind Siliguri"'); c.fillText(COACHING.address+"  •  "+COACHING.phones,40,H-24);
+  c.restore();
+}
+async function shareResult(examId){
+  const r = RESULTS.find(x=>x.exam_id==examId); if(!r) return;
+  await fontsReady();
+  const cv=document.createElement("canvas"), W=1080, H=1350; cv.width=W; cv.height=H; const c=cv.getContext("2d");
+  const g=c.createLinearGradient(0,0,W,H); g.addColorStop(0,"#0b3d2e"); g.addColorStop(.6,"#13684c"); g.addColorStop(1,"#13294b");
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+  c.globalAlpha=.08; c.fillStyle="#fff"; c.beginPath(); c.arc(W-80,120,300,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(60,H-100,240,0,Math.PI*2); c.fill(); c.globalAlpha=1;
+  c.textAlign="center"; c.fillStyle="#fff"; c.font='800 74px Poppins'; c.fillText(COACHING.name,W/2,140);
+  c.font='600 34px "Hind Siliguri"'; c.fillStyle="#f2b632"; fitText(c,r.title+(r.subject?" • "+r.subject:""),W-120,38,600,'"Hind Siliguri"'); c.fillText(r.title+(r.subject?" • "+r.subject:""),W/2,205);
+  c.fillStyle="#ffffffcc"; c.font='500 28px "Hind Siliguri"'; c.fillText(fmtDate(r.exam_date),W/2,250);
+  c.fillStyle="#fff"; c.beginPath(); c.arc(W/2,420,128,0,Math.PI*2); c.fill();
+  await drawPhoto(c,W/2-118,302,236,true);
+  c.fillStyle="#fff"; fitText(c,ME.name,W-120,58,700,'"Hind Siliguri"'); c.fillText(ME.name,W/2,625);
+  c.font='500 32px "Hind Siliguri"'; c.fillStyle="#ffffffcc"; c.fillText("রোল "+ME.roll+(ME.batch?" • "+ME.batch:""),W/2,675);
+  c.fillStyle="#fff"; rr(c,110,730,W-220,330,40); c.fill();
+  c.fillStyle="#6b7685"; c.font='600 32px "Hind Siliguri"'; c.fillText("প্রাপ্ত নম্বর",W/2-215,805); c.fillText("মেরিট পজিশন",W/2+215,805);
+  c.fillStyle="#0b3d2e"; c.font='800 104px Poppins'; c.fillText(num(r.marks),W/2-215,920); c.fillText("#"+r.rank,W/2+215,920);
+  c.fillStyle="#6b7685"; c.font='600 30px "Hind Siliguri"'; c.fillText("মোট "+num(r.total_marks)+" এর মধ্যে",W/2-215,975); c.fillText(r.participants+" জনের মধ্যে",W/2+215,975);
+  c.fillStyle="#e3e8ee"; c.fillRect(W/2-2,770,4,230);
+  c.font='500 28px "Hind Siliguri"'; c.fillStyle="#13684c"; c.fillText("সর্বোচ্চ "+num(r.highest)+"   •   গড় "+num(r.average),W/2,1035);
+  if(r.rank<=3){ c.font='800 60px Poppins'; c.fillText(["🥇","🥈","🥉"][r.rank-1],W-170,800); }
+  c.fillStyle="#fff"; c.font='600 34px "Hind Siliguri"'; c.fillText(r.rank==1?"অভিনন্দন! ক্লাসে প্রথম 🎉":"পরিশ্রমের ফল ✨",W/2,1140);
+  c.fillStyle="#ffffffb0"; fitText(c,COACHING.address,W-100,24,500,'"Hind Siliguri"'); c.fillText(COACHING.address,W/2,1255);
+  c.font='500 24px "Hind Siliguri"'; c.fillText("📞 "+COACHING.phones,W/2,1295);
+  const blob = await new Promise(ok=>cv.toBlob(ok,"image/png"));
+  const file = new File([blob], `Result-${ME.roll}-${r.exam_id}.png`, {type:"image/png"});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], title:"আমার রেজাল্ট — "+COACHING.name}); return; }catch(e){ if(e.name==="AbortError") return; }
+  }
+  downloadBlob(blob, file.name);
+}
+function downloadBlob(blob,name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); toast("ছবি ডাউনলোড হয়েছে ✅"); }
+function saveCanvas(id,name){ $("#"+id).toBlob(b=>downloadBlob(b,name),"image/png"); }
+
+/* ---------------- অ্যাডমিন ---------------- */
+document.querySelectorAll("#admNav button").forEach(b => b.onclick = () => admTab(b.dataset.tab));
+function admTab(t){
+  document.querySelectorAll("#admNav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
+  window.scrollTo(0,0);
+  ({students:admStudents, exams:admExams, anotices:admNotices, settings:admSettings})[t]();
+}
+function parseLines(text){
+  return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>l.split(/\t|,|;/).map(x=>x.trim()));
+}
+let STU = [];
+async function admStudents(){
+  $("#admMain").innerHTML = `
+    <div class="card"><h3>➕ নতুন স্টুডেন্ট যোগ করো</h3>
+      <div class="muted">প্রতি লাইনে একজন: <b>রোল, নাম, ব্যাচ, ফোন, কলেজ/স্কুল</b><br>Excel/Google Sheet থেকে সরাসরি কপি-পেস্টও করা যাবে।</div>
+      <textarea id="sIn" placeholder="27001, Abdur Rahim, HSC'27, 01711223344, Cumilla Victoria College&#10;27002, Sumaiya Akter, HSC'27, 01812345678, Cumilla Govt. Women's College"></textarea>
+      <button class="btn" id="sAdd">সেভ করো</button><div id="sMsg"></div>
+      <p class="hint">শুরুর পাসওয়ার্ড = ফোন নম্বরের শেষ ৬ ডিজিট (ফোন না থাকলে রোলটাই পাসওয়ার্ড)। একই রোল আবার দিলে নাম/তথ্য আপডেট হবে।</p>
+    </div>
+    <div class="card"><div class="row between"><h3 style="margin:0">👥 সব স্টুডেন্ট <span id="sCount" class="chip"></span></h3></div>
+      <input id="sSearch" placeholder="🔍 নাম বা রোল দিয়ে খোঁজো" style="margin-top:10px">
+      <div id="sList"><div class="spin"></div></div></div>`;
+  $("#sAdd").onclick = async () => {
+    const rows = parseLines($("#sIn").value).filter(c=>/\d/.test(c[0]||"")).map(c=>({roll:c[0],name:c[1]||"",batch:c[2]||"",phone:c[3]||"",institution:c[4]||""}));
+    const msg=$("#sMsg");
+    if(!rows.length){ msg.innerHTML='<div class="err">কোনো সঠিক লাইন পাওয়া যায়নি। ফরম্যাট: রোল, নাম, ব্যাচ, ফোন, কলেজ</div>'; return; }
+    try{
+      const r = await rpc("admin_add_students",{p_token:TOKEN,p_rows:rows});
+      const list = r.new_accounts.map(a=>`${a.roll}  ${a.name}  →  পাসওয়ার্ড: ${a.password}`).join("\n");
+      msg.innerHTML = `<div class="ok">✅ নতুন ${r.added} জন যোগ হয়েছে, ${r.updated} জনের তথ্য আপডেট হয়েছে।</div>` +
+        (r.added?`<div class="pwlist" id="pwl">${esc(list)}</div><button class="btn sec" onclick="copyText($('#pwl').textContent)">📋 লগইন তথ্য কপি করো</button>`:"");
+      $("#sIn").value=""; loadStu();
+    }catch(ex){ msg.innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+  };
+  $("#sSearch").oninput = paintStu;
+  loadStu();
+}
+async function loadStu(){
+  try{ STU = await rpc("admin_students",{p_token:TOKEN}); paintStu(); }
+  catch(ex){ $("#sList").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+}
+function paintStu(){
+  const q = ($("#sSearch").value||"").toLowerCase();
+  const list = STU.filter(s=>!q || s.roll.toLowerCase().includes(q) || s.name.toLowerCase().includes(q) || (s.batch||"").toLowerCase().includes(q));
+  const act = STU.filter(s=>s.activated).length;
+  $("#sCount").textContent = STU.length+" জন • "+act+" জন লগইন করেছে";
+  $("#sList").innerHTML = list.length ? `<table class="tbl"><tr><th>রোল</th><th>নাম</th><th></th></tr>` + list.map(s=>`<tr>
+    <td><b>${esc(s.roll)}</b></td>
+    <td>${esc(s.name)}<div class="muted" style="font-size:12px">${esc(s.batch)} ${s.activated?'<span class="chip">সক্রিয়</span>':'<span class="chip warn">লগইন করেনি</span>'} ${s.has_photo?"📷":""}</div></td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn sm sec" onclick="resetPw('${esc(s.roll)}')">🔑</button> <button class="btn sm danger" onclick="delStu('${esc(s.roll)}')">🗑</button></td>
+  </tr>`).join("") + "</table>" : '<p class="muted" style="margin-top:10px">কাউকে পাওয়া যায়নি।</p>';
+}
+async function resetPw(roll){
+  if(!confirm(roll+" রোলের পাসওয়ার্ড রিসেট করবে?")) return;
+  try{ const r = await rpc("admin_reset_password",{p_token:TOKEN,p_roll:roll}); alert("রোল "+r.roll+"\nনতুন পাসওয়ার্ড: "+r.password+"\n\n(লগইনের পর স্টুডেন্টকে নতুন পাসওয়ার্ড সেট করতে বলবে)"); loadStu(); }
+  catch(ex){ toast(ex.message); }
+}
+async function delStu(roll){
+  if(!confirm(roll+" রোলের স্টুডেন্ট আর তার সব রেজাল্ট মুছে যাবে। নিশ্চিত?")) return;
+  try{ await rpc("admin_delete_student",{p_token:TOKEN,p_roll:roll}); toast("মুছে ফেলা হয়েছে"); loadStu(); }
+  catch(ex){ toast(ex.message); }
+}
+function copyText(t){ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("কপি হয়েছে ✅")).catch(()=>{ const a=document.createElement("textarea"); a.value=t; document.body.appendChild(a); a.select(); document.execCommand("copy"); a.remove(); toast("কপি হয়েছে ✅"); }); }
+
+async function admExams(){
+  const today = new Date().toISOString().slice(0,10);
+  $("#admMain").innerHTML = `
+    <div class="card"><h3>📝 নতুন পরীক্ষার রেজাল্ট দাও</h3>
+      <label>পরীক্ষার নাম</label><input id="eT" placeholder="যেমন: Daily Quiz 05">
+      <label>বিষয় / অধ্যায়</label><input id="eS" placeholder="যেমন: প্রাণিবিজ্ঞান — হাইড্রা">
+      <div class="row"><div style="flex:1"><label>তারিখ</label><input id="eD" type="date" value="${today}"></div>
+      <div style="flex:1"><label>মোট নম্বর</label><input id="eM" type="number" value="100" inputmode="decimal"></div></div>
+      <label>ব্যাচ (ঐচ্ছিক)</label><input id="eB" placeholder="যেমন: HSC'27">
+      <label>রেজাল্ট — প্রতি লাইনে: <b>রোল, নম্বর</b> (চাইলে: রোল, নম্বর, সঠিক, ভুল)</label>
+      <textarea id="eR" placeholder="27001, 88&#10;27002, 92.5, 20, 3&#10;27003, 76"></textarea>
+      <button class="btn" id="eSave">রেজাল্ট প্রকাশ করো</button><div id="eMsg"></div>
+      <p class="hint">টিপস: Claude দিয়ে OMR কাটানোর পর রেজাল্ট এই ফরম্যাটে চেয়ে নিলে সরাসরি পেস্ট করে দিতে পারবে।</p>
+    </div>
+    <div class="sec-title">সব পরীক্ষা</div><div id="eList"><div class="spin"></div></div>`;
+  $("#eSave").onclick = async () => {
+    const rows = parseLines($("#eR").value).filter(c=>/\d/.test(c[0]||"") && c[1]!==undefined && !isNaN(parseFloat(c[1])))
+      .map(c=>({roll:c[0],marks:parseFloat(c[1]),correct:c[2]&&!isNaN(parseInt(c[2]))?parseInt(c[2]):null,wrong:c[3]&&!isNaN(parseInt(c[3]))?parseInt(c[3]):null}));
+    const msg=$("#eMsg");
+    if(!$("#eT").value.trim()){ msg.innerHTML='<div class="err">পরীক্ষার নাম দাও</div>'; return; }
+    if(!rows.length){ msg.innerHTML='<div class="err">রেজাল্টের কোনো সঠিক লাইন পাওয়া যায়নি (রোল, নম্বর)</div>'; return; }
+    try{
+      const r = await rpc("admin_save_exam",{p_token:TOKEN,p_title:$("#eT").value,p_subject:$("#eS").value,p_date:$("#eD").value||null,p_total:parseFloat($("#eM").value)||100,p_batch:$("#eB").value,p_rows:rows});
+      msg.innerHTML = `<div class="ok">✅ ${r.saved} জনের রেজাল্ট প্রকাশ হয়েছে।</div>` +
+        (r.missing.length?`<div class="err">⚠️ এই রোলগুলো স্টুডেন্ট তালিকায় নেই, তাই বাদ গেছে: ${esc(r.missing.join(", "))}<br>আগে স্টুডেন্ট ট্যাবে এদের যোগ করো, তারপর আবার দাও।</div>`:"");
+      ["#eT","#eS","#eR"].forEach(s=>$(s).value=""); loadExams();
+    }catch(ex){ msg.innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+  };
+  loadExams();
+}
+async function loadExams(){
+  try{
+    const ex = await rpc("admin_exams",{p_token:TOKEN});
+    $("#eList").innerHTML = ex.length ? ex.map(e=>`<div class="card">
+      <div class="row between"><div><b>${esc(e.title)}</b><div class="muted">${esc(e.subject)} ${e.subject?"•":""} ${fmtDate(e.exam_date)} ${e.batch?"• "+esc(e.batch):""}</div></div></div>
+      <div class="grid4"><div><b>${e.participants}</b><span>জন</span></div><div><b>${num(e.highest)}</b><span>সর্বোচ্চ</span></div><div><b>${num(e.average)}</b><span>গড়</span></div><div><b>${num(e.total_marks)}</b><span>মোট</span></div></div>
+      <div class="row" style="margin-top:12px;gap:8px"><button class="btn sm sec" onclick="examDetail(${e.id},this)">📋 মেধাক্রম দেখো</button>
+      <button class="btn sm danger" onclick="delExam(${e.id})">🗑 মুছো</button></div><div id="ed${e.id}"></div></div>`).join("")
+      : '<div class="card muted">এখনো কোনো পরীক্ষা নেই।</div>';
+  }catch(ex){ $("#eList").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+}
+async function examDetail(id){
+  const box=$("#ed"+id); if(box.innerHTML){ box.innerHTML=""; return; }
+  box.innerHTML='<div class="spin"></div>';
+  try{
+    const rs = await rpc("admin_exam_results",{p_token:TOKEN,p_exam:id});
+    const ex = (await rpc("admin_exams",{p_token:TOKEN})).find(e=>e.id==id) || {};
+    box.innerHTML = `<table class="tbl" style="margin-top:10px"><tr><th>#</th><th>নাম</th><th>নম্বর</th><th></th></tr>` + rs.map(r=>{
+      const d=(r.phone||"").replace(/\D/g,""); const p = d.length>=10 ? "880"+d.slice(-10) : "";
+      const txt = `${COACHING.name}\n${ex.title||""}${ex.subject?" ("+ex.subject+")":""}\nনাম: ${r.name}\nরোল: ${r.roll}\nপ্রাপ্ত নম্বর: ${num(r.marks)}/${num(ex.total_marks)}\nমেরিট পজিশন: ${r.rank} (মোট ${rs.length} জন)\nসর্বোচ্চ: ${num(ex.highest)}`;
+      return `<tr><td>${r.rank}</td><td>${esc(r.name)}<div class="muted" style="font-size:12px">${esc(r.roll)}</div></td><td><b>${num(r.marks)}</b></td>
+      <td style="text-align:right">${p?`<a class="wa" target="_blank" rel="noopener" href="https://wa.me/${p}?text=${encodeURIComponent(txt)}">WhatsApp</a>`:""}</td></tr>`;}).join("") + "</table>" +
+      `<button class="btn sec" onclick="copyText(this.dataset.t)" data-t="${esc(rs.map(r=>r.rank+". "+r.name+" ("+r.roll+") — "+num(r.marks)).join("\n"))}">📋 পুরো মেধাক্রম কপি করো</button>`;
+  }catch(ex){ box.innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+}
+async function delExam(id){
+  if(!confirm("এই পরীক্ষা আর এর সব রেজাল্ট মুছে যাবে। নিশ্চিত?")) return;
+  try{ await rpc("admin_delete_exam",{p_token:TOKEN,p_exam:id}); toast("মুছে ফেলা হয়েছে"); loadExams(); }catch(ex){ toast(ex.message); }
+}
+
+async function admNotices(){
+  $("#admMain").innerHTML = `
+    <div class="card"><h3>📢 নতুন নোটিশ</h3>
+      <label>শিরোনাম</label><input id="nT" placeholder="যেমন: শুক্রবার ক্লাস বন্ধ">
+      <label>বিস্তারিত</label><textarea id="nB" style="font-family:inherit" placeholder="নোটিশের লেখা..."></textarea>
+      <label>শুধু কোন ব্যাচের জন্য? (খালি রাখলে সবাই দেখবে)</label><input id="nBt" placeholder="যেমন: HSC'27">
+      <button class="btn" id="nSave">নোটিশ দাও</button><div id="nMsg"></div></div>
+    <div class="sec-title">সব নোটিশ</div><div id="nList"><div class="spin"></div></div>`;
+  $("#nSave").onclick = async () => {
+    try{ await rpc("admin_add_notice",{p_token:TOKEN,p_title:$("#nT").value,p_body:$("#nB").value,p_batch:$("#nBt").value});
+      ["#nT","#nB","#nBt"].forEach(s=>$(s).value=""); $("#nMsg").innerHTML='<div class="ok">✅ নোটিশ দেওয়া হয়েছে</div>'; loadNotices(); }
+    catch(ex){ $("#nMsg").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+  };
+  loadNotices();
+}
+async function loadNotices(){
+  try{ const ns = await rpc("get_notices",{p_token:TOKEN});
+    $("#nList").innerHTML = ns.length ? ns.map(n=>noticeCard(n).replace(/<\/div>$/,`<button class="btn sm danger" style="margin-top:8px" onclick="delNotice(${n.id})">🗑 মুছো</button></div>`)).join("") : '<div class="card muted">কোনো নোটিশ নেই।</div>';
+  }catch(ex){ $("#nList").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+}
+async function delNotice(id){ if(!confirm("নোটিশটা মুছবে?")) return; try{ await rpc("admin_delete_notice",{p_token:TOKEN,p_id:id}); loadNotices(); }catch(ex){ toast(ex.message); } }
+
+function admSettings(){
+  $("#admMain").innerHTML = `
+    <div class="card"><h3>🔑 অ্যাডমিন পাসওয়ার্ড বদলাও</h3>
+      <button class="btn sec" onclick="openChangePw()">পাসওয়ার্ড বদলাও</button></div>
+    <div class="card"><h3>ℹ️ কীভাবে লগইন করবে</h3>
+      <p class="muted">অ্যাডমিন হিসেবে ঢুকতে রোলের ঘরে <b>admin</b> লিখে তোমার অ্যাডমিন পাসওয়ার্ড দাও। স্টুডেন্টরা তাদের রোল আর পাসওয়ার্ড দিয়ে ঢুকবে।</p></div>
+    <div class="card"><button class="btn danger" style="margin-top:0" onclick="logout()">লগআউট</button></div>`;
+}
+
+/* ---------------- শুরু ---------------- */
+if (TOKEN && configured()) start(); else show("loginView");
+</script>
+</body>
+</html>
