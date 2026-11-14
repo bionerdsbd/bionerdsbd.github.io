@@ -331,11 +331,11 @@ async function stuHome(){
     <div class="card">
       <h3>👤 আমার প্রোফাইল</h3>
       <table class="tbl">
-        <tr><td class="muted">বাবার নাম</td><td>${esc(ME.father_name)||"-"}</td></tr>
-        <tr><td class="muted">মায়ের নাম</td><td>${esc(ME.mother_name)||"-"}</td></tr>
+        <tr><td class="muted">ক্লাস</td><td>${esc(ME.class_name)||"-"}</td></tr>
         <tr><td class="muted">কলেজ/স্কুল</td><td>${esc(ME.institution)||"-"}</td></tr>
+        <tr><td class="muted">বাবা</td><td>${esc(ME.father_name)||"-"}<br><span class="muted">${esc(ME.father_phone)}</span></td></tr>
+        <tr><td class="muted">মা</td><td>${esc(ME.mother_name)||"-"}<br><span class="muted">${esc(ME.mother_phone)}</span></td></tr>
         <tr><td class="muted">নিজের মোবাইল</td><td>${esc(ME.phone)||"-"}</td></tr>
-        <tr><td class="muted">অভিভাবকের মোবাইল</td><td>${esc(ME.guardian_phone)||"-"}</td></tr>
       </table>
       <button class="btn sec" onclick="stuProfile(false)">✏️ প্রোফাইল এডিট করো</button>
       <button class="btn ghost" onclick="openChangePw()">🔑 পাসওয়ার্ড বদলাও</button>
@@ -356,17 +356,20 @@ function stuProfile(forced){
       <label>তোমার নাম</label>
       <input id="pfName" value="${v("name")}" ${ME.name?"disabled":""} placeholder="পুরো নাম (ইংরেজিতে)">
       ${ME.name?'<div class="hint" style="margin-top:4px">নাম ভুল থাকলে কোচিংয়ে জানাও</div>':""}
-      <label>বাবার নাম</label><input id="pfFather" value="${v("father_name")}" placeholder="বাবার নাম">
-      <label>মায়ের নাম</label><input id="pfMother" value="${v("mother_name")}" placeholder="মায়ের নাম">
+      <label>কোন ক্লাসে পড়ো</label>
+      <select id="pfClass"><option value="">— বেছে নাও —</option><option ${ME.class_name==="Class 6"?"selected":""}>Class 6</option><option ${ME.class_name==="Class 7"?"selected":""}>Class 7</option><option ${ME.class_name==="Class 8"?"selected":""}>Class 8</option><option ${ME.class_name==="Class 9"?"selected":""}>Class 9</option><option ${ME.class_name==="Class 10"?"selected":""}>Class 10</option><option ${ME.class_name==="SSC Candidate"?"selected":""}>SSC Candidate</option><option ${ME.class_name==="HSC 1st Year"?"selected":""}>HSC 1st Year</option><option ${ME.class_name==="HSC 2nd Year"?"selected":""}>HSC 2nd Year</option><option ${ME.class_name==="HSC Candidate"?"selected":""}>HSC Candidate</option><option ${ME.class_name==="Admission"?"selected":""}>Admission</option></select>
       <label>কলেজ / স্কুল</label><input id="pfInst" value="${v("institution")}" placeholder="যেমন: Cumilla Victoria Govt. College">
-      <label>তোমার নিজের মোবাইল (না থাকলে খালি রাখো)</label><input id="pfPhone" value="${v("phone")}" inputmode="tel" placeholder="01XXXXXXXXX">
-      <label>অভিভাবকের মোবাইল (রেজাল্ট এই নম্বরে যাবে)</label><input id="pfG" value="${v("guardian_phone")}" inputmode="tel" placeholder="01XXXXXXXXX">
+      <label>বাবার নাম</label><input id="pfFather" value="${v("father_name")}" placeholder="বাবার নাম">
+      <label>বাবার মোবাইল নম্বর</label><input id="pfFP" value="${v("father_phone")}" inputmode="tel" placeholder="01XXXXXXXXX">
+      <label>মায়ের নাম</label><input id="pfMother" value="${v("mother_name")}" placeholder="মায়ের নাম">
+      <label>মায়ের মোবাইল নম্বর</label><input id="pfMP" value="${v("mother_phone")}" inputmode="tel" placeholder="01XXXXXXXXX">
+      <label>তোমার নিজের মোবাইল নম্বর</label><input id="pfPhone" value="${v("phone")}" inputmode="tel" placeholder="01XXXXXXXXX">
       <button class="btn" type="submit">সেভ করো</button><div id="pfErr" class="err hidden"></div>
       ${forced?"":'<button class="btn ghost" type="button" onclick="stuTab(\'home\')">বাতিল</button>'}
     </form></div>`;
   $("#pf").onsubmit = async e => {
     e.preventDefault(); const err=$("#pfErr"); err.classList.add("hidden");
-    const d={p_token:TOKEN,p_name:$("#pfName").value,p_father:$("#pfFather").value,p_mother:$("#pfMother").value,p_phone:$("#pfPhone").value,p_gphone:$("#pfG").value,p_inst:$("#pfInst").value};
+    const d={p_token:TOKEN,p_name:$("#pfName").value,p_class:$("#pfClass").value,p_inst:$("#pfInst").value,p_father:$("#pfFather").value,p_fphone:$("#pfFP").value,p_mother:$("#pfMother").value,p_mphone:$("#pfMP").value,p_phone:$("#pfPhone").value};
     try{ await rpc("set_profile",d); ME = await rpc("me",{p_token:TOKEN}); paintHeader(); $("#stuNav").classList.remove("hidden"); toast("প্রোফাইল সেভ হয়েছে ✅"); stuTab("home"); }
     catch(ex){ err.textContent=ex.message; err.classList.remove("hidden"); }
   };
@@ -462,8 +465,8 @@ async function drawId(cv){
   await drawPhoto(c,52,200,220,false);
   const x=320; c.fillStyle="#1b2430";
   fitText(c,ME.name,W-x-40,50,700,'"Hind Siliguri"'); c.fillText(ME.name,x,245);
-  const rows=[["রোল",ME.roll],["ব্যাচ",ME.batch||"-"],["প্রতিষ্ঠান",ME.institution||"-"],["মোবাইল",ME.phone||ME.guardian_phone||"-"]];
-  rows.forEach((r,i)=>{ const y=315+i*52; c.font='500 26px "Hind Siliguri"'; c.fillStyle="#6b7685"; c.fillText(r[0],x,y);
+  const rows=[["রোল",ME.roll],["ব্যাচ",ME.batch||"-"],["প্রতিষ্ঠান",ME.institution||"-"],["ক্লাস",ME.class_name||"-"],["মোবাইল",ME.phone||"-"]];
+  rows.forEach((r,i)=>{ const y=305+i*45; c.font='500 26px "Hind Siliguri"'; c.fillStyle="#6b7685"; c.fillText(r[0],x,y);
     c.fillStyle="#1b2430"; fitText(c,String(r[1]),W-x-200,30,600,'"Hind Siliguri"'); c.fillText(String(r[1]),x+170,y); });
   c.fillStyle="#13684c"; rr(c,x,512,260,54,14); c.fill(); c.fillStyle="#fff"; c.font='800 30px Poppins'; c.fillText("ROLL "+ME.roll,x+22,549);
   c.fillStyle="#e8f6ef"; c.fillRect(0,H-62,W,62); c.fillStyle="#0b3d2e"; fitText(c,COACHING.address+"  •  "+COACHING.phones,W-80,22,500,'"Hind Siliguri"'); c.fillText(COACHING.address+"  •  "+COACHING.phones,40,H-24);
@@ -517,7 +520,7 @@ let STU = [];
 async function admStudents(){
   $("#admMain").innerHTML = `
     <div class="card"><h3>➕ নতুন স্টুডেন্ট যোগ করো</h3>
-      <div class="muted">প্রতি লাইনে একজন: <b>রোল, নাম, ব্যাচ, ফোন</b><br>বাবা-মায়ের নাম, কলেজ, অভিভাবকের ফোন স্টুডেন্ট প্রথম লগইনে নিজেই পূরণ করবে।<br>Excel/Google Sheet থেকে সরাসরি কপি-পেস্টও করা যাবে।</div>
+      <div class="muted">প্রতি লাইনে একজন: <b>রোল, নাম, ব্যাচ, ফোন</b><br>ক্লাস, কলেজ, বাবা-মায়ের নাম ও মোবাইল স্টুডেন্ট প্রথম লগইনে নিজেই পূরণ করবে।<br>Excel/Google Sheet থেকে সরাসরি কপি-পেস্টও করা যাবে।</div>
       <textarea id="sIn" placeholder="27001, Abdur Rahim, HSC'27, 01711223344&#10;27002, Sumaiya Akter, HSC'27, 01812345678"></textarea>
       <button class="btn" id="sAdd">সেভ করো</button><div id="sMsg"></div>
       <p class="hint">শুরুর পাসওয়ার্ড = ফোন নম্বরের শেষ ৬ ডিজিট (ফোন না থাকলে রোলটাই পাসওয়ার্ড)। একই রোল আবার দিলে নাম/তথ্য আপডেট হবে।</p>
@@ -551,7 +554,7 @@ function paintStu(){
   $("#sCount").textContent = STU.length+" জন • "+act+" জন লগইন করেছে";
   $("#sList").innerHTML = list.length ? `<table class="tbl"><tr><th>রোল</th><th>নাম</th><th></th></tr>` + list.map(s=>`<tr>
     <td><b>${esc(s.roll)}</b></td>
-    <td>${esc(s.name)||"<i>(নাম দেয়নি)</i>"}<div class="muted" style="font-size:12px">${esc(s.batch)} ${s.activated?'<span class="chip">সক্রিয়</span>':'<span class="chip warn">লগইন করেনি</span>'} ${s.has_photo?"📷":""}${s.profile_done?`<br>পিতা: ${esc(s.father_name)} • মাতা: ${esc(s.mother_name)}<br>${esc(s.institution)} • অভিভাবক: ${esc(s.guardian_phone)}`:""}</div></td>
+    <td>${esc(s.name)||"<i>(নাম দেয়নি)</i>"}<div class="muted" style="font-size:12px">${esc(s.batch)} ${s.activated?'<span class="chip">সক্রিয়</span>':'<span class="chip warn">লগইন করেনি</span>'} ${s.has_photo?"📷":""}${s.profile_done?`<br>${esc(s.class_name)} • ${esc(s.institution)}<br>পিতা: ${esc(s.father_name)} ${esc(s.father_phone)}<br>মাতা: ${esc(s.mother_name)} ${esc(s.mother_phone)}<br>নিজে: ${esc(s.phone)}`:'<br><span class="chip warn">প্রোফাইল পূরণ করেনি</span>'}</div></td>
     <td style="text-align:right;white-space:nowrap"><button class="btn sm sec" onclick="resetPw('${esc(s.roll)}')">🔑</button> <button class="btn sm danger" onclick="delStu('${esc(s.roll)}')">🗑</button></td>
   </tr>`).join("") + "</table>" : '<p class="muted" style="margin-top:10px">কাউকে পাওয়া যায়নি।</p>';
 }
@@ -615,7 +618,7 @@ async function examDetail(id){
     const rs = await rpc("admin_exam_results",{p_token:TOKEN,p_exam:id});
     const ex = (await rpc("admin_exams",{p_token:TOKEN})).find(e=>e.id==id) || {};
     box.innerHTML = `<table class="tbl" style="margin-top:10px"><tr><th>#</th><th>নাম</th><th>নম্বর</th><th></th></tr>` + rs.map(r=>{
-      const nums=[]; [["ছাত্র/ছাত্রী",r.phone],["অভিভাবক",r.guardian_phone]].forEach(([l,n])=>{ const d=(n||"").replace(/\D/g,""); if(d.length>=10){ const p="880"+d.slice(-10); if(!nums.some(x=>x.p===p)) nums.push({l,p}); } });
+      const nums=[]; [["ছাত্র/ছাত্রী",r.phone],["বাবা",r.father_phone],["মা",r.mother_phone]].forEach(([l,n])=>{ const d=(n||"").replace(/\D/g,""); if(d.length>=10){ const p="880"+d.slice(-10); if(!nums.some(x=>x.p===p)) nums.push({l,p}); } });
       const txt = `${COACHING.name}\n${ex.title||""}${ex.subject?" ("+ex.subject+")":""}\nনাম: ${r.name}\nরোল: ${r.roll}\nপ্রাপ্ত নম্বর: ${num(r.marks)}/${num(ex.total_marks)}\nমেরিট পজিশন: ${r.rank} (মোট ${rs.length} জন)\nসর্বোচ্চ: ${num(ex.highest)}`;
       return `<tr><td>${r.rank}</td><td>${esc(r.name)}<div class="muted" style="font-size:12px">${esc(r.roll)}</div></td><td><b>${num(r.marks)}</b></td>
       <td style="text-align:right">${nums.map(n=>`<a class="wa" style="display:inline-block;margin:2px 0" target="_blank" rel="noopener" href="https://wa.me/${n.p}?text=${encodeURIComponent(txt)}">📲 ${n.l}</a>`).join("<br>")}</td></tr>`;}).join("") + "</table>" +
