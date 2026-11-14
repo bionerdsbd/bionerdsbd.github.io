@@ -19,7 +19,8 @@ const COACHING = {
   name: "BIO NERDS",
   tagline: "Biology Care for HSC & SSC",
   address: "আকবর প্যালেস, কর ভবনের বিপরীতে, শর্মা ক্লিনিকের পাশে, কান্দিরপাড়, কুমিল্লা",
-  phones: "01956126878, 01913314303"
+  phones: "01956126878, 01913314303",
+  whatsapp: "01964335667"
 };
 </script>
 <style>
@@ -118,6 +119,18 @@ canvas.preview{width:100%;height:auto;border-radius:14px;box-shadow:0 4px 18px r
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:50;max-width:90%;text-align:center}
 .spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--g2);border-radius:50%;animation:s .8s linear infinite;margin:30px auto}
 @keyframes s{to{transform:rotate(360deg)}}
+.chat{display:flex;flex-direction:column;gap:8px;padding:4px 0 10px}
+.bub{max-width:82%;padding:9px 13px;border-radius:16px;white-space:pre-wrap;word-wrap:break-word;font-size:15px}
+.bub small{display:block;font-size:11px;opacity:.65;margin-top:3px}
+.bub.me{align-self:flex-end;background:var(--g2);color:#fff;border-bottom-right-radius:4px}
+.bub.them{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+.composer{position:sticky;bottom:70px;display:flex;gap:8px;background:var(--bg);padding:8px 0}
+.composer textarea{min-height:46px;height:46px;font-family:inherit;font-size:16px;resize:none}
+.composer .btn{width:auto;margin:0;padding:0 18px}
+.badge{position:absolute;top:2px;right:calc(50% - 22px);background:var(--red);color:#fff;border-radius:10px;font-size:11px;min-width:18px;padding:0 5px;line-height:18px;font-weight:700}
+nav.bottom button{position:relative}
+.thread{display:flex;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.thread:last-child{border:0}
 .wa{background:#25d366;color:#fff;border-radius:8px;padding:5px 9px;font-size:12.5px;text-decoration:none;font-weight:700;white-space:nowrap}
 </style>
 </head>
@@ -178,6 +191,7 @@ canvas.preview{width:100%;height:auto;border-radius:14px;box-shadow:0 4px 18px r
     <button data-tab="merit"><i>🏆</i>মেরিট</button>
     <button data-tab="id"><i>🪪</i>আইডি</button>
     <button data-tab="notices"><i>📢</i>নোটিশ</button>
+    <button data-tab="msg"><i>💬</i>মেসেজ</button>
   </nav>
 </section>
 
@@ -192,6 +206,7 @@ canvas.preview{width:100%;height:auto;border-radius:14px;box-shadow:0 4px 18px r
     <button data-tab="students" class="on"><i>👥</i>স্টুডেন্ট</button>
     <button data-tab="exams"><i>📝</i>পরীক্ষা</button>
     <button data-tab="anotices"><i>📢</i>নোটিশ</button>
+    <button data-tab="amsg"><i>💬</i>মেসেজ</button>
     <button data-tab="settings"><i>⚙️</i>সেটিংস</button>
   </nav>
 </section>
@@ -210,7 +225,7 @@ const store = {
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
 let TOKEN = store.get("bn_token"), ROLE = store.get("bn_role");
-let ME = null, RESULTS = [], PW_FORCED = false;
+let ME = null, RESULTS = [], PW_FORCED = false, CHAT_TIMER = null;
 
 function toast(msg, ms=2600){
   const t = document.createElement("div"); t.className="toast"; t.textContent=msg;
@@ -243,7 +258,7 @@ async function logout(){ try{ await rpc("logout",{p_token:TOKEN}); }catch(e){} l
 
 /* ---------------- লগইন ---------------- */
 $("#lgName").textContent = COACHING.name;
-$("#lgFoot").innerHTML = esc(COACHING.address) + "<br>📞 " + esc(COACHING.phones);
+$("#lgFoot").innerHTML = esc(COACHING.address) + "<br>📞 " + esc(COACHING.phones) + (COACHING.whatsapp ? '<br><a class="wa" style="display:inline-block;margin-top:8px" target="_blank" rel="noopener" href="'+waLink(COACHING.whatsapp,"")+'">📲 WhatsApp: '+esc(COACHING.whatsapp)+'</a>' : "");
 $("#loginForm").onsubmit = async e => {
   e.preventDefault();
   const err = $("#lgErr"); err.classList.add("hidden");
@@ -270,7 +285,7 @@ $("#pwForm").onsubmit = async e => {
 };
 $("#pwCancel").onclick = () => PW_FORCED ? logout() : start();
 
-function start(){ if(ROLE==="admin"){ show("admView"); admTab("students"); } else { show("stuView"); loadStudent(); } }
+function start(){ if(ROLE==="admin"){ show("admView"); admTab("students"); refreshBadge(); } else { show("stuView"); loadStudent(); } }
 
 /* ---------------- স্টুডেন্ট ---------------- */
 document.querySelectorAll("#stuNav button").forEach(b => b.onclick = () => stuTab(b.dataset.tab));
@@ -279,7 +294,7 @@ async function loadStudent(){
   try{
     [ME, RESULTS] = await Promise.all([rpc("me",{p_token:TOKEN}), rpc("my_results",{p_token:TOKEN})]);
     if(ME.must_change){ PW_FORCED = true; show("pwView"); return; }
-    paintHeader(); if(!ME.profile_done) stuProfile(true); else stuTab("home");
+    paintHeader(); if(!ME.profile_done) stuProfile(true); else stuTab("home"); refreshBadge();
   }catch(ex){ $("#stuMain").innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; }
 }
 function initials(n){ return esc((n||"?").trim().charAt(0)); }
@@ -291,7 +306,8 @@ function paintHeader(){
 function stuTab(t){
   document.querySelectorAll("#stuNav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
   window.scrollTo(0,0);
-  ({home:stuHome, results:stuResults, merit:stuMerit, id:stuId, notices:stuNotices})[t]();
+  clearInterval(CHAT_TIMER);
+  ({home:stuHome, results:stuResults, merit:stuMerit, id:stuId, notices:stuNotices, msg:stuMsg})[t]();
 }
 function resultCard(r, withShare=true){
   const pct = r.total_marks ? Math.max(0, Math.min(100, r.marks / r.total_marks * 100)) : 0;
@@ -506,12 +522,87 @@ async function shareResult(examId){
 function downloadBlob(blob,name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); toast("ছবি ডাউনলোড হয়েছে ✅"); }
 function saveCanvas(id,name){ $("#"+id).toBlob(b=>downloadBlob(b,name),"image/png"); }
 
+/* ---------------- মেসেজ ---------------- */
+function setBadge(navSel, tab, n){
+  const b=document.querySelector(navSel+' button[data-tab="'+tab+'"]'); if(!b) return;
+  let el=b.querySelector(".badge"); if(!n){ if(el) el.remove(); return; }
+  if(!el){ el=document.createElement("span"); el.className="badge"; b.appendChild(el); } el.textContent=n;
+}
+async function refreshBadge(){
+  try{
+    if(ROLE==="admin") setBadge("#admNav","amsg", await rpc("admin_unread",{p_token:TOKEN}));
+    else setBadge("#stuNav","msg", await rpc("my_unread",{p_token:TOKEN}));
+  }catch(e){}
+}
+setInterval(()=>{ if(TOKEN && document.visibilityState==="visible") refreshBadge(); }, 60000);
+const fmtTime = t => { const d=new Date(t); return d.toLocaleDateString("bn-BD",{day:"numeric",month:"short"})+" • "+d.toLocaleTimeString("bn-BD",{hour:"numeric",minute:"2-digit"}); };
+function bubbles(list, mineIsAdmin){
+  if(!list.length) return '<div class="muted" style="text-align:center;padding:24px 0">এখনো কোনো মেসেজ নেই</div>';
+  return list.map(m=>`<div class="bub ${m.from_admin===mineIsAdmin?"me":"them"}">${esc(m.body)}<small>${fmtTime(m.created_at)}</small></div>`).join("");
+}
+function studentNums(st){
+  const out=[]; [["ছাত্র",st.phone],["বাবা",st.father_phone],["মা",st.mother_phone]].forEach(([l,n])=>{
+    const d=String(n||"").replace(/\D/g,""); if(d.length>=10){ const p="880"+d.slice(-10); if(!out.some(x=>x.p===p)) out.push({l,p}); } });
+  return out;
+}
+let WA_SENT = {};
+try{ WA_SENT = JSON.parse(sessionStorage.getItem("bn_wa")||"{}"); }catch(e){}
+function waBtns(st, text, key){
+  return studentNums(st).map(n=>{ const k=key+"|"+n.p; const done=WA_SENT[k];
+    return `<a class="wa" style="display:inline-block;margin:2px 0;${done?"background:#9aa5b1":""}" target="_blank" rel="noopener" data-k="${esc(k)}" onclick="markSent(this)" href="https://wa.me/${n.p}${text?"?text="+encodeURIComponent(text):""}">${done?"✓":"📲"} ${n.l}</a>`; }).join(" ") || '<span class="muted" style="font-size:12px">নম্বর নেই</span>';
+}
+function markSent(a){ WA_SENT[a.dataset.k]=1; try{ sessionStorage.setItem("bn_wa",JSON.stringify(WA_SENT)); }catch(e){} setTimeout(()=>{ a.style.background="#9aa5b1"; a.textContent=a.textContent.replace("📲","✓"); },300); }
+function waLink(num, text){ const d=String(num||"").replace(/\D/g,""); return "https://wa.me/880"+d.slice(-10)+(text?"?text="+encodeURIComponent(text):""); }
+async function stuMsg(){
+  $("#stuMain").innerHTML = `<div class="sec-title">💬 কোচিংকে মেসেজ</div>
+    <div class="card" style="padding:12px 14px"><div class="muted">পড়াশোনা, ক্লাস বা যেকোনো সমস্যার কথা এখানে লেখো। স্যার উত্তর দিলে এখানেই দেখতে পাবে।</div>
+    ${COACHING.whatsapp?`<a class="wa" style="display:inline-block;margin-top:10px" target="_blank" rel="noopener" href="${waLink(COACHING.whatsapp,"আসসালামু আলাইকুম, আমি "+ME.name+" (রোল "+ME.roll+")")}">📲 WhatsApp-এ যোগাযোগ: ${esc(COACHING.whatsapp)}</a>`:""}</div>
+    <div class="chat" id="chat"><div class="spin"></div></div>
+    <form class="composer" id="cmp"><textarea id="cmpIn" placeholder="মেসেজ লেখো..." maxlength="1000"></textarea><button class="btn" type="submit">পাঠাও</button></form>`;
+  const load = async () => { try{ const l = await rpc("my_messages",{p_token:TOKEN}); $("#chat").innerHTML = bubbles(l,false); setBadge("#stuNav","msg",0); }catch(ex){ $("#chat").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; } };
+  await load(); window.scrollTo(0,document.body.scrollHeight);
+  CHAT_TIMER = setInterval(()=>{ if(document.visibilityState==="visible") load(); }, 20000);
+  $("#cmp").onsubmit = async e => { e.preventDefault(); const v=$("#cmpIn").value.trim(); if(!v) return;
+    try{ await rpc("send_message",{p_token:TOKEN,p_body:v}); $("#cmpIn").value=""; await load(); window.scrollTo(0,document.body.scrollHeight); }catch(ex){ toast(ex.message); } };
+}
+async function admMsg(){
+  $("#admMain").innerHTML = `<div class="sec-title">💬 মেসেজ</div>
+    <div class="card"><div class="row" style="gap:8px"><input id="newRoll" placeholder="রোল লিখে নতুন মেসেজ শুরু করো" inputmode="numeric"><button class="btn sm" style="height:46px" onclick="openThread($('#newRoll').value.trim())">খোলো</button></div></div>
+    <div class="card" id="thList"><div class="spin"></div></div>`;
+  try{
+    const th = await rpc("admin_threads",{p_token:TOKEN});
+    $("#thList").innerHTML = th.length ? th.map(t=>`<div class="thread" onclick="openThread('${esc(t.roll)}')">
+      <div class="avatar" style="background:var(--mint);color:var(--g)">${esc((t.name||"?").charAt(0))}</div>
+      <div style="flex:1;min-width:0"><b>${esc(t.name||"(নাম নেই)")}</b> <span class="muted">• ${esc(t.roll)}</span>
+      <div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.last_from_admin?"তুমি: ":""}${esc(t.last_body)}</div></div>
+      ${t.unread?`<span class="chip" style="background:var(--red);color:#fff">${t.unread}</span>`:""}</div>`).join("") : '<div class="muted">এখনো কোনো মেসেজ নেই।</div>';
+    refreshBadge();
+  }catch(ex){ $("#thList").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+}
+async function openThread(roll){
+  if(!roll) return;
+  clearInterval(CHAT_TIMER);
+  const st = (STU.length?STU:(STU=await rpc("admin_students",{p_token:TOKEN}))).find(x=>x.roll===roll);
+  if(!st){ toast("এই রোলের কোনো স্টুডেন্ট নেই"); return; }
+  window.scrollTo(0,0);
+  $("#admMain").innerHTML = `<div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="admMsg()">← সব মেসেজ</button>
+    <div style="min-width:0"><b>${esc(st.name||"(নাম নেই)")}</b><div class="muted">রোল ${esc(st.roll)} • ${esc(st.batch)}</div></div></div>
+    <div class="chat" id="chat"><div class="spin"></div></div>
+    <form class="composer" id="cmp"><textarea id="cmpIn" placeholder="উত্তর লেখো..." maxlength="2000"></textarea><button class="btn" type="submit">পাঠাও</button></form>`;
+  const load = async () => { try{ $("#chat").innerHTML = bubbles(await rpc("admin_thread",{p_token:TOKEN,p_roll:roll}), true); refreshBadge(); }catch(ex){ $("#chat").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; } };
+  await load(); window.scrollTo(0,document.body.scrollHeight);
+  CHAT_TIMER = setInterval(()=>{ if(document.visibilityState==="visible") load(); }, 20000);
+  $("#cmp").onsubmit = async e => { e.preventDefault(); const v=$("#cmpIn").value.trim(); if(!v) return;
+    try{ await rpc("admin_send",{p_token:TOKEN,p_roll:roll,p_body:v}); $("#cmpIn").value=""; await load(); window.scrollTo(0,document.body.scrollHeight); }catch(ex){ toast(ex.message); } };
+}
+
 /* ---------------- অ্যাডমিন ---------------- */
 document.querySelectorAll("#admNav button").forEach(b => b.onclick = () => admTab(b.dataset.tab));
 function admTab(t){
   document.querySelectorAll("#admNav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
   window.scrollTo(0,0);
-  ({students:admStudents, exams:admExams, anotices:admNotices, settings:admSettings})[t]();
+  clearInterval(CHAT_TIMER);
+  ({students:admStudents, exams:admExams, anotices:admNotices, settings:admSettings, amsg:admMsg})[t]();
 }
 function parseLines(text){
   return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>l.split(/\t|,|;/).map(x=>x.trim()));
@@ -555,7 +646,7 @@ function paintStu(){
   $("#sList").innerHTML = list.length ? `<table class="tbl"><tr><th>রোল</th><th>নাম</th><th></th></tr>` + list.map(s=>`<tr>
     <td><b>${esc(s.roll)}</b></td>
     <td>${esc(s.name)||"<i>(নাম দেয়নি)</i>"}<div class="muted" style="font-size:12px">${esc(s.batch)} ${s.activated?'<span class="chip">সক্রিয়</span>':'<span class="chip warn">লগইন করেনি</span>'} ${s.has_photo?"📷":""}${s.profile_done?`<br>${esc(s.class_name)} • ${esc(s.institution)}<br>পিতা: ${esc(s.father_name)} ${esc(s.father_phone)}<br>মাতা: ${esc(s.mother_name)} ${esc(s.mother_phone)}<br>নিজে: ${esc(s.phone)}`:'<br><span class="chip warn">প্রোফাইল পূরণ করেনি</span>'}</div></td>
-    <td style="text-align:right;white-space:nowrap"><button class="btn sm sec" onclick="resetPw('${esc(s.roll)}')">🔑</button> <button class="btn sm danger" onclick="delStu('${esc(s.roll)}')">🗑</button></td>
+    <td style="text-align:right;white-space:nowrap"><div style="margin-bottom:4px;white-space:normal">${waBtns(s,"",s.roll+"|direct")}</div><button class="btn sm sec" onclick="admTab('amsg');setTimeout(()=>openThread('${esc(s.roll)}'),50)">💬</button> <button class="btn sm sec" onclick="resetPw('${esc(s.roll)}')">🔑</button> <button class="btn sm danger" onclick="delStu('${esc(s.roll)}')">🗑</button></td>
   </tr>`).join("") + "</table>" : '<p class="muted" style="margin-top:10px">কাউকে পাওয়া যায়নি।</p>';
 }
 async function resetPw(roll){
@@ -618,10 +709,9 @@ async function examDetail(id){
     const rs = await rpc("admin_exam_results",{p_token:TOKEN,p_exam:id});
     const ex = (await rpc("admin_exams",{p_token:TOKEN})).find(e=>e.id==id) || {};
     box.innerHTML = `<table class="tbl" style="margin-top:10px"><tr><th>#</th><th>নাম</th><th>নম্বর</th><th></th></tr>` + rs.map(r=>{
-      const nums=[]; [["ছাত্র/ছাত্রী",r.phone],["বাবা",r.father_phone],["মা",r.mother_phone]].forEach(([l,n])=>{ const d=(n||"").replace(/\D/g,""); if(d.length>=10){ const p="880"+d.slice(-10); if(!nums.some(x=>x.p===p)) nums.push({l,p}); } });
       const txt = `${COACHING.name}\n${ex.title||""}${ex.subject?" ("+ex.subject+")":""}\nনাম: ${r.name}\nরোল: ${r.roll}\nপ্রাপ্ত নম্বর: ${num(r.marks)}/${num(ex.total_marks)}\nমেরিট পজিশন: ${r.rank} (মোট ${rs.length} জন)\nসর্বোচ্চ: ${num(ex.highest)}`;
       return `<tr><td>${r.rank}</td><td>${esc(r.name)}<div class="muted" style="font-size:12px">${esc(r.roll)}</div></td><td><b>${num(r.marks)}</b></td>
-      <td style="text-align:right">${nums.map(n=>`<a class="wa" style="display:inline-block;margin:2px 0" target="_blank" rel="noopener" href="https://wa.me/${n.p}?text=${encodeURIComponent(txt)}">📲 ${n.l}</a>`).join("<br>")}</td></tr>`;}).join("") + "</table>" +
+      <td style="text-align:right">${waBtns(r,txt,"exam"+id+"|"+r.roll)}</td></tr>`;}).join("") + "</table>" +
       `<button class="btn sec" onclick="copyText(this.dataset.t)" data-t="${esc(rs.map(r=>r.rank+". "+r.name+" ("+r.roll+") — "+num(r.marks)).join("\n"))}">📋 পুরো মেধাক্রম কপি করো</button>`;
   }catch(ex){ box.innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
 }
@@ -645,9 +735,21 @@ async function admNotices(){
   };
   loadNotices();
 }
+async function waNotice(id){
+  const box=$("#wan"+id); if(box.innerHTML){ box.innerHTML=""; return; }
+  box.innerHTML='<div class="spin"></div>';
+  try{
+    const ns = await rpc("get_notices",{p_token:TOKEN}); const n = ns.find(x=>x.id==id);
+    STU = await rpc("admin_students",{p_token:TOKEN});
+    const list = STU.filter(st=>!n.batch || st.batch===n.batch);
+    const txt = `📢 ${COACHING.name} নোটিশ\n\n${n.title}\n${n.body||""}`;
+    box.innerHTML = `<div class="muted" style="margin:10px 0 6px">${list.length} জন স্টুডেন্ট${n.batch?" ("+esc(n.batch)+")":""} — একটা একটা করে চেপে Send করো। পাঠানো বাটন ধূসর ✓ হয়ে যাবে।</div>
+      <table class="tbl">${list.map(st=>`<tr><td><b>${esc(st.roll)}</b><div class="muted" style="font-size:12px">${esc(st.name)}</div></td><td style="text-align:right">${waBtns(st,txt,"notice"+id+"|"+st.roll)}</td></tr>`).join("")}</table>`;
+  }catch(ex){ box.innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+}
 async function loadNotices(){
   try{ const ns = await rpc("get_notices",{p_token:TOKEN});
-    $("#nList").innerHTML = ns.length ? ns.map(n=>noticeCard(n).replace(/<\/div>$/,`<button class="btn sm danger" style="margin-top:8px" onclick="delNotice(${n.id})">🗑 মুছো</button></div>`)).join("") : '<div class="card muted">কোনো নোটিশ নেই।</div>';
+    $("#nList").innerHTML = ns.length ? ns.map(n=>noticeCard(n).replace(/<\/div>$/,`<div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" style="background:#25d366" onclick="waNotice(${n.id})">📲 WhatsApp-এ সবাইকে পাঠাও</button><button class="btn sm danger" onclick="delNotice(${n.id})">🗑 মুছো</button></div><div id="wan${n.id}"></div></div>`)).join("") : '<div class="card muted">কোনো নোটিশ নেই।</div>';
   }catch(ex){ $("#nList").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
 }
 async function delNotice(id){ if(!confirm("নোটিশটা মুছবে?")) return; try{ await rpc("admin_delete_notice",{p_token:TOKEN,p_id:id}); loadNotices(); }catch(ex){ toast(ex.message); } }
