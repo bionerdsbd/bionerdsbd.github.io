@@ -31,6 +31,8 @@ const COACHING = {
   address: "আকবর প্যালেস, কর ভবনের বিপরীতে, শর্মা ক্লিনিকের পাশে, কান্দিরপাড়, কুমিল্লা",
   phones: "01956126878, 01913314303",
   whatsapp: "01913314303",
+  bkash: "01956126878",      // বিকাশ নম্বর (Send Money)
+  nagad: "01956126878",      // নগদ নম্বর (Send Money)
   batches: ["HSC'27", "HSC'28", "SSC'27", "SSC'28"]   // হাজিরা ও আইডি কার্ডের ব্যাচ
 };
 </script>
@@ -143,6 +145,23 @@ nav.bottom button{position:relative}
 .thread{display:flex;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer}
 .thread:last-child{border:0}
 .wa{background:#25d366;color:#fff;border-radius:8px;padding:5px 9px;font-size:12.5px;text-decoration:none;font-weight:700;white-space:nowrap}
+
+.mchips{display:flex;flex-wrap:wrap;gap:6px}
+.mchips button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:6px 10px;font-size:13.5px;font-weight:600;color:var(--mute);cursor:pointer}
+.mchips button:disabled{opacity:1;cursor:default}
+.mchips .due{border-color:#f3b4b4;color:var(--red);background:#fff6f6}
+.mchips .paid{background:var(--mint);color:var(--g2);border-color:var(--mint)}
+.mchips .sel{background:var(--g2);color:#fff;border-color:var(--g2)}
+details summary{cursor:pointer}
+.asheet-bg{position:fixed;inset:0;background:#0007;z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.asheet{background:#fff;border-radius:24px 24px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));width:100%;max-width:640px}
+.asheet h3{font-size:20px;margin-bottom:4px}
+.paynum{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px}
+.paynum b{font-family:Poppins;font-size:17px;letter-spacing:.5px}
+.paynum .tag{color:#fff;border-radius:8px;padding:2px 8px;font-size:12.5px;font-weight:700}
+.tag.bkash{background:#e2136e}.tag.nagad{background:#f6921e}
+.mbtn{display:flex;gap:8px}.mbtn button{flex:1;border:2px solid var(--line);background:#fff;border-radius:12px;padding:10px;font-weight:700;cursor:pointer}
+.mbtn button.on.bkash{border-color:#e2136e;color:#e2136e;background:#fdeef5}.mbtn button.on.nagad{border-color:#f6921e;color:#c86d05;background:#fff5ea}
 
 /* ---------- পাবলিক হোম পেজ ---------- */
 :root{--orange:#f05a22;--cream:#fdf8ef}
@@ -258,6 +277,13 @@ nav.bottom button{position:relative}
   <div class="h-main" id="homeMain"><div class="card"><div class="spin"></div></div></div>
 </section>
 
+<!-- ============ অনলাইন ভর্তি ============ -->
+<section id="admitView" class="hidden">
+  <header class="top"><button class="btn sm" style="background:#fff2;color:#fff" onclick="show('homeView')">←</button>
+    <div class="t"><b>📝 ভর্তির আবেদন</b><small>BIO NERDS — অনলাইন ভর্তি</small></div></header>
+  <main id="admitMain"></main>
+</section>
+
 <!-- ============ লগইন ============ -->
 <section id="loginView" class="hidden">
   <div class="login-top">
@@ -328,6 +354,7 @@ nav.bottom button{position:relative}
   <nav class="bottom" id="admNav">
     <button data-tab="students" class="on"><i>👥</i>স্টুডেন্ট</button>
     <button data-tab="att"><i>✅</i>হাজিরা</button>
+    <button data-tab="fees"><i>💳</i>বেতন</button>
     <button data-tab="exams"><i>📝</i>পরীক্ষা</button>
     <button data-tab="anotices"><i>📢</i>নোটিশ</button>
     <button data-tab="amsg"><i>💬</i>মেসেজ</button>
@@ -358,7 +385,7 @@ function toast(msg, ms=2600){
 }
 function show(id){
   if(id==="homeView") loadHome();
-  ["homeView","loginView","pwView","stuView","admView"].forEach(v => $("#"+v).classList.toggle("hidden", v!==id));
+  ["homeView","admitView","loginView","pwView","stuView","admView"].forEach(v => $("#"+v).classList.toggle("hidden", v!==id));
   window.scrollTo(0,0);
 }
 const configured = () => !SUPABASE_URL.includes("PASTE_") && !SUPABASE_KEY.includes("PASTE_");
@@ -468,6 +495,7 @@ async function stuHome(){
       <div class="stat"><b>${n?"#"+best:"-"}</b><span>সেরা র‍্যাংক</span></div>
     </div>
     <div id="attCard"></div>
+    <div id="feeMini"></div>
     <div class="sec-title">সর্বশেষ রেজাল্ট</div>
     ${n ? resultCard(RESULTS[0]) : '<div class="card muted">এখনো কোনো রেজাল্ট আসেনি। পরীক্ষার পর এখানে দেখতে পাবে।</div>'}
     <div id="homeNotice"></div>
@@ -500,7 +528,7 @@ async function stuHome(){
     try{ await rpc("submit_feedback",{p_token:TOKEN,p_body:v,p_rating:rating}); $("#fbBody").value=""; toast("ধন্যবাদ! মতামত পাঠানো হয়েছে ✅"); }
     catch(ex){ toast(ex.message); }
   };
-  stuAttCard();
+  stuAttCard(); stuFeeMini();
   try{
     const ns = await rpc("get_notices",{p_token:TOKEN});
     if(ns.length) $("#homeNotice").innerHTML = '<div class="sec-title">নতুন নোটিশ</div>' + noticeCard(ns[0]);
@@ -563,7 +591,9 @@ async function stuId(){
   $("#stuMain").innerHTML = `<div class="sec-title">🪪 ডিজিটাল আইডি কার্ড</div>
     <canvas id="idCv" class="preview"></canvas>
     ${ME.photo?"":'<div class="card ok" style="margin-top:12px">আইডি কার্ডে ছবি দেখাতে আগে হোম থেকে ছবি যোগ করো।</div>'}
-    <button class="btn" onclick="saveCanvas('idCv','ID-${esc(ME.roll)}.png')">⬇️ আইডি কার্ড ডাউনলোড</button>`;
+    <button class="btn" onclick="saveCanvas('idCv','ID-${esc(ME.roll)}.png')">⬇️ আইডি কার্ড ডাউনলোড</button>
+    <div id="feeBox"></div>`;
+  stuFees();
   await drawId($("#idCv"));
 }
 function noticeCard(n){
@@ -597,7 +627,7 @@ $("#photoInput").onchange = async e => {
 function loadImg(src){ return new Promise((ok,no)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=no; i.src=src; }); }
 
 /* ---------------- ক্যানভাস: আইডি কার্ড ও রেজাল্ট কার্ড ---------------- */
-async function fontsReady(){ try{ await Promise.all([document.fonts.load('700 40px "Hind Siliguri"'),document.fonts.load('800 40px Poppins'),document.fonts.load('500 30px "Hind Siliguri"')]); }catch(e){} }
+async function fontsReady(){ try{ await Promise.all([document.fonts.load('700 40px "Hind Siliguri"'),document.fonts.load('800 40px Poppins'),document.fonts.load('500 30px "Hind Siliguri"'),document.fonts.load('600 30px "Hind Siliguri"')]); }catch(e){} }
 function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 function fitText(ctx,text,maxW,size,weight,family){ do{ ctx.font=`${weight} ${size}px ${family}`; size-=2; }while(ctx.measureText(text).width>maxW && size>14); }
 async function drawPhoto(ctx, x, y, size, round, st=ME){
@@ -674,7 +704,9 @@ function setBadge(navSel, tab, n){
 }
 async function refreshBadge(){
   try{
-    if(ROLE==="admin") setBadge("#admNav","amsg", await rpc("admin_unread",{p_token:TOKEN}));
+    if(ROLE==="admin"){ rpc("admin_admission_count",{p_token:TOKEN}).then(n=>setBadge("#admNav","students",n)).catch(()=>{});
+      rpc("admin_pay_request_count",{p_token:TOKEN}).then(n=>setBadge("#admNav","fees",n)).catch(()=>{});
+      setBadge("#admNav","amsg", await rpc("admin_unread",{p_token:TOKEN})); }
     else setBadge("#stuNav","msg", await rpc("my_unread",{p_token:TOKEN}));
   }catch(e){}
 }
@@ -746,7 +778,7 @@ function admTab(t){
   document.querySelectorAll("#admNav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
   window.scrollTo(0,0);
   clearInterval(CHAT_TIMER);
-  ({students:admStudents, att:admAtt, exams:admExams, anotices:admNotices, settings:admSettings, amsg:admMsg, ahome:admHome})[t]();
+  ({students:admStudents, att:admAtt, exams:admExams, anotices:admNotices, settings:admSettings, amsg:admMsg, ahome:admHome, fees:admFees})[t]();
 }
 function parseLines(text){
   return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>l.split(/\t|,|;/).map(x=>x.trim()));
@@ -754,6 +786,7 @@ function parseLines(text){
 let STU = [];
 async function admStudents(){
   $("#admMain").innerHTML = `
+    <div id="admitDone"></div><div id="admitBox"></div>
     <div class="card"><h3>➕ নতুন স্টুডেন্ট যোগ করো</h3>
       <div class="muted">প্রতি লাইনে একজন: <b>রোল, নাম, ব্যাচ, ফোন</b><br>ক্লাস, কলেজ, বাবা-মায়ের নাম ও মোবাইল স্টুডেন্ট প্রথম লগইনে নিজেই পূরণ করবে।<br>Excel/Google Sheet থেকে সরাসরি কপি-পেস্টও করা যাবে।</div>
       <textarea id="sIn" placeholder="27001, Abdur Rahim, HSC'27, 01711223344&#10;27002, Sumaiya Akter, HSC'27, 01812345678"></textarea>
@@ -778,7 +811,7 @@ async function admStudents(){
     }catch(ex){ msg.innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
   };
   $("#sSearch").oninput = paintStu;
-  loadStu();
+  loadStu().then(loadAdmits);
 }
 async function loadStu(){
   try{ STU = await rpc("admin_students",{p_token:TOKEN}); cacheStu(); paintStu(); }
@@ -792,7 +825,7 @@ function paintStu(){
   $("#sList").innerHTML = list.length ? `<table class="tbl"><tr><th>রোল</th><th>নাম</th><th></th></tr>` + list.map(s=>`<tr>
     <td><b>${esc(s.roll)}</b></td>
     <td>${esc(s.name)||"<i>(নাম দেয়নি)</i>"}<div class="muted" style="font-size:12px">${esc(s.batch)} ${s.activated?'<span class="chip">সক্রিয়</span>':'<span class="chip warn">লগইন করেনি</span>'} ${s.has_photo?"📷":""}${s.profile_done?`<br>${esc(s.class_name)} • ${esc(s.institution)}<br>পিতা: ${esc(s.father_name)} ${esc(s.father_phone)}<br>মাতা: ${esc(s.mother_name)} ${esc(s.mother_phone)}<br>নিজে: ${esc(s.phone)}`:'<br><span class="chip warn">প্রোফাইল পূরণ করেনি</span>'}</div></td>
-    <td style="text-align:right;white-space:nowrap"><div style="margin-bottom:4px;white-space:normal">${waBtns(s,"",s.roll+"|direct")}</div><button class="btn sm sec" onclick="admTab('amsg');setTimeout(()=>openThread('${esc(s.roll)}'),50)">💬</button> <button class="btn sm sec" onclick="resetPw('${esc(s.roll)}')">🔑</button> <button class="btn sm danger" onclick="delStu('${esc(s.roll)}')">🗑</button></td>
+    <td style="text-align:right;white-space:nowrap"><div style="margin-bottom:4px;white-space:normal">${waBtns(s,"",s.roll+"|direct")}</div><button class="btn sm sec" onclick="admTab('amsg');setTimeout(()=>openThread('${esc(s.roll)}'),50)">💬</button> <button class="btn sm sec" onclick="goFee('${esc(s.roll)}')">💳</button> <button class="btn sm sec" onclick="resetPw('${esc(s.roll)}')">🔑</button> <button class="btn sm danger" onclick="delStu('${esc(s.roll)}')">🗑</button></td>
   </tr>`).join("") + "</table>" : '<p class="muted" style="margin-top:10px">কাউকে পাওয়া যায়নি।</p>';
 }
 async function resetPw(roll){
@@ -950,7 +983,8 @@ function paintHomeMain(h, loading){
   if(s.highlight) html += `<div class="hl-note"><span>📌</span><span>${esc(s.highlight)}</span></div>`;
   if(open && s.admission_text) html += `<div class="card" style="margin-top:12px;border-left:5px solid var(--orange)"><b>🎓 ${esc(s.admission_text)}</b>
     <div class="muted" style="margin-top:4px">WhatsApp-এ মেসেজ দাও বা সরাসরি কোচিংয়ে চলে আসো।</div>
-    <button class="btn orange" onclick="openAdmission()">📲 WhatsApp-এ ভর্তির জন্য মেসেজ</button></div>`;
+    <button class="btn orange" onclick="admitOnline()">📝 অনলাইনে ভর্তির আবেদন করো</button>
+    <a class="btn sec" style="text-decoration:none" target="_blank" rel="noopener" href="${waLink(COACHING.whatsapp, admissionMsg())}">📲 WhatsApp-এ মেসেজ দাও</a></div>`;
 
   // Star of the Week
   const stars = h.stars || [];
@@ -996,7 +1030,6 @@ function paintHomeMain(h, loading){
   paintInstall();
 }
 function fmtShort(d){ const x=new Date(d); return isNaN(x)?d:x.toLocaleDateString("en-GB",{day:"numeric",month:"short"}).replace(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/,m=>({Jan:"জানু",Feb:"ফেব্রু",Mar:"মার্চ",Apr:"এপ্রিল",May:"মে",Jun:"জুন",Jul:"জুলাই",Aug:"আগস্ট",Sep:"সেপ্টে",Oct:"অক্টো",Nov:"নভে",Dec:"ডিসে"}[m])); }
-function openAdmission(){ window.open(waLink(COACHING.whatsapp, admissionMsg()), "_blank"); }
 function paintInstall(){
   const box = $("#instBox"); if(!box) return;
   if(isStandalone() || (!INSTALL_EVT && !isIOS())){ box.innerHTML=""; return; }
@@ -1259,6 +1292,490 @@ async function admIdCards(){
     await Promise.all([...pa.querySelectorAll("img")].map(i=>i.decode().catch(()=>{})));
     window.print();
   };
+}
+
+/* ---------------- অনলাইন ভর্তি (পাবলিক ফর্ম) ---------------- */
+const CLASS_OPTS = ["Class 6","Class 7","Class 8","Class 9","Class 10","SSC Candidate","HSC 1st Year","HSC 2nd Year","HSC Candidate"];
+const SITE_URL = "https://bionerdsbd.github.io";
+function payNumHtml(m){
+  const num = COACHING[m]; if(!num) return "";
+  return `<div class="paynum"><span class="tag ${m}">${METHOD[m]}</span><b>${esc(num)}</b><button type="button" class="btn sm sec" style="margin-left:auto" onclick="copyText('${esc(num)}')">📋 কপি</button></div>
+    <div class="hint" style="margin-top:6px">${METHOD[m]} অ্যাপ → <b>Send Money</b> → এই নম্বরে টাকা পাঠাও। তারপর মেসেজে আসা <b>TrxID</b> নিচে লেখো।</div>`;
+}
+const PAY_METHODS = () => ["bkash","nagad"].filter(m => COACHING[m]);
+function openAdmission(){
+  const bg = document.createElement("div"); bg.className = "asheet-bg";
+  bg.onclick = e => { if(e.target === bg) bg.remove(); };
+  bg.innerHTML = `<div class="asheet"><h3>🎓 BIO NERDS-এ ভর্তি</h3><div class="muted">যেভাবে সুবিধা, সেভাবে করো:</div>
+    <button class="btn orange" onclick="admitOnline()">📝 নিজে অনলাইনে আবেদন করো</button>
+    <div class="hint" style="margin-top:6px">ফর্ম পূরণ করো — যাচাই করে তোমার রোল ও পাসওয়ার্ড WhatsApp-এ পাঠানো হবে।</div>
+    <a class="btn" style="background:#25d366;text-decoration:none" target="_blank" rel="noopener" onclick="this.closest('.asheet-bg').remove()" href="${waLink(COACHING.whatsapp, admissionMsg())}">📲 WhatsApp-এ মেসেজ দাও</a>
+    <div class="hint" style="margin-top:6px">সরাসরি কোচিংয়ের সাথে কথা বলে ভর্তি হও।</div>
+    <button class="btn ghost" onclick="this.closest('.asheet-bg').remove()">বন্ধ করো</button></div>`;
+  document.body.appendChild(bg);
+}
+function admitOnline(){ document.querySelectorAll(".asheet-bg").forEach(x => x.remove()); paintAdmit(); show("admitView"); }
+function paintAdmit(){
+  const opt = a => a.map(x=>`<option>${esc(x)}</option>`).join("");
+  $("#admitMain").innerHTML = `
+    <div class="card ok" style="margin-bottom:14px">নিচের ফর্মটা পূরণ করে জমা দাও। যাচাইয়ের পর তোমার <b>রোল ও পাসওয়ার্ড</b> WhatsApp-এ পাঠানো হবে, তারপর পোর্টালে লগইন করতে পারবে।</div>
+    <div class="card"><form id="adF" autocomplete="on">
+      <label>পুরো নাম (ইংরেজিতে) *</label><input id="adName" required maxlength="80" autocomplete="name" placeholder="যেমন: Abdur Rahim">
+      <label>কোন ব্যাচে ভর্তি হতে চাও *</label>
+      <select id="adBatch" required><option value="">— বেছে নাও —</option>${opt(COACHING.batches)}</select>
+      <label>কোন ক্লাসে পড়ো</label>
+      <select id="adClass"><option value="">— বেছে নাও —</option>${opt(CLASS_OPTS)}</select>
+      <label>কলেজ / স্কুল</label><input id="adInst" maxlength="100" placeholder="যেমন: Cumilla Victoria Govt. College">
+      <label>তোমার মোবাইল নম্বর (WhatsApp) *</label><input id="adPhone" required inputmode="tel" autocomplete="tel" placeholder="01XXXXXXXXX">
+      <label>বাবার নাম</label><input id="adFN" maxlength="80">
+      <label>বাবার মোবাইল নম্বর</label><input id="adFP" inputmode="tel" placeholder="01XXXXXXXXX">
+      <label>মায়ের নাম</label><input id="adMN" maxlength="80">
+      <label>মায়ের মোবাইল নম্বর</label><input id="adMP" inputmode="tel" placeholder="01XXXXXXXXX">
+      <label>ঠিকানা</label><input id="adAddr" maxlength="150" placeholder="এলাকা, কুমিল্লা">
+      <label>কিছু জানাতে চাইলে (ঐচ্ছিক)</label><input id="adNote" maxlength="300">
+      ${PAY_METHODS().length ? `<label>ভর্তি ফি (ঐচ্ছিক)</label>
+      <div class="mbtn" id="adPM"><button type="button" class="on" data-m="">পরে দেব</button>${PAY_METHODS().map(m=>`<button type="button" class="${m}" data-m="${m}">${METHOD[m]}</button>`).join("")}</div>
+      <div id="adPayBox" class="hidden"><div id="adPN"></div>
+        <label>কোন নম্বর থেকে পাঠিয়েছ</label><input id="adPS" inputmode="tel" placeholder="01XXXXXXXXX">
+        <label>কত টাকা পাঠিয়েছ</label><input id="adPA" inputmode="numeric" placeholder="টাকা">
+        <label>TrxID</label><input id="adPT" autocapitalize="characters" autocomplete="off" placeholder="যেমন 8N7A6XK2QP"></div>` : ""}
+      <button class="btn orange" type="submit" id="adBtn">📝 আবেদন জমা দাও</button>
+      <div id="adErr" class="err hidden"></div>
+    </form></div>
+    <div class="card muted" style="text-align:center">প্রশ্ন থাকলে কল করো 📞 ${esc(COACHING.phones)}<br>
+      <a class="wa" style="display:inline-block;margin-top:8px" target="_blank" rel="noopener" href="${waLink(COACHING.whatsapp, admissionMsg())}">📲 WhatsApp-এ জিজ্ঞেস করো</a></div>`;
+  let payM = "";
+  document.querySelectorAll("#adPM button").forEach(b => b.onclick = () => {
+    payM = b.dataset.m; document.querySelectorAll("#adPM button").forEach(x => x.classList.toggle("on", x===b));
+    $("#adPayBox").classList.toggle("hidden", !payM); if(payM) $("#adPN").innerHTML = payNumHtml(payM); });
+  $("#adF").onsubmit = async e => {
+    e.preventDefault();
+    const err = $("#adErr"); err.classList.add("hidden");
+    const ph = s => $(s).value.replace(/[^\d+]/g,"");
+    const d = { name:$("#adName").value.trim(), batch:$("#adBatch").value, class_name:$("#adClass").value,
+      institution:$("#adInst").value.trim(), phone:ph("#adPhone"), father_name:$("#adFN").value.trim(), father_phone:ph("#adFP"),
+      mother_name:$("#adMN").value.trim(), mother_phone:ph("#adMP"), address:$("#adAddr").value.trim(), note:$("#adNote").value.trim() };
+    if(payM){
+      Object.assign(d, {pay_method:payM, pay_sender:ph("#adPS"), pay_amount:$("#adPA").value.replace(/[^\d.]/g,""), pay_trx:$("#adPT").value.trim().replace(/\s/g,"")});
+      const pe = !(+d.pay_amount>0) ? "কত টাকা পাঠিয়েছ, লেখো" : !/^[A-Za-z0-9]{6,20}$/.test(d.pay_trx) ? "TrxID ঠিকভাবে লেখো (মেসেজে যেটা আসে)" : "";
+      if(pe){ err.textContent = pe; err.classList.remove("hidden"); return; }
+    }
+    const bad = [["তোমার",d.phone,true],["বাবার",d.father_phone],["মায়ের",d.mother_phone]].find(([l,n,req]) => (req||n) && !/^(\+?88)?01\d{9}$/.test(n));
+    if(bad){ err.textContent = bad[0]+" মোবাইল নম্বরটা ঠিক নেই (01 দিয়ে শুরু, ১১ ডিজিট)"; err.classList.remove("hidden"); return; }
+    const b = $("#adBtn"); b.disabled = true; b.textContent = "জমা হচ্ছে...";
+    try{
+      await rpc("submit_admission", {p:d});
+      const tell = `আসসালামু আলাইকুম, আমি BIO NERDS-এর ওয়েবসাইটে ভর্তির আবেদন করেছি।\nনাম: ${d.name}\nব্যাচ: ${d.batch}\nমোবাইল: ${d.phone}`;
+      $("#admitMain").innerHTML = `<div class="card" style="text-align:center;padding:28px 18px">
+        <div style="font-size:54px">🎉</div><h3 style="font-size:21px">আবেদন জমা হয়েছে!</h3>
+        <p class="muted" style="font-size:15px">ধন্যবাদ, ${esc(d.name)}। কোচিং থেকে যাচাই করে <b>${esc(d.phone)}</b> নম্বরে WhatsApp-এ তোমার রোল ও পাসওয়ার্ড পাঠানো হবে।</p>
+        <a class="btn orange" style="text-decoration:none" target="_blank" rel="noopener" href="${waLink(COACHING.whatsapp, tell)}">📲 কোচিংকে WhatsApp-এ জানাও</a>
+        <button class="btn ghost" onclick="show('homeView')">← হোম পেজে ফেরো</button></div>`;
+      window.scrollTo(0,0);
+    }catch(ex){ err.textContent = ex.message; err.classList.remove("hidden"); b.disabled = false; b.textContent = "📝 আবেদন জমা দাও"; }
+  };
+}
+
+/* ---------------- অ্যাডমিন: ভর্তির আবেদন ---------------- */
+function rollPrefix(batch){ const m = String(batch||"").match(/^(HSC|SSC)\s*'?\s*(\d{2})/i); return m ? (m[1].toUpperCase()==="SSC"?"1":"") + m[2] : null; }
+function nextRoll(batch, taken){
+  const p = rollPrefix(batch); if(!p) return "";
+  const used = new Set([...STU.map(s=>String(s.roll)), ...taken]);
+  let max = 0; used.forEach(r => { if(r.length===p.length+3 && r.startsWith(p)) max = Math.max(max, +r.slice(p.length)); });
+  let n = max + 1; while(used.has(p+String(n).padStart(3,"0"))) n++;
+  return p + String(n).padStart(3,"0");
+}
+function admitInfo(a){
+  return `<b>${esc(a.name)}</b> <span class="chip">${esc(a.batch||"-")}</span>
+    <div class="muted" style="font-size:13px;line-height:1.55">${esc(a.class_name||"")}${a.class_name&&a.institution?" • ":""}${esc(a.institution||"")}
+    <br>📱 নিজে: ${esc(a.phone)}<br>পিতা: ${esc(a.father_name||"-")} ${esc(a.father_phone||"")}<br>মাতা: ${esc(a.mother_name||"-")} ${esc(a.mother_phone||"")}
+    ${a.address?"<br>📍 "+esc(a.address):""}${a.note?"<br>💬 "+esc(a.note):""}
+    ${a.pay_trx?`<br><span class="tag ${esc(a.pay_method)}" style="color:#fff;border-radius:6px;padding:0 6px">${METHOD[a.pay_method]||""}</span> ভর্তি ফি ${tk(a.pay_amount)} • TrxID <b>${esc(a.pay_trx)}</b>${a.pay_sender?" • প্রেরক "+esc(a.pay_sender):""}<br><span style="font-size:12px">ভর্তি করলে এটা 💳 বেতন ট্যাবে নিশ্চিত করার তালিকায় যাবে</span>`:""}<br><span style="font-size:12px">আবেদন: ${fmtTime(a.created_at)}</span></div>`;
+}
+async function loadAdmits(){
+  const box = $("#admitBox"); if(!box) return;
+  let list;
+  try{ list = await rpc("admin_admissions",{p_token:TOKEN,p_status:"pending"}); }
+  catch(ex){ box.innerHTML = '<div class="card err">ভর্তির আবেদন লোড হয়নি: '+esc(ex.message)+' — ভর্তি+বেতনের SQL চালানো হয়েছে তো?</div>'; return; }
+  setBadge("#admNav","students",list.length);
+  const taken = [];
+  box.innerHTML = `<div class="card" style="border-left:5px solid var(--orange)">
+    <div class="row between"><h3 style="margin:0">📝 ভর্তির আবেদন ${list.length?`<span class="chip warn">${list.length}টা নতুন</span>`:""}</h3>
+      <button class="btn sm ghost" onclick="admitHistory()">আগের আবেদন</button></div>
+    ${list.length ? list.map(a => { const r = nextRoll(a.batch, taken); if(r) taken.push(r);
+      return `<div style="border-top:1px solid var(--line);padding:12px 0 4px;margin-top:10px">${admitInfo(a)}
+        <div style="margin-top:6px">${waBtns(a,"","adq"+a.id)}</div>
+        <div class="row" style="margin-top:10px;flex-wrap:wrap">
+          <input id="ar${a.id}" value="${esc(r)}" inputmode="numeric" placeholder="রোল" style="width:110px;padding:8px 10px">
+          <button class="btn sm" onclick="approveAdmit(${a.id})">✅ ভর্তি করো</button>
+          <button class="btn sm danger" onclick="rejectAdmit(${a.id})">বাতিল</button></div></div>`; }).join("")
+      : '<div class="muted" style="margin-top:6px">নতুন কোনো আবেদন নেই। হোম পেজের “ভর্তি হতে চাই” থেকে কেউ আবেদন করলে এখানে আসবে।</div>'}
+    ${list.length?'<p class="hint">রোলের ঘরে পরের খালি রোল নিজে থেকে বসানো আছে — চাইলে বদলাতে পারো।</p>':""}</div>`;
+}
+async function approveAdmit(id){
+  const roll = ($("#ar"+id).value||"").trim();
+  if(!/^\d{4,8}$/.test(roll)){ toast("সঠিক রোল দাও"); return; }
+  if(!confirm("রোল "+roll+" দিয়ে ভর্তি করবে?")) return;
+  try{
+    const r = await rpc("admin_admission_approve",{p_token:TOKEN,p_id:id,p_roll:roll});
+    const msg = `আসসালামু আলাইকুম। BIO NERDS-এ ${r.name}-এর ভর্তি নিশ্চিত হয়েছে ✅\nব্যাচ: ${r.batch}\nরোল: ${r.roll}\nপাসওয়ার্ড: ${r.password}\nলগইন করো: ${SITE_URL}\n(প্রথম লগইনের পর নিজের নতুন পাসওয়ার্ড সেট করতে হবে)\n— BIO NERDS, ${COACHING.whatsapp}`;
+    $("#admitDone").innerHTML = `<div class="card" style="border-left:5px solid var(--g3)">
+      <h3>✅ ${esc(r.name)} — ভর্তি হয়েছে</h3>
+      <div class="pwlist">রোল: ${esc(r.roll)}\nপাসওয়ার্ড: ${esc(r.password)}</div>
+      <div class="muted" style="margin:10px 0 4px">লগইন তথ্য WhatsApp-এ পাঠাও (প্রতিটায় Send চাপতে হবে):</div>
+      ${waBtns(r, msg, "admok"+r.roll)}
+      <button class="btn sec" onclick="goFee('${esc(r.roll)}')">💳 ভর্তি ফি / বেতন এন্ট্রি করো</button>
+      <button class="btn ghost" onclick="$('#admitDone').innerHTML=''">ঠিক আছে</button></div>`;
+    await loadStu(); loadAdmits();
+    window.scrollTo(0,0);
+  }catch(ex){ toast(ex.message, 4000); }
+}
+async function rejectAdmit(id){
+  if(!confirm("এই আবেদনটা বাতিল করবে? (পরে “আগের আবেদন” থেকে ফিরিয়ে আনা যাবে)")) return;
+  try{ await rpc("admin_admission_set",{p_token:TOKEN,p_id:id,p_status:"rejected"}); loadAdmits(); }catch(ex){ toast(ex.message); }
+}
+async function admitHistory(){
+  window.scrollTo(0,0);
+  $("#admMain").innerHTML = `<div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="admTab('students')">← স্টুডেন্ট</button><b>📝 আগের আবেদন</b></div><div id="ahL"><div class="spin"></div></div>`;
+  try{
+    const [ok, no] = await Promise.all([rpc("admin_admissions",{p_token:TOKEN,p_status:"approved"}), rpc("admin_admissions",{p_token:TOKEN,p_status:"rejected"})]);
+    $("#ahL").innerHTML = `<div class="card"><h3>❌ বাতিল করা (${no.length})</h3>${no.map(a=>`<div style="border-top:1px solid var(--line);padding:10px 0">${admitInfo(a)}
+        <div class="row" style="margin-top:6px"><button class="btn sm sec" onclick="admitSet(${a.id},'pending')">↩️ ফিরিয়ে আনো</button><button class="btn sm danger" onclick="admitDel(${a.id})">🗑 মুছো</button></div></div>`).join("") || '<div class="muted">নেই</div>'}</div>
+      <div class="card"><h3>✅ ভর্তি হয়েছে (${ok.length})</h3>${ok.map(a=>`<div style="border-top:1px solid var(--line);padding:10px 0"><span class="chip">রোল ${esc(a.roll)}</span> ${admitInfo(a)}</div>`).join("") || '<div class="muted">নেই</div>'}</div>`;
+  }catch(ex){ $("#ahL").innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; }
+}
+async function admitSet(id, st){ try{ await rpc("admin_admission_set",{p_token:TOKEN,p_id:id,p_status:st}); toast("আবেদন আবার নতুন তালিকায় ✅"); admitHistory(); }catch(ex){ toast(ex.message); } }
+async function admitDel(id){ if(!confirm("আবেদনটা একেবারে মুছবে?")) return; try{ await rpc("admin_admission_delete",{p_token:TOKEN,p_id:id}); admitHistory(); }catch(ex){ toast(ex.message); } }
+
+/* ---------------- বেতন: সাধারণ ---------------- */
+const BN_MON = ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+const bnNum = v => String(v).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+const ymNow = () => todayBD().slice(0,7);
+const ymName = ym => { const [y,m] = String(ym).split("-"); return BN_MON[+m-1] ? BN_MON[+m-1]+" "+bnNum(y) : ym; };
+const ymShort = ym => { const [y,m] = String(ym).split("-"); return BN_MON[+m-1] ? BN_MON[+m-1]+" '"+bnNum(y.slice(2)) : ym; };
+function ymAdd(ym, k){ let [y,m] = ym.split("-").map(Number); m += k; while(m>12){m-=12;y++;} while(m<1){m+=12;y--;} return y+"-"+String(m).padStart(2,"0"); }
+function ymRange(a, b){ const out=[]; if(!a || a>b) return out; let x=a; while(x<=b && out.length<60){ out.push(x); x=ymAdd(x,1); } return out; }
+const tk = n => "৳" + bnNum(Math.round(+n||0).toLocaleString("en-IN"));
+const KIND = {monthly:"মাসিক বেতন", admission:"ভর্তি ফি", other:"অন্যান্য"};
+const METHOD = {cash:"ক্যাশ", bkash:"বিকাশ", nagad:"নগদ", bank:"ব্যাংক"};
+let FEES = null;
+function feeCfg(batch, fees=FEES){ return ((fees||{}).batches||{})[batch] || {}; }
+function feeStart(st, cfg){ return st.fee_from || cfg.start || null; }
+function paidSet(pays){ const s = new Set(); (pays||[]).forEach(p => (p.months||[]).forEach(m => s.add(m))); return s; }
+function dueList(st, cfg, upto=ymNow()){ const from = feeStart(st,cfg) || upto, paid = paidSet(st.payments); return ymRange(from, upto).filter(m => !paid.has(m)); }
+function payFor(p){ return p.kind==="monthly" ? "মাসিক বেতন — " + (p.months||[]).map(ymName).join(", ") : (KIND[p.kind]||p.kind) + (p.kind==="other" && p.note ? " — "+p.note : ""); }
+function receiptText(p){
+  return `🧾 ${COACHING.name} — টাকা প্রাপ্তির রসিদ\nরসিদ নং: ${p.receipt_no}\nতারিখ: ${fmtDate(p.paid_on)}\nনাম: ${p.name} (রোল ${p.roll}${p.batch?", "+p.batch:""})\nবাবদ: ${payFor(p)}\nপরিমাণ: ${tk(p.amount)} (${METHOD[p.method]||p.method})${p.note&&p.kind!=="other"?"\nনোট: "+p.note:""}\nধন্যবাদ। — ${COACHING.name}, ${COACHING.whatsapp}`;
+}
+async function drawReceipt(cv, p){
+  await fontsReady();
+  const rows=[["নাম",p.name||"-"],["রোল",p.roll+(p.batch?"   •   ব্যাচ: "+p.batch:"")],["বাবদ",payFor(p)],["মাধ্যম",METHOD[p.method]||p.method||"ক্যাশ"]];
+  if(p.note && p.kind!=="other") rows.push(["নোট",p.note]);
+  const W=1000, H=420+rows.length*70; cv.width=W; cv.height=H; const c=cv.getContext("2d");
+  c.textBaseline="alphabetic"; c.textAlign="left";
+  c.fillStyle="#fff"; c.fillRect(0,0,W,H);
+  const g=c.createLinearGradient(0,0,W,0); g.addColorStop(0,"#0b3d2e"); g.addColorStop(1,"#13294b");
+  c.fillStyle=g; c.fillRect(0,0,W,140); c.fillStyle="#f2b632"; c.fillRect(0,140,W,7);
+  try{ const lg = await loadImg("icon-192.png"); c.save(); c.beginPath(); c.arc(92,70,46,0,Math.PI*2); c.fillStyle="#fff"; c.fill(); c.clip(); c.drawImage(lg,46,24,92,92); c.restore(); }catch(e){}
+  c.fillStyle="#fff"; c.font='800 46px Poppins'; c.fillText(COACHING.name,160,72);
+  c.font='500 24px "Hind Siliguri"'; c.globalAlpha=.85; c.fillText("MONEY RECEIPT • টাকা প্রাপ্তির রসিদ",162,112); c.globalAlpha=1;
+  c.textAlign="right"; c.font='700 24px Poppins'; c.fillText(p.receipt_no||"",W-40,66);
+  c.font='500 22px "Hind Siliguri"'; c.fillText(fmtDate(p.paid_on),W-40,104); c.textAlign="left";
+  let y=210;
+  rows.forEach(([k,v])=>{
+    c.fillStyle="#6b7685"; c.font='500 25px "Hind Siliguri"'; c.fillText(k,50,y);
+    c.fillStyle="#1b2430"; fitText(c,String(v),W-260,30,600,'"Hind Siliguri"'); c.fillText(String(v),200,y);
+    c.strokeStyle="#e3e8ee"; c.lineWidth=2; c.beginPath(); c.moveTo(50,y+20); c.lineTo(W-50,y+20); c.stroke();
+    y+=70;
+  });
+  c.fillStyle="#e8f6ef"; rr(c,50,y-8,430,110,20); c.fill();
+  c.fillStyle="#6b7685"; c.font='500 22px "Hind Siliguri"'; c.fillText("মোট পরিশোধ",74,y+26);
+  c.fillStyle="#0b3d2e"; c.font='800 48px "Hind Siliguri"'; c.fillText(tk(p.amount),74,y+80);
+  c.save(); c.translate(W-190,y+46); c.rotate(-0.12);
+  c.strokeStyle="#1f9d6f"; c.lineWidth=5; rr(c,-140,-46,280,92,16); c.stroke();
+  c.fillStyle="#1f9d6f"; c.textAlign="center"; c.font='800 34px Poppins'; c.fillText("PAID ✓",0,-2);
+  c.font='600 22px "Hind Siliguri"'; c.fillText("পরিশোধিত",0,32); c.restore();
+  c.fillStyle="#e8f6ef"; c.fillRect(0,H-64,W,64); c.fillStyle="#0b3d2e"; c.textAlign="left";
+  const foot = COACHING.address+"  •  "+COACHING.phones; fitText(c,foot,W-80,21,500,'"Hind Siliguri"'); c.fillText(foot,40,H-26);
+}
+async function downloadReceipt(p){ const cv=document.createElement("canvas"); await drawReceipt(cv,p); cv.toBlob(b=>downloadBlob(b,"Receipt-"+p.receipt_no+".png"),"image/png"); }
+
+/* ---------------- অ্যাডমিন: বেতন ট্যাব ---------------- */
+let FB = null, FM = null, FOV = [], FVIEW = 0, REC = {}, REQ = {};
+const FEE_MSG_DEFAULT = "আসসালামু আলাইকুম।\nBIO NERDS থেকে জানানো হচ্ছে, {নাম} (রোল {রোল}, {ব্যাচ})-এর {মাস} মাসের বেতন {টাকা} এখনো বকেয়া আছে।\nঅনুগ্রহ করে দ্রুত পরিশোধ করবেন।\n— BIO NERDS, " + COACHING.whatsapp;
+function goFee(roll){ document.querySelectorAll("#admNav button").forEach(b=>b.classList.toggle("on", b.dataset.tab==="fees")); clearInterval(CHAT_TIMER); feeStu(roll); }
+async function loadFees(){ if(!FEES) FEES = await rpc("admin_fees_get",{p_token:TOKEN}); if(!FEES.batches) FEES.batches = {}; return FEES; }
+async function admFees(){
+  const my = ++FVIEW;
+  FB = FB || store.get("bn_att_batch") || COACHING.batches[0];
+  FM = FM || ymNow();
+  $("#admMain").innerHTML = `<div id="fReq"></div>
+    <div class="tabs" id="fB">${COACHING.batches.map(b=>`<button class="${b===FB?"on":""}" data-b="${esc(b)}">${esc(b)}</button>`).join("")}</div>
+    <div class="card"><div class="row between"><b>📅 মাস</b><input type="month" id="fM" value="${FM}" style="width:auto;padding:8px 10px"></div>
+      <div id="fSum" class="muted" style="margin-top:8px"></div></div>
+    <div class="card"><h3>💳 ${esc(FB)} — ${ymName(FM)}</h3>
+      <input id="fQ" placeholder="🔍 নাম বা রোল দিয়ে খোঁজো">
+      <div id="fList"><div class="spin"></div></div>
+      <p class="hint">কারো নামে ট্যাপ করলে তার বেতন এন্ট্রি, রসিদ আর পুরো হিসাব খুলবে।</p></div>
+    <div class="card" id="fDue"></div>
+    <div class="card" id="fSet"></div>
+    <div class="card" id="fRec"></div>`;
+  document.querySelectorAll("#fB button").forEach(b => b.onclick = () => { FB = b.dataset.b; admFees(); });
+  loadPayReqs();
+  $("#fM").onchange = e => { FM = e.target.value || ymNow(); admFees(); };
+  try{
+    await loadFees();
+    const ov = await rpc("admin_fee_overview",{p_token:TOKEN,p_batch:FB});
+    if(my !== FVIEW) return;
+    FOV = ov;
+  }catch(ex){ if(my===FVIEW) $("#fList").innerHTML = '<div class="err">'+esc(ex.message)+' — ভর্তি+বেতনের SQL চালানো হয়েছে তো?</div>'; return; }
+  paintFeeList(); paintFeeDue(); paintFeeSet(); paintFeeRec();
+  $("#fQ").oninput = paintFeeList;
+}
+function feeState(st, cfg){
+  const start = feeStart(st, cfg);
+  if(start && FM < start) return "na";
+  return paidSet(st.payments).has(FM) ? "paid" : "due";
+}
+function paintFeeList(){
+  const cfg = feeCfg(FB), q = ($("#fQ").value||"").toLowerCase();
+  let paid=0, due=0, got=0;
+  FOV.forEach(st => { const s = feeState(st,cfg); if(s==="paid") paid++; if(s==="due") due++;
+    st.payments.forEach(p => { if((p.months||[]).includes(FM)) got += p.amount/(p.months.length||1); }); });
+  $("#fSum").innerHTML = `✅ পরিশোধ <b>${bnNum(paid)}</b> জন • ❌ বকেয়া <b style="color:var(--red)">${bnNum(due)}</b> জন<br>${ymName(FM)}-এর বেতন বাবদ আদায়: <b>${tk(got)}</b>${cfg.monthly?` • মাসিক বেতন ${tk(cfg.monthly)}`:""}`;
+  const list = FOV.filter(s => !q || String(s.roll).includes(q) || (s.name||"").toLowerCase().includes(q));
+  $("#fList").innerHTML = list.length ? `<table class="tbl" style="margin-top:8px">` + list.map(st => {
+    const s = feeState(st,cfg), dl = dueList(st,cfg);
+    const p = st.payments.find(x => (x.months||[]).includes(FM));
+    return `<tr style="cursor:pointer" onclick="feeStu('${esc(st.roll)}')"><td><b>${esc(st.roll)}</b></td>
+      <td>${esc(st.name)||"<i>(নাম নেই)</i>"}${dl.length>1?`<div style="font-size:12px;color:var(--red)">মোট বকেয়া ${bnNum(dl.length)} মাস</div>`:""}</td>
+      <td style="text-align:right;white-space:nowrap">${s==="paid"?`<span class="chip">✅ ${tk(p.amount/(p.months.length||1))}</span>`:s==="due"?'<span class="chip" style="background:#fdeaea;color:var(--red)">❌ বকেয়া</span>':'<span class="muted" style="font-size:12px">ভর্তির আগে</span>'}</td></tr>`;
+  }).join("") + "</table>" : '<p class="muted" style="margin-top:10px">এই ব্যাচে কেউ নেই।</p>';
+}
+function paintFeeDue(){
+  const cfg = feeCfg(FB), dues = FOV.filter(st => feeState(st,cfg)==="due");
+  const tpl = store.get("bn_fee_msg") || FEE_MSG_DEFAULT;
+  if(!dues.length){ $("#fDue").innerHTML = `<h3>📲 বকেয়ার রিমাইন্ডার</h3><div class="muted">${ymName(FM)}-এ কারো বেতন বকেয়া নেই 🎉</div>`; return; }
+  const msgFor = st => { const dl = dueList(st,cfg,FM); return tpl.replace(/\{নাম\}/g,st.name||"").replace(/\{রোল\}/g,st.roll).replace(/\{ব্যাচ\}/g,st.batch||"")
+      .replace(/\{মাস\}/g, dl.map(ymName).join(", ")).replace(/\{টাকা\}/g, cfg.monthly ? "("+tk(cfg.monthly*dl.length)+")" : "").replace(/ +\n/g,"\n").replace(/  +/g," "); };
+  $("#fDue").innerHTML = `<h3>📲 বকেয়ার রিমাইন্ডার (${bnNum(dues.length)} জন)</h3>
+    <div class="muted" style="font-size:13px">বাবা/মায়ের নম্বরে মেসেজ লেখা অবস্থায় WhatsApp খুলবে, Send নিজে চাপতে হবে।</div>
+    <table class="tbl">${dues.map(st=>`<tr><td><b>${esc(st.name||st.roll)}</b><div class="muted" style="font-size:12px">${dueList(st,cfg,FM).map(ymShort).join(", ")}</div></td>
+      <td style="text-align:right">${waParentBtns(st, msgFor(st), "fee|"+FM+"|"+st.roll)}</td></tr>`).join("")}</table>
+    <details style="margin-top:10px"><summary class="muted">✏️ মেসেজ বদলাও</summary>
+      <textarea id="fMsg" style="font-family:inherit;min-height:130px">${esc(tpl)}</textarea>
+      <div class="hint">{নাম} {রোল} {ব্যাচ} {মাস} {টাকা} — এগুলো নিজে থেকে বসবে</div>
+      <div class="row"><button class="btn sm" onclick="store.set('bn_fee_msg',$('#fMsg').value);paintFeeDue();toast('সেভ হয়েছে ✅')">সেভ</button>
+      <button class="btn sm ghost" onclick="store.del('bn_fee_msg');paintFeeDue()">আগেরটা ফেরাও</button></div></details>`;
+}
+function paintFeeSet(){
+  const cfg = feeCfg(FB);
+  $("#fSet").innerHTML = `<details><summary><b>⚙️ ${esc(FB)} — বেতনের সেটিং</b></summary>
+    <label>মাসিক বেতন (টাকা)</label><input id="fsMon" inputmode="numeric" value="${esc(cfg.monthly||"")}" placeholder="যেমন 1000">
+    <label>ভর্তি ফি (টাকা)</label><input id="fsAdm" inputmode="numeric" value="${esc(cfg.admission||"")}" placeholder="যেমন 500">
+    <label>কোন মাস থেকে বেতন ধরা হবে</label><input type="month" id="fsStart" value="${esc(cfg.start||"")}">
+    <div class="hint">যার আলাদা শুরুর মাস দেওয়া নেই, তার বকেয়া এই মাস থেকে হিসাব হবে। অনলাইনে ভর্তি হওয়া স্টুডেন্টের শুরুর মাস = ভর্তির মাস।</div>
+    <button class="btn" id="fsSave">সেভ করো</button></details>`;
+  $("#fsSave").onclick = async () => {
+    const n = v => +String(v).replace(/[^\d.]/g,"") || null;
+    const v = JSON.parse(JSON.stringify(FEES));
+    v.batches[FB] = {monthly:n($("#fsMon").value), admission:n($("#fsAdm").value), start:$("#fsStart").value||null};
+    try{ await rpc("admin_fees_save",{p_token:TOKEN,p_value:v}); FEES = v; toast("সেটিং সেভ হয়েছে ✅"); admFees(); }catch(ex){ toast(ex.message); }
+  };
+}
+function paintFeeRec(){
+  const all = []; FOV.forEach(st => st.payments.forEach(p => all.push({...p, name:st.name, batch:st.batch})));
+  all.sort((a,b) => (b.paid_on+String(b.id).padStart(8,"0")).localeCompare(a.paid_on+String(a.id).padStart(8,"0")));
+  all.forEach(p => REC[p.id] = p);
+  $("#fRec").innerHTML = `<h3>🧾 সাম্প্রতিক রসিদ — ${esc(FB)}</h3>` + (all.length ? `<table class="tbl">${all.slice(0,20).map(p=>`<tr>
+      <td><b>${esc(p.name||p.roll)}</b><div class="muted" style="font-size:12px">${esc(p.receipt_no)} • ${fmtShort(p.paid_on)}<br>${esc(payFor(p))}</div></td>
+      <td style="text-align:right;white-space:nowrap"><b>${tk(p.amount)}</b><br><button class="btn sm sec" style="margin-top:4px" onclick="downloadReceipt(REC[${p.id}])">🧾</button></td></tr>`).join("")}</table>`
+    : '<div class="muted">এখনো কোনো পেমেন্ট এন্ট্রি হয়নি।</div>');
+}
+
+async function loadPayReqs(){
+  let list; try{ list = await rpc("admin_pay_requests",{p_token:TOKEN,p_status:"pending"}); }catch(e){ return; }
+  setBadge("#admNav","fees",list.length);
+  const box = $("#fReq"); if(!box) return;
+  if(!list.length){ box.innerHTML = ""; return; }
+  list.forEach(q => REQ[q.id] = q);
+  box.innerHTML = `<div class="card" style="border-left:5px solid #e2136e"><h3>📲 বিকাশ/নগদে জমা — নিশ্চিত করো (${bnNum(list.length)})</h3>
+    <div class="muted" style="font-size:13px">বিকাশ/নগদ অ্যাপে টাকা এসেছে কিনা TrxID আর টাকার পরিমাণ মিলিয়ে দেখো, তারপর নিশ্চিত করো।</div>
+    ${list.map(q=>`<div style="border-top:1px solid var(--line);padding:10px 0 4px;margin-top:10px">
+      <div class="row between"><b>${esc(q.name||q.roll)}</b><span class="paynum" style="border:0;padding:0;margin:0"><span class="tag ${esc(q.method)}">${METHOD[q.method]||q.method}</span></span></div>
+      <div class="muted" style="font-size:13px">রোল ${esc(q.roll)} • ${esc(q.batch||"")}<br>${esc(payFor(q))}<br>প্রেরক: ${esc(q.sender||"-")} • ${fmtTime(q.created_at)}</div>
+      <div class="row" style="margin-top:6px;flex-wrap:wrap"><b style="font-size:21px;font-family:Poppins">${tk(q.amount)}</b>
+        <span class="chip" style="cursor:pointer" onclick="copyText('${esc(q.trx_id)}')">TrxID ${esc(q.trx_id)} 📋</span></div>
+      <div class="row" style="margin-top:8px"><button class="btn sm" onclick="confirmReq(${q.id})">✅ টাকা পেয়েছি</button><button class="btn sm danger" onclick="rejectReq(${q.id})">বাতিল</button></div></div>`).join("")}</div>`;
+}
+async function confirmReq(id){
+  const q = REQ[id]; if(!confirm(`${q.name||q.roll} — ${METHOD[q.method]} ${tk(q.amount)}\nTrxID ${q.trx_id}\n\nটাকা পেয়েছ? নিশ্চিত করলে রসিদ তৈরি হবে।`)) return;
+  try{ const p = await rpc("admin_pay_request_confirm",{p_token:TOKEN,p_id:id}); refreshBadge(); FVIEW++; showReceipt(p); }catch(ex){ toast(ex.message, 4000); }
+}
+async function rejectReq(id){
+  if(!confirm("এই জমাটা বাতিল করবে? (TrxID না মিললে) — স্টুডেন্ট দেখবে “বাতিল হয়েছে”।")) return;
+  try{ await rpc("admin_pay_request_reject",{p_token:TOKEN,p_id:id}); loadPayReqs(); }catch(ex){ toast(ex.message); }
+}
+
+/* এক স্টুডেন্টের বেতন: এন্ট্রি, রসিদ, হিসাব */
+async function feeStu(roll){
+  const my = ++FVIEW;
+  window.scrollTo(0,0);
+  $("#admMain").innerHTML = '<div class="spin"></div>';
+  let st;
+  try{
+    await loadFees();
+    const all = await rpc("admin_fee_overview",{p_token:TOKEN,p_batch:""});
+    st = all.find(s => String(s.roll) === String(roll));
+  }catch(ex){ $("#admMain").innerHTML = '<div class="err">'+esc(ex.message)+' — ভর্তি+বেতনের SQL চালানো হয়েছে তো?</div>'; return; }
+  if(my !== FVIEW) return;
+  if(!st){ $("#admMain").innerHTML = '<div class="err">রোল '+esc(roll)+' পাওয়া যায়নি</div>'; return; }
+  const cfg = feeCfg(st.batch), now = ymNow(), start = feeStart(st,cfg), paid = paidSet(st.payments);
+  let from = start || ymAdd(now,-2); if(from < ymAdd(now,-23)) from = ymAdd(now,-23); if(from > now) from = now;
+  const months = ymRange(from, ymAdd(now,2)), dl = dueList(st,cfg);
+  const sel = new Set(dl.length ? [dl[0]] : (paid.has(now) ? [] : [now]));
+  st.payments.forEach(p => REC[p.id] = {...p, name:st.name, batch:st.batch});
+  $("#admMain").innerHTML = `
+    <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="admTab('fees')">← বেতন</button><b>💳 বেতনের হিসাব</b></div>
+    <div class="card"><b style="font-size:18px">${esc(st.name||"(নাম নেই)")}</b><div class="muted">রোল ${esc(st.roll)} • ${esc(st.batch||"-")}</div>
+      <div style="margin-top:8px">${dl.length ? `<span style="color:var(--red);font-weight:700">বকেয়া ${bnNum(dl.length)} মাস: ${dl.map(ymShort).join(", ")}</span>` : '<span style="color:var(--g3);font-weight:700">✅ কোনো বকেয়া নেই</span>'}</div></div>
+    <div class="card"><h3>➕ টাকা জমা নাও</h3>
+      <label>কিসের টাকা</label>
+      <select id="pKind"><option value="monthly">মাসিক বেতন</option><option value="admission">ভর্তি ফি</option><option value="other">অন্যান্য</option></select>
+      <div id="pMonWrap"><label>কোন মাসের (একাধিক বাছাই করা যায়)</label>
+        <div class="mchips" id="pMon">${months.map(m=>`<button type="button" data-m="${m}" class="${paid.has(m)?"paid":((start&&m<start)||m>now?"":"due")+(sel.has(m)?" sel":"")}" ${paid.has(m)?"disabled":""}>${ymShort(m)}${paid.has(m)?" ✓":""}</button>`).join("")}</div></div>
+      <label>টাকার পরিমাণ</label><input id="pAmt" inputmode="numeric" placeholder="টাকা">
+      <div class="row" style="gap:8px">
+        <div style="flex:1"><label>তারিখ</label><input type="date" id="pDate" value="${todayBD()}"></div>
+        <div style="flex:1"><label>মাধ্যম</label><select id="pMeth">${Object.entries(METHOD).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></div></div>
+      <label>নোট (ঐচ্ছিক)</label><input id="pNote" maxlength="120" placeholder="যেমন: আংশিক পরিশোধ">
+      <button class="btn" id="pSave">💾 সেভ করো ও রসিদ বানাও</button>
+      <div class="hint">সবুজ ✓ = পরিশোধিত, লাল = বকেয়া। মাস বাছাই করলে টাকা নিজে থেকে বসবে।</div></div>
+    <div class="card"><h3>🧾 সব রসিদ</h3>${st.payments.length ? `<table class="tbl">${st.payments.map(p=>`<tr>
+        <td><b>${tk(p.amount)}</b> <span class="muted" style="font-size:12px">${esc(METHOD[p.method]||p.method)}</span><div class="muted" style="font-size:12px">${esc(p.receipt_no)} • ${fmtShort(p.paid_on)}<br>${esc(payFor(p))}</div></td>
+        <td style="text-align:right;white-space:nowrap"><button class="btn sm sec" onclick="downloadReceipt(REC[${p.id}])">🧾</button> <button class="btn sm danger" onclick="delPay(${p.id},'${esc(st.roll)}')">🗑</button></td></tr>`).join("")}</table>`
+      : '<div class="muted">এখনো কোনো পেমেন্ট নেই।</div>'}</div>
+    <div class="card"><details><summary class="muted">⚙️ এই স্টুডেন্টের বেতন শুরুর মাস</summary>
+      <input type="month" id="pFrom" value="${esc(st.fee_from||"")}" style="margin-top:10px">
+      <div class="hint">খালি রাখলে ব্যাচের শুরুর মাস (${cfg.start?ymName(cfg.start):"সেট করা নেই"}) ধরা হবে।</div>
+      <button class="btn sec" id="pFromSave">সেভ</button></details></div>`;
+  const kind = () => $("#pKind").value;
+  const setAmt = () => {
+    if(kind()==="monthly") $("#pAmt").value = cfg.monthly ? cfg.monthly*sel.size : "";
+    else if(kind()==="admission") $("#pAmt").value = cfg.admission || "";
+    else $("#pAmt").value = "";
+  };
+  document.querySelectorAll("#pMon button").forEach(b => b.onclick = () => {
+    const m = b.dataset.m; if(sel.has(m)){ sel.delete(m); b.classList.remove("sel"); } else { sel.add(m); b.classList.add("sel"); } setAmt(); });
+  $("#pKind").onchange = () => { $("#pMonWrap").classList.toggle("hidden", kind()!=="monthly"); setAmt(); };
+  setAmt();
+  $("#pSave").onclick = async () => {
+    const amt = +String($("#pAmt").value).replace(/[^\d.]/g,"");
+    if(!amt){ toast("টাকার পরিমাণ দাও"); return; }
+    const ms = [...sel].sort();
+    if(kind()==="monthly" && !ms.length){ toast("কোন মাসের বেতন, বেছে নাও"); return; }
+    const b = $("#pSave"); b.disabled = true;
+    try{
+      const p = await rpc("admin_pay_add",{p_token:TOKEN,p_roll:st.roll,p_kind:kind(),p_months:kind()==="monthly"?ms:[],p_amount:amt,
+        p_paid_on:$("#pDate").value||todayBD(),p_method:$("#pMeth").value,p_note:$("#pNote").value.trim()||null});
+      showReceipt(p);
+    }catch(ex){ toast(ex.message); b.disabled = false; }
+  };
+  $("#pFromSave").onclick = async () => {
+    try{ await rpc("admin_set_fee_from",{p_token:TOKEN,p_roll:st.roll,p_month:$("#pFrom").value||""}); toast("সেভ হয়েছে ✅"); feeStu(st.roll); }catch(ex){ toast(ex.message); }
+  };
+}
+async function showReceipt(p){
+  REC[p.id] = p;
+  window.scrollTo(0,0);
+  $("#admMain").innerHTML = `
+    <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="feeStu('${esc(p.roll)}')">← ${esc(p.name)}</button><b>🧾 রসিদ তৈরি হয়েছে</b></div>
+    <canvas id="rcCv" class="preview"></canvas>
+    <button class="btn" onclick="saveCanvas('rcCv','Receipt-${esc(p.receipt_no)}.png')">⬇️ রসিদ ডাউনলোড</button>
+    <div class="card" style="margin-top:14px"><h3>📲 WhatsApp-এ রসিদ পাঠাও</h3>
+      <div class="muted" style="font-size:13px;margin-bottom:6px">রসিদের লেখা মেসেজে বসানো থাকবে (Send নিজে চাপতে হবে)। ছবিটাও পাঠাতে চাইলে আগে ডাউনলোড করে নাও।</div>
+      ${waBtns(p, receiptText(p), "rc"+p.id)}</div>
+    <button class="btn sec" onclick="feeStu('${esc(p.roll)}')">➕ আরেকটা এন্ট্রি</button>
+    <button class="btn ghost" onclick="admTab('fees')">← বেতনের তালিকা</button>`;
+  await drawReceipt($("#rcCv"), p);
+  toast("সেভ হয়েছে ✅");
+}
+async function delPay(id, roll){
+  if(!confirm("এই পেমেন্টটা মুছবে? (ভুল এন্ট্রি হলে)")) return;
+  try{ await rpc("admin_pay_delete",{p_token:TOKEN,p_id:id}); toast("মুছে ফেলা হয়েছে"); feeStu(roll); }catch(ex){ toast(ex.message); }
+}
+
+/* ---------------- স্টুডেন্ট: আমার বেতন ---------------- */
+let MYFEE = null;
+async function stuFeeLoad(){ MYFEE = await rpc("my_fees",{p_token:TOKEN}); MYFEE.payments.forEach(p => REC[p.id] = {...p, name:MYFEE.name, batch:MYFEE.batch}); return MYFEE; }
+async function stuFeeMini(){
+  try{
+    const f = await stuFeeLoad(), dl = dueList(f, f.fee||{});
+    if(dl.length && $("#feeMini")) $("#feeMini").innerHTML = `<div class="card" style="border-left:5px solid var(--red);cursor:pointer" onclick="stuTab('id')">
+      <b>💳 বকেয়া বেতন: ${dl.map(ymShort).join(", ")}</b><div class="muted">বিস্তারিত ও রসিদ “আইডি” ট্যাবে</div></div>`;
+  }catch(e){}
+}
+async function stuFees(){
+  const box = $("#feeBox"); if(!box) return;
+  try{
+    const f = await stuFeeLoad(), cfg = f.fee || {}, now = ymNow(), start = feeStart(f,cfg), paid = paidSet(f.payments), dl = dueList(f,cfg);
+    let from = start || now; if(from < ymAdd(now,-11)) from = ymAdd(now,-11); if(from > now) from = now;
+    const months = ymRange(from, now);
+    [...paid].filter(m => m > now).sort().forEach(m => months.push(m));   // আগাম দেওয়া মাস
+    const reqs = (f.requests||[]).filter(r => r.status==="pending" || Date.now()-new Date(r.decided_at||r.created_at) < 14*864e5);
+    const pend = new Set(); reqs.filter(r=>r.status==="pending").forEach(r => (r.months||[]).forEach(m => pend.add(m)));
+    box.innerHTML = `<div class="card" style="margin-top:14px"><h3>💳 আমার বেতন</h3>
+      ${dl.length ? `<div style="color:var(--red);font-weight:700">বকেয়া: ${dl.map(ymName).join(", ")}${cfg.monthly?" ("+tk(cfg.monthly*dl.length)+")":""}</div>` : '<div style="color:var(--g3);font-weight:700">✅ সব বেতন পরিশোধিত</div>'}
+      <div class="mchips" style="margin-top:10px">${months.map(m=>`<button type="button" disabled class="${paid.has(m)?"paid":pend.has(m)?"":"due"}">${ymShort(m)}${paid.has(m)?" ✓":pend.has(m)?" ⏳":""}</button>`).join("")}</div>
+      ${reqs.map(r=>`<div style="margin-top:10px;padding:10px 12px;border-radius:12px;background:${r.status==="pending"?"#fff8e6":"#fdeaea"}">
+        <b>${r.status==="pending"?"⏳ যাচাই চলছে":"❌ বাতিল হয়েছে — কোচিংয়ে যোগাযোগ করো"}</b>
+        <div class="muted" style="font-size:13px">${METHOD[r.method]||r.method} ${tk(r.amount)} • TrxID ${esc(r.trx_id)}<br>${esc(payFor(r))}</div></div>`).join("")}
+      ${PAY_METHODS().length ? `<button class="btn" style="background:#e2136e" onclick="stuPayForm()">📲 বিকাশ/নগদে টাকা দাও</button>` : ""}
+      ${f.payments.length ? `<div class="sec-title" style="font-size:16px;margin-top:14px">🧾 রসিদ</div><table class="tbl">${f.payments.map(p=>`<tr>
+        <td><b>${tk(p.amount)}</b><div class="muted" style="font-size:12px">${esc(p.receipt_no)} • ${fmtShort(p.paid_on)}<br>${esc(payFor(p))}</div></td>
+        <td style="text-align:right"><button class="btn sm sec" onclick="downloadReceipt(REC[${p.id}])">⬇️ রসিদ</button></td></tr>`).join("")}</table>` : ""}
+    </div>`;
+  }catch(e){ box.innerHTML = ""; }
+}
+
+function stuPayForm(){
+  const f = MYFEE, cfg = f.fee || {}, now = ymNow(), paid = paidSet(f.payments), pend = new Set();
+  (f.requests||[]).filter(r => r.status==="pending").forEach(r => (r.months||[]).forEach(m => pend.add(m)));
+  const dl = dueList(f,cfg).filter(m => !pend.has(m));
+  const cand = [...new Set([...dl, now, ymAdd(now,1), ymAdd(now,2)])].filter(m => !paid.has(m) && !pend.has(m)).sort();
+  const sel = new Set(cand.slice(0,1)); let method = PAY_METHODS()[0];
+  $("#feeBox").innerHTML = `<div class="card" style="margin-top:14px"><h3>📲 বিকাশ/নগদে টাকা দাও</h3>
+    <div class="mbtn" id="spM">${PAY_METHODS().map(m=>`<button type="button" class="${m} ${m===method?"on":""}" data-m="${m}">${METHOD[m]}</button>`).join("")}</div>
+    <div id="spNum"></div>
+    <label>কিসের টাকা</label>
+    <select id="spKind"><option value="monthly">মাসিক বেতন</option><option value="admission">ভর্তি ফি</option><option value="other">অন্যান্য</option></select>
+    <div id="spMonW"><label>কোন মাসের (একাধিক বাছাই করা যায়)</label>
+      <div class="mchips" id="spMon">${cand.map(m=>`<button type="button" data-m="${m}" class="${dl.includes(m)?"due":""}${sel.has(m)?" sel":""}">${ymShort(m)}</button>`).join("")}</div></div>
+    <label>কত টাকা পাঠিয়েছ</label><input id="spAmt" inputmode="numeric" placeholder="টাকা">
+    <label>কোন নম্বর থেকে পাঠিয়েছ</label><input id="spSender" inputmode="tel" placeholder="01XXXXXXXXX" value="${esc(ME&&ME.phone||"")}">
+    <label>TrxID</label><input id="spTrx" autocapitalize="characters" autocomplete="off" placeholder="যেমন 8N7A6XK2QP">
+    <button class="btn" id="spGo">✅ জমা দাও</button>
+    <button class="btn ghost" onclick="stuFees()">বাতিল</button>
+    <p class="hint">কোচিং থেকে TrxID মিলিয়ে নিশ্চিত করলে এখানেই রসিদ পাবে।</p></div>`;
+  const kind = () => $("#spKind").value;
+  const setAmt = () => { $("#spAmt").value = kind()==="monthly" ? (cfg.monthly ? cfg.monthly*sel.size : "") : kind()==="admission" ? (cfg.admission||"") : ""; };
+  const paintNum = () => { $("#spNum").innerHTML = payNumHtml(method); };
+  document.querySelectorAll("#spM button").forEach(b => b.onclick = () => { method = b.dataset.m; document.querySelectorAll("#spM button").forEach(x => x.classList.toggle("on", x===b)); paintNum(); });
+  document.querySelectorAll("#spMon button").forEach(b => b.onclick = () => { const m = b.dataset.m; sel.has(m) ? sel.delete(m) : sel.add(m); b.classList.toggle("sel", sel.has(m)); setAmt(); });
+  $("#spKind").onchange = () => { $("#spMonW").classList.toggle("hidden", kind()!=="monthly"); setAmt(); };
+  paintNum(); setAmt();
+  $("#spGo").onclick = async () => {
+    const amt = +$("#spAmt").value.replace(/[^\d.]/g,""), trx = $("#spTrx").value.trim().replace(/\s/g,"");
+    if(!amt){ toast("কত টাকা পাঠিয়েছ, লেখো"); return; }
+    if(kind()==="monthly" && !sel.size){ toast("কোন মাসের বেতন, বেছে নাও"); return; }
+    if(!/^[A-Za-z0-9]{6,20}$/.test(trx)){ toast("TrxID ঠিকভাবে লেখো (মেসেজে যেটা আসে)"); return; }
+    const b = $("#spGo"); b.disabled = true;
+    try{
+      await rpc("submit_payment",{p_token:TOKEN,p_method:method,p_sender:$("#spSender").value.replace(/[^\d+]/g,""),p_trx:trx,p_amount:amt,p_kind:kind(),p_months:kind()==="monthly"?[...sel].sort():[]});
+      toast("জমা হয়েছে ✅ যাচাইয়ের পর রসিদ পাবে", 3500); stuFees();
+    }catch(ex){ toast(ex.message, 3500); b.disabled = false; }
+  };
+  $("#feeBox").scrollIntoView({behavior:"smooth"});
 }
 
 /* ---------------- শুরু ---------------- */
