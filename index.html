@@ -30,7 +30,8 @@ const COACHING = {
   tagline: "Biology Care for HSC & SSC",
   address: "আকবর প্যালেস, কর ভবনের বিপরীতে, শর্মা ক্লিনিকের পাশে, কান্দিরপাড়, কুমিল্লা",
   phones: "01956126878, 01913314303",
-  whatsapp: "01913314303"
+  whatsapp: "01913314303",
+  batches: ["HSC'27", "HSC'28", "SSC'27", "SSC'28"]   // হাজিরা ও আইডি কার্ডের ব্যাচ
 };
 </script>
 <style>
@@ -218,6 +219,23 @@ nav.bottom button{position:relative}
 .rate{display:flex;gap:4px;font-size:28px;margin:4px 0}
 .rate span{cursor:pointer;color:#d6dbe1}
 .rate span.on{color:var(--gold)}
+/* হাজিরা */
+.att-sum{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 0}
+.att-row{display:flex;align-items:center;gap:10px;width:100%;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 10px;margin:6px 0;text-align:left;cursor:pointer;font:inherit;color:var(--ink)}
+.att-row .av{width:36px;height:36px;border-radius:50%;background:var(--mint);color:var(--g);display:grid;place-items:center;font-weight:700;flex:none}
+.att-row .nm{flex:1;min-width:0}.att-row .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.att-row .st{font-weight:700;font-size:13px;border-radius:20px;padding:4px 10px;background:var(--mint);color:var(--g2);white-space:nowrap}
+.att-row.ab{border-color:#f3b4b4;background:#fff6f6}.att-row.ab .av{background:#fdeaea;color:var(--red)}.att-row.ab .st{background:var(--red);color:#fff}
+.dots{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.dots span{width:14px;height:14px;border-radius:50%;background:var(--g3)}.dots span.x{background:var(--red)}
+.idgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.idgrid canvas{width:100%;height:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer}
+#printArea{display:none}
+@media print{
+  @page{size:A4;margin:10mm}
+  body{background:#fff!important}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:grid!important;grid-template-columns:repeat(2,85.6mm);gap:5mm 6mm;justify-content:center}
+  #printArea img{width:85.6mm;height:54mm;outline:.2mm dashed #bbb;break-inside:avoid;page-break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -309,6 +327,7 @@ nav.bottom button{position:relative}
   <main id="admMain"></main>
   <nav class="bottom" id="admNav">
     <button data-tab="students" class="on"><i>👥</i>স্টুডেন্ট</button>
+    <button data-tab="att"><i>✅</i>হাজিরা</button>
     <button data-tab="exams"><i>📝</i>পরীক্ষা</button>
     <button data-tab="anotices"><i>📢</i>নোটিশ</button>
     <button data-tab="amsg"><i>💬</i>মেসেজ</button>
@@ -392,7 +411,7 @@ $("#pwForm").onsubmit = async e => {
 };
 $("#pwCancel").onclick = () => PW_FORCED ? logout() : start();
 
-function start(){ if(ROLE==="admin"){ show("admView"); admTab("students"); refreshBadge(); } else { show("stuView"); loadStudent(); } }
+function start(){ if(ROLE==="admin"){ show("admView"); admTab("students"); refreshBadge(); attFlush(); } else { show("stuView"); loadStudent(); } }
 
 /* ---------------- স্টুডেন্ট ---------------- */
 document.querySelectorAll("#stuNav button").forEach(b => b.onclick = () => stuTab(b.dataset.tab));
@@ -448,6 +467,7 @@ async function stuHome(){
       <div class="stat"><b>${n?avg+"%":"-"}</b><span>গড় নম্বর</span></div>
       <div class="stat"><b>${n?"#"+best:"-"}</b><span>সেরা র‍্যাংক</span></div>
     </div>
+    <div id="attCard"></div>
     <div class="sec-title">সর্বশেষ রেজাল্ট</div>
     ${n ? resultCard(RESULTS[0]) : '<div class="card muted">এখনো কোনো রেজাল্ট আসেনি। পরীক্ষার পর এখানে দেখতে পাবে।</div>'}
     <div id="homeNotice"></div>
@@ -480,6 +500,7 @@ async function stuHome(){
     try{ await rpc("submit_feedback",{p_token:TOKEN,p_body:v,p_rating:rating}); $("#fbBody").value=""; toast("ধন্যবাদ! মতামত পাঠানো হয়েছে ✅"); }
     catch(ex){ toast(ex.message); }
   };
+  stuAttCard();
   try{
     const ns = await rpc("get_notices",{p_token:TOKEN});
     if(ns.length) $("#homeNotice").innerHTML = '<div class="sec-title">নতুন নোটিশ</div>' + noticeCard(ns[0]);
@@ -579,16 +600,16 @@ function loadImg(src){ return new Promise((ok,no)=>{ const i=new Image(); i.onlo
 async function fontsReady(){ try{ await Promise.all([document.fonts.load('700 40px "Hind Siliguri"'),document.fonts.load('800 40px Poppins'),document.fonts.load('500 30px "Hind Siliguri"')]); }catch(e){} }
 function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 function fitText(ctx,text,maxW,size,weight,family){ do{ ctx.font=`${weight} ${size}px ${family}`; size-=2; }while(ctx.measureText(text).width>maxW && size>14); }
-async function drawPhoto(ctx, x, y, size, round){
+async function drawPhoto(ctx, x, y, size, round, st=ME){
   ctx.save();
   if(round){ ctx.beginPath(); ctx.arc(x+size/2,y+size/2,size/2,0,Math.PI*2); ctx.clip(); } else { rr(ctx,x,y,size,size*1.2,18); ctx.clip(); }
   const h = round?size:size*1.2;
-  if(ME.photo){ const img = await loadImg(ME.photo); const s=Math.min(img.width,img.height*size/h);
+  if(st.photo){ const img = await loadImg(st.photo); const s=Math.min(img.width,img.height*size/h);
     ctx.drawImage(img,(img.width-s)/2,0,s,s*h/size,x,y,size,h); }
-  else { ctx.fillStyle="#dfe9e4"; ctx.fillRect(x,y,size,h); ctx.fillStyle="#13684c"; ctx.font=`700 ${size/2.4}px "Hind Siliguri"`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText((ME.name||"?").trim().charAt(0),x+size/2,y+h/2); }
+  else { ctx.fillStyle="#dfe9e4"; ctx.fillRect(x,y,size,h); ctx.fillStyle="#13684c"; ctx.font=`700 ${size/2.4}px "Hind Siliguri"`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText((st.name||"?").trim().charAt(0),x+size/2,y+h/2); }
   ctx.restore();
 }
-async function drawId(cv){
+async function drawId(cv, st=ME){
   await fontsReady();
   const W=1012,H=640; cv.width=W; cv.height=H; const c=cv.getContext("2d");
   c.textAlign="left"; c.textBaseline="alphabetic";
@@ -601,13 +622,13 @@ async function drawId(cv){
   c.font='500 26px "Hind Siliguri"'; c.globalAlpha=.85; c.fillText("STUDENT ID CARD • "+COACHING.tagline,50,124); c.globalAlpha=1;
   c.fillStyle="#13684c"; c.globalAlpha=.06; c.beginPath(); c.arc(W-60,H-40,260,0,Math.PI*2); c.fill(); c.globalAlpha=1;
   c.fillStyle="#13684c"; rr(c,44,192,236,290,22); c.fill();
-  await drawPhoto(c,52,200,220,false);
+  await drawPhoto(c,52,200,220,false,st);
   const x=320; c.fillStyle="#1b2430";
-  fitText(c,ME.name,W-x-40,50,700,'"Hind Siliguri"'); c.fillText(ME.name,x,245);
-  const rows=[["রোল",ME.roll],["ব্যাচ",ME.batch||"-"],["প্রতিষ্ঠান",ME.institution||"-"],["ক্লাস",ME.class_name||"-"],["মোবাইল",ME.phone||"-"]];
+  fitText(c,st.name,W-x-40,50,700,'"Hind Siliguri"'); c.fillText(st.name,x,245);
+  const rows=[["রোল",st.roll],["ব্যাচ",st.batch||"-"],["প্রতিষ্ঠান",st.institution||"-"],["ক্লাস",st.class_name||"-"],["মোবাইল",st.phone||"-"]];
   rows.forEach((r,i)=>{ const y=305+i*45; c.font='500 26px "Hind Siliguri"'; c.fillStyle="#6b7685"; c.fillText(r[0],x,y);
     c.fillStyle="#1b2430"; fitText(c,String(r[1]),W-x-200,30,600,'"Hind Siliguri"'); c.fillText(String(r[1]),x+170,y); });
-  c.fillStyle="#13684c"; rr(c,x,512,260,54,14); c.fill(); c.fillStyle="#fff"; c.font='800 30px Poppins'; c.fillText("ROLL "+ME.roll,x+22,549);
+  c.fillStyle="#13684c"; rr(c,x,512,260,54,14); c.fill(); c.fillStyle="#fff"; c.font='800 30px Poppins'; c.fillText("ROLL "+st.roll,x+22,549);
   c.fillStyle="#e8f6ef"; c.fillRect(0,H-62,W,62); c.fillStyle="#0b3d2e"; fitText(c,COACHING.address+"  •  "+COACHING.phones,W-80,22,500,'"Hind Siliguri"'); c.fillText(COACHING.address+"  •  "+COACHING.phones,40,H-24);
   c.restore();
 }
@@ -725,7 +746,7 @@ function admTab(t){
   document.querySelectorAll("#admNav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
   window.scrollTo(0,0);
   clearInterval(CHAT_TIMER);
-  ({students:admStudents, exams:admExams, anotices:admNotices, settings:admSettings, amsg:admMsg, ahome:admHome})[t]();
+  ({students:admStudents, att:admAtt, exams:admExams, anotices:admNotices, settings:admSettings, amsg:admMsg, ahome:admHome})[t]();
 }
 function parseLines(text){
   return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>l.split(/\t|,|;/).map(x=>x.trim()));
@@ -739,6 +760,8 @@ async function admStudents(){
       <button class="btn" id="sAdd">সেভ করো</button><div id="sMsg"></div>
       <p class="hint">শুরুর পাসওয়ার্ড = ফোন নম্বরের শেষ ৬ ডিজিট (ফোন না থাকলে রোলটাই পাসওয়ার্ড)। একই রোল আবার দিলে নাম/তথ্য আপডেট হবে।</p>
     </div>
+    <div class="card"><h3>🪪 সব স্টুডেন্টের আইডি কার্ড</h3><div class="muted">ব্যাচ ধরে সবার আইডি কার্ড (ছবিসহ) দেখো, ডাউনলোড বা একসাথে প্রিন্ট করো।</div>
+      <button class="btn sec" onclick="admIdCards()">🪪 আইডি কার্ড দেখো / প্রিন্ট করো</button></div>
     <div class="card"><div class="row between"><h3 style="margin:0">👥 সব স্টুডেন্ট <span id="sCount" class="chip"></span></h3></div>
       <input id="sSearch" placeholder="🔍 নাম বা রোল দিয়ে খোঁজো" style="margin-top:10px">
       <div id="sList"><div class="spin"></div></div></div>`;
@@ -758,7 +781,7 @@ async function admStudents(){
   loadStu();
 }
 async function loadStu(){
-  try{ STU = await rpc("admin_students",{p_token:TOKEN}); paintStu(); }
+  try{ STU = await rpc("admin_students",{p_token:TOKEN}); cacheStu(); paintStu(); }
   catch(ex){ $("#sList").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
 }
 function paintStu(){
@@ -1043,9 +1066,205 @@ async function loadFb(){
 async function setFb(id,ok){ try{ await rpc("admin_feedback_set",{p_token:TOKEN,p_id:id,p_approved:ok}); HOME=null; loadFb(); }catch(ex){ toast(ex.message); } }
 async function delFb(id){ if(!confirm("মতামতটা মুছবে?")) return; try{ await rpc("admin_feedback_delete",{p_token:TOKEN,p_id:id}); HOME=null; loadFb(); }catch(ex){ toast(ex.message); } }
 
+/* ---------------- হাজিরা (অ্যাটেনডেন্স) ---------------- */
+const todayBD = () => new Date(Date.now() + 6*3600e3).toISOString().slice(0,10);   // বাংলাদেশ সময়ের আজকের তারিখ
+const ATT_MSG_DEFAULT = "আসসালামু আলাইকুম।\nBIO NERDS থেকে জানানো হচ্ছে, {তারিখ} আপনার সন্তান {নাম} (রোল {রোল}, {ব্যাচ}) ক্লাসে আসেনি।\nকোনো সমস্যা থাকলে অনুগ্রহ করে আমাদের জানাবেন।\n— BIO NERDS, " + COACHING.whatsapp;
+const ATT = { batch: null, date: null, absent: new Set() };
+function cacheStu(){ try{ store.set("bn_stu_cache", JSON.stringify(STU.map(({photo,...x})=>x))); }catch(e){} }
+async function getStu(){
+  try{ STU = await rpc("admin_students",{p_token:TOKEN}); cacheStu(); }
+  catch(ex){ if(!STU.length){ try{ STU = JSON.parse(store.get("bn_stu_cache")||"[]"); }catch(e){} } if(!STU.length) throw ex; }
+  return STU;
+}
+const attQueue = () => { try{ return JSON.parse(store.get("bn_att_queue")||"[]"); }catch(e){ return []; } };
+const setAttQueue = q => store.set("bn_att_queue", JSON.stringify(q));
+const isNetErr = ex => String(ex && ex.message).startsWith("ইন্টারনেট");
+async function attFlush(){
+  let q = attQueue(), sent = 0; if(!q.length || !TOKEN || ROLE!=="admin") return;
+  for(const it of [...q]){
+    try{ await rpc("admin_att_save",{p_token:TOKEN,p_batch:it.batch,p_date:it.date,p_absent:it.absent}); sent++;
+      q = attQueue().filter(x=>!(x.batch===it.batch && x.date===it.date)); setAttQueue(q); }
+    catch(ex){ if(isNetErr(ex)) break; }
+  }
+  if(sent){ toast("📶 অফলাইনে নেওয়া "+sent+"টা হাজিরা সার্ভারে পাঠানো হয়েছে ✅"); if($("#attPending")) paintAttPending(); }
+}
+window.addEventListener("online", () => setTimeout(attFlush, 1500));
+function attMsgFor(st, date){
+  const tpl = store.get("bn_att_msg") || ATT_MSG_DEFAULT;
+  const d = date===todayBD() ? "আজ" : fmtDate(date)+" তারিখে";
+  return tpl.replace(/\{তারিখ\}/g,d).replace(/\{নাম\}/g,st.name||"").replace(/\{রোল\}/g,st.roll).replace(/\{ব্যাচ\}/g,st.batch||"");
+}
+function parentNums(st){
+  const out=[]; [["বাবা",st.father_phone],["মা",st.mother_phone]].forEach(([l,n])=>{
+    const d=String(n||"").replace(/\D/g,""); if(d.length>=10){ const p="880"+d.slice(-10); if(!out.some(x=>x.p===p)) out.push({l,p}); } });
+  if(!out.length){ const d=String(st.phone||"").replace(/\D/g,""); if(d.length>=10) out.push({l:"ছাত্র (অভিভাবকের নম্বর নেই)",p:"880"+d.slice(-10)}); }
+  return out;
+}
+function waParentBtns(st, text, key){
+  return parentNums(st).map(n=>{ const k=key+"|"+n.p, done=WA_SENT[k];
+    return `<a class="wa" style="display:inline-block;margin:2px 0;${done?"background:#9aa5b1":""}" target="_blank" rel="noopener" data-k="${esc(k)}" onclick="markSent(this)" href="https://wa.me/${n.p}?text=${encodeURIComponent(text)}">${done?"✓":"📲"} ${n.l}</a>`; }).join(" ")
+    || '<span class="muted" style="font-size:12px">কোনো নম্বর নেই</span>';
+}
+async function admAtt(){
+  const B = COACHING.batches;
+  ATT.batch = ATT.batch || store.get("bn_att_batch") || B[0];
+  ATT.date = ATT.date || todayBD();
+  $("#admMain").innerHTML = `<div class="sec-title">✅ হাজিরা</div>
+    <div class="tabs" id="attB">${B.map(b=>`<button class="${b===ATT.batch?"on":""}" data-b="${esc(b)}">${esc(b)}</button>`).join("")}</div>
+    <div id="attPending"></div>
+    <div class="card">
+      <div class="row" style="gap:8px;align-items:center"><span class="muted" style="flex:none">📅 তারিখ</span><input type="date" id="attDate" value="${ATT.date}" max="${todayBD()}"></div>
+      <div id="attState" class="muted" style="margin-top:8px"></div>
+      <div id="attBody"><div class="spin"></div></div>
+    </div>
+    <div id="attWA"></div>
+    <div class="card"><h3>📊 ${esc(ATT.batch)} — রিপোর্ট</h3><div id="attRep"><div class="spin"></div></div></div>
+    <div class="card"><details><summary style="font-weight:700;cursor:pointer">✏️ অভিভাবকের WhatsApp মেসেজ বদলাও</summary>
+      <div class="muted" style="margin-top:8px">এগুলো নিজে থেকে বসে যাবে: <b>{নাম} {রোল} {ব্যাচ} {তারিখ}</b> ({তারিখ} = "আজ" বা "১৩ নভেম্বর ২০২৬ তারিখে")</div>
+      <textarea id="attTpl" style="font-family:inherit;min-height:130px">${esc(store.get("bn_att_msg")||ATT_MSG_DEFAULT)}</textarea>
+      <button class="btn sec" id="attTplSave">সেভ করো</button> <button class="btn ghost" id="attTplReset">আগের লেখায় ফেরত যাও</button></details></div>`;
+  document.querySelectorAll("#attB button").forEach(b=>b.onclick=()=>{ ATT.batch=b.dataset.b; store.set("bn_att_batch",ATT.batch); admAtt(); });
+  $("#attDate").onchange = e => { ATT.date = e.target.value || todayBD(); $("#attWA").innerHTML=""; loadAttDay(); };
+  $("#attTplSave").onclick = () => { store.set("bn_att_msg", $("#attTpl").value.trim() || ATT_MSG_DEFAULT); toast("মেসেজ সেভ হয়েছে ✅"); };
+  $("#attTplReset").onclick = () => { store.del("bn_att_msg"); $("#attTpl").value = ATT_MSG_DEFAULT; toast("আগের লেখা ফেরত এসেছে"); };
+  paintAttPending();
+  attFlush();
+  await loadAttDay();
+  loadAttReport();
+}
+function paintAttPending(){
+  const q = attQueue(); const el = $("#attPending"); if(!el) return;
+  el.innerHTML = q.length ? `<div class="card ok" style="margin-top:0">📴 নেট না থাকায় ${q.length}টা হাজিরা ফোনে জমা আছে: ${q.map(x=>esc(x.batch)+" "+fmtShort(x.date)).join(", ")}<br>নেট এলে নিজে থেকেই পাঠাবে। <button class="btn sm sec" onclick="attFlush()">🔄 এখনই পাঠাও</button></div>` : "";
+}
+async function loadAttDay(){
+  const body = $("#attBody"), state = $("#attState"); body.innerHTML = '<div class="spin"></div>'; state.textContent = "";
+  let list;
+  try{ list = (await getStu()).filter(s=>s.batch===ATT.batch).sort((a,b)=>a.roll.localeCompare(b.roll)); }
+  catch(ex){ body.innerHTML='<div class="err">'+esc(ex.message)+'</div>'; return; }
+  if(!list.length){ body.innerHTML = '<div class="muted" style="padding:10px 0">এই ব্যাচে পোর্টালে এখনো কোনো স্টুডেন্ট নেই।</div>'; return; }
+  ATT.absent = new Set();
+  const pend = attQueue().find(x=>x.batch===ATT.batch && x.date===ATT.date);
+  if(pend){ pend.absent.forEach(r=>ATT.absent.add(r)); state.innerHTML = "📴 এই দিনের হাজিরা ফোনে জমা আছে, এখনো সার্ভারে যায়নি।"; }
+  else{
+    try{ const r = await rpc("admin_att_get",{p_token:TOKEN,p_batch:ATT.batch,p_date:ATT.date});
+      (r.absent||[]).forEach(x=>ATT.absent.add(x));
+      state.innerHTML = r.saved ? "✔️ এই দিনের হাজিরা আগে সেভ করা আছে। কিছু বদলালে আবার সেভ করো।" : "সবাই উপস্থিত ধরা আছে — শুধু অনুপস্থিতদের নামে ট্যাপ করো, তারপর সেভ।"; }
+    catch(ex){ state.innerHTML = isNetErr(ex) ? "📴 নেট নেই — তবু হাজিরা নাও, সেভ করলে ফোনে জমা থাকবে।" : '<span style="color:var(--red)">'+esc(ex.message)+' — হাজিরার SQL চালানো হয়েছে তো?</span>'; }
+  }
+  body.innerHTML = `<div class="att-sum"><b id="attCount"></b><button class="btn sm ghost" id="attAll">সবাই উপস্থিত</button></div>
+    <div id="attList">${list.map(s=>`<button class="att-row" data-r="${esc(s.roll)}"><span class="av">${initials(s.name)}</span>
+      <span class="nm"><b>${esc(s.name)||"(নাম নেই)"}</b><span class="muted" style="font-size:12.5px">রোল ${esc(s.roll)}</span></span><span class="st"></span></button>`).join("")}</div>
+    <button class="btn" id="attSave">💾 হাজিরা সেভ করো</button><div id="attMsg"></div>`;
+  const paint = () => {
+    document.querySelectorAll("#attList .att-row").forEach(b=>{ const ab = ATT.absent.has(b.dataset.r);
+      b.classList.toggle("ab", ab); b.querySelector(".st").textContent = ab ? "✗ অনুপস্থিত" : "✓ উপস্থিত"; });
+    $("#attCount").innerHTML = `✓ ${list.length-ATT.absent.size} জন উপস্থিত • <span style="color:var(--red)">✗ ${ATT.absent.size} জন অনুপস্থিত</span>`;
+  };
+  document.querySelectorAll("#attList .att-row").forEach(b=>b.onclick=()=>{ const r=b.dataset.r; ATT.absent.has(r)?ATT.absent.delete(r):ATT.absent.add(r); paint(); });
+  $("#attAll").onclick = () => { ATT.absent.clear(); paint(); };
+  paint();
+  $("#attSave").onclick = async () => {
+    const btn = $("#attSave"), msg = $("#attMsg"); btn.disabled = true; btn.textContent = "সেভ হচ্ছে...";
+    const item = { batch: ATT.batch, date: ATT.date, absent: [...ATT.absent].filter(r=>list.some(s=>s.roll===r)) };
+    try{
+      const r = await rpc("admin_att_save",{p_token:TOKEN,p_batch:item.batch,p_date:item.date,p_absent:item.absent});
+      setAttQueue(attQueue().filter(x=>!(x.batch===item.batch && x.date===item.date)));
+      msg.innerHTML = `<div class="ok">✅ সেভ হয়েছে — ${r.present} জন উপস্থিত, ${r.absent} জন অনুপস্থিত।</div>`;
+      $("#attState").innerHTML = "✔️ এই দিনের হাজিরা সেভ করা আছে।"; loadAttReport();
+    }catch(ex){
+      if(isNetErr(ex)){ setAttQueue([...attQueue().filter(x=>!(x.batch===item.batch && x.date===item.date)), item]);
+        msg.innerHTML = '<div class="ok">📴 নেট নেই — হাজিরা ফোনে জমা হলো। নেট এলে নিজে থেকেই সার্ভারে যাবে।</div>'; paintAttPending(); }
+      else msg.innerHTML = '<div class="err">'+esc(ex.message)+'</div>';
+    }
+    btn.disabled = false; btn.textContent = "💾 হাজিরা সেভ করো";
+    if(!msg.querySelector(".err")) paintAttWA(list.filter(s=>item.absent.includes(s.roll)), item.date);
+  };
+}
+function paintAttWA(abs, date){
+  $("#attWA").innerHTML = abs.length ? `<div class="card"><h3>📲 অনুপস্থিতদের অভিভাবককে জানাও</h3>
+    <div class="muted">প্রতিটা বাটনে চাপ দিলে WhatsApp-এ মেসেজ লেখা অবস্থায় খুলবে — শুধু Send চাপবে।</div>
+    <table class="tbl" style="margin-top:8px">${abs.map(s=>`<tr><td><b>${esc(s.name)}</b><div class="muted" style="font-size:12px">রোল ${esc(s.roll)}</div></td>
+      <td style="text-align:right">${waParentBtns(s, attMsgFor(s,date), "att|"+date+"|"+s.roll)}</td></tr>`).join("")}</table></div>`
+    : `<div class="card ok">🎉 আজ সবাই উপস্থিত!</div>`;
+}
+async function loadAttReport(){
+  const el = $("#attRep"); if(!el) return;
+  try{
+    const r = await rpc("admin_att_report",{p_token:TOKEN,p_batch:ATT.batch});
+    const days = r.days||[], sts = (r.students||[]).filter(s=>s.total>0);
+    el.innerHTML = !days.length ? '<div class="muted">এই ব্যাচের এখনো কোনো হাজিরা নেওয়া হয়নি।</div>' : `
+      <div class="muted">মোট ${days.length} দিনের হাজিরা নেওয়া হয়েছে। কম উপস্থিতি (৭৫%-এর নিচে) লাল দেখাবে।</div>
+      <table class="tbl" style="margin-top:6px"><tr><th>রোল</th><th>নাম</th><th style="text-align:right">উপস্থিতি</th></tr>
+      ${sts.map(s=>`<tr><td>${esc(s.roll)}</td><td>${esc(s.name)}</td><td style="text-align:right;white-space:nowrap"><span class="chip ${s.pct<75?"warn":""}" ${s.pct<75?'style="background:#fdeaea;color:var(--red)"':""}>${s.pct}%</span> <span class="muted" style="font-size:12px">${s.present}/${s.total}</span></td></tr>`).join("")}</table>
+      <h3 style="margin-top:16px">🗓️ আগের ক্লাসগুলো</h3>
+      <table class="tbl">${days.slice(0,20).map(d=>`<tr><td><a href="#" onclick="ATT.date='${d.att_date}';$('#attDate').value=ATT.date;$('#attWA').innerHTML='';loadAttDay();window.scrollTo(0,0);return false">${fmtDate(d.att_date)}</a></td>
+        <td>✓ ${d.present} • <span style="color:var(--red)">✗ ${d.absent}</span></td>
+        <td style="text-align:right"><button class="btn sm danger" onclick="delAttDay('${d.att_date}')">🗑</button></td></tr>`).join("")}</table>`;
+  }catch(ex){ el.innerHTML = isNetErr(ex) ? '<div class="muted">নেট এলে রিপোর্ট দেখাবে।</div>' : '<div class="err">'+esc(ex.message)+'</div>'; }
+}
+async function delAttDay(d){
+  if(!confirm(ATT.batch+" — "+fmtDate(d)+" তারিখের হাজিরা মুছে ফেলবে?")) return;
+  try{ await rpc("admin_att_delete",{p_token:TOKEN,p_batch:ATT.batch,p_date:d}); toast("মুছে ফেলা হয়েছে"); if(d===ATT.date) loadAttDay(); loadAttReport(); }
+  catch(ex){ toast(ex.message); }
+}
+/* স্টুডেন্টের হোমে উপস্থিতি */
+async function stuAttCard(){
+  try{
+    const a = await rpc("my_attendance",{p_token:TOKEN}); const el = $("#attCard"); if(!el || !a.total) return;
+    const pct = Math.round(a.present/a.total*100);
+    el.innerHTML = `<div class="card"><div class="row between"><h3 style="margin:0">📅 আমার উপস্থিতি</h3>
+      <b style="font-family:Poppins;font-size:22px;color:${pct<75?"var(--red)":"var(--g2)"}">${pct}%</b></div>
+      <div class="muted">${BN_DIGITS(a.total)}টা ক্লাসের মধ্যে ${BN_DIGITS(a.present)}টায় উপস্থিত ছিলে${pct<75?" — নিয়মিত ক্লাসে আসো!":""}</div>
+      <div class="dots">${(a.recent||[]).slice().reverse().map(r=>`<span class="${r.present?"":"x"}" title="${fmtDate(r.att_date)}: ${r.present?"উপস্থিত":"অনুপস্থিত"}"></span>`).join("")}</div>
+      <div class="muted" style="font-size:12px;margin-top:4px">শেষ ${BN_DIGITS((a.recent||[]).length)}টা ক্লাস — সবুজ = উপস্থিত, লাল = অনুপস্থিত</div></div>`;
+  }catch(e){}
+}
+
+/* ---------------- অ্যাডমিন: সব আইডি কার্ড ---------------- */
+let IDB = null;
+async function admIdCards(){
+  IDB = IDB || store.get("bn_att_batch") || COACHING.batches[0];
+  window.scrollTo(0,0);
+  $("#admMain").innerHTML = `<div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="admTab('students')">← স্টুডেন্ট</button><b>🪪 সব আইডি কার্ড</b></div>
+    <div class="tabs" id="idB">${[...COACHING.batches,"সবাই"].map(b=>`<button class="${b===IDB?"on":""}" data-b="${esc(b)}">${esc(b)}</button>`).join("")}</div>
+    <div class="card"><div id="idInfo" class="muted">লোড হচ্ছে...</div>
+      <button class="btn" id="idPrint" disabled>🖨️ একসাথে প্রিন্ট / PDF</button>
+      <p class="hint">A4 কাগজে প্রতি পাতায় ১০টা কার্ড (আসল আইডি কার্ডের মাপে, কাটার দাগসহ)। iPhone-এ প্রিন্ট পেজ খুললে Share → Save to Files দিয়ে PDF রাখতে পারো। কোনো কার্ডে ট্যাপ করলে সেটা আলাদা ছবি হিসেবে ডাউনলোড হবে।</p></div>
+    <div class="idgrid" id="idGrid"></div>`;
+  document.querySelectorAll("#idB button").forEach(b=>b.onclick=()=>{ IDB=b.dataset.b; admIdCards(); });
+  let list;
+  try{ list = await rpc("admin_id_cards",{p_token:TOKEN,p_batch:IDB==="সবাই"?"":IDB}); }
+  catch(ex){ $("#idInfo").innerHTML='<span style="color:var(--red)">'+esc(ex.message)+' — হাজিরার SQL চালানো হয়েছে তো?</span>'; return; }
+  const myB = IDB;
+  if(!list.length){ $("#idInfo").textContent = "এই ব্যাচে কোনো স্টুডেন্ট নেই।"; return; }
+  const noPhoto = list.filter(s=>!s.photo);
+  $("#idInfo").innerHTML = `${list.length} জন • ছবি আছে ${list.length-noPhoto.length} জনের` + (noPhoto.length?`<br><span style="font-size:12.5px">ছবি নেই: ${noPhoto.map(s=>esc(s.name||s.roll)).join(", ")}</span>`:"");
+  const cvs = [];
+  for(const s of list){
+    if(IDB!==myB) return;   // মাঝপথে অন্য ব্যাচ বাছাই করলে থামো
+    const cv = document.createElement("canvas"); cv.title = s.roll;
+    cv.onclick = () => cv.toBlob(b=>downloadBlob(b,"ID-"+s.roll+".png"),"image/png");
+    $("#idGrid").appendChild(cv);
+    try{ await drawId(cv, s); }catch(e){ s.photo=null; await drawId(cv, s); }
+    cvs.push(cv);
+  }
+  $("#idPrint").disabled = false;
+  $("#idPrint").onclick = async () => {
+    const pa = $("#printArea"); pa.innerHTML = "";
+    for(const cv of cvs){   // গোল কোনা যেন কালো না হয় — সাদা পটভূমিতে বসাও
+      const t = document.createElement("canvas"); t.width=cv.width; t.height=cv.height; const c=t.getContext("2d");
+      c.fillStyle="#fff"; c.fillRect(0,0,t.width,t.height); c.drawImage(cv,0,0);
+      const img = new Image(); img.src = t.toDataURL("image/jpeg",.92); pa.appendChild(img);
+    }
+    await Promise.all([...pa.querySelectorAll("img")].map(i=>i.decode().catch(()=>{})));
+    window.print();
+  };
+}
+
 /* ---------------- শুরু ---------------- */
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 if (TOKEN && configured()) start(); else show("homeView");
 </script>
+<div id="printArea"></div>
 </body>
 </html>
