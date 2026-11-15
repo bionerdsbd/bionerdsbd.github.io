@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BIO NERDS — স্টুডেন্ট পোর্টাল</title>
 <meta name="theme-color" content="#0b3d2e">
+<meta name="description" content="BIO NERDS — Biology Care for HSC & SSC, কান্দিরপাড়, কুমিল্লা। ক্লাস রুটিন, Star of the Week, ফ্রি ক্লাস ও স্টুডেন্ট পোর্টাল।">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BIO NERDS">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta property="og:title" content="BIO NERDS — Biology Care for HSC & SSC">
+<meta property="og:image" content="https://bionerdsbd.github.io/icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
 <script>
@@ -20,7 +30,7 @@ const COACHING = {
   tagline: "Biology Care for HSC & SSC",
   address: "আকবর প্যালেস, কর ভবনের বিপরীতে, শর্মা ক্লিনিকের পাশে, কান্দিরপাড়, কুমিল্লা",
   phones: "01956126878, 01913314303",
-  whatsapp: "01964335667"
+  whatsapp: "01913314303"
 };
 </script>
 <style>
@@ -35,7 +45,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .brand{font-family:Poppins,sans-serif;font-weight:800;letter-spacing:.5px}
 
 /* login */
-#loginView{min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(160deg,var(--g) 0%,var(--g2) 55%,var(--navy) 100%)}
+#loginView{position:relative;min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(160deg,var(--g) 0%,var(--g2) 55%,var(--navy) 100%)}
 .login-top{padding:56px 24px 28px;color:#fff;text-align:center}
 .logo{width:76px;height:76px;border-radius:22px;background:#fff;display:grid;place-items:center;margin:0 auto 14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .logo span{font-family:Poppins;font-weight:800;color:var(--g);font-size:26px}
@@ -132,14 +142,109 @@ nav.bottom button{position:relative}
 .thread{display:flex;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer}
 .thread:last-child{border:0}
 .wa{background:#25d366;color:#fff;border-radius:8px;padding:5px 9px;font-size:12.5px;text-decoration:none;font-weight:700;white-space:nowrap}
+
+/* ---------- পাবলিক হোম পেজ ---------- */
+:root{--orange:#f05a22;--cream:#fdf8ef}
+.logo img{width:100%;height:100%;object-fit:cover;border-radius:22px}
+.logo.img{background:var(--cream);overflow:hidden}
+#homeView{background:var(--bg);min-height:100vh}
+.h-top{position:sticky;top:0;z-index:6;background:#fffffff2;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 14px calc(10px);display:flex;align-items:center;gap:10px}
+.h-top img{width:40px;height:40px;border-radius:12px}
+.h-top b{flex:1;font-family:Poppins;font-weight:800;color:var(--g);font-size:17px;letter-spacing:.3px}
+.h-hero{background:radial-gradient(circle at 85% 10%,#1f9d6f55 0,transparent 45%),linear-gradient(160deg,var(--g) 0%,var(--g2) 60%,var(--navy) 100%);color:#fff;padding:26px 18px 34px;text-align:center;position:relative;overflow:hidden}
+.h-hero .hl{width:112px;height:112px;border-radius:30px;margin:0 auto 14px;background:var(--cream);box-shadow:0 14px 34px rgba(0,0,0,.3);overflow:hidden}
+.h-hero .hl img{width:100%;height:100%;object-fit:cover}
+.h-hero h1{font-family:Poppins;font-weight:800;font-size:31px;letter-spacing:.5px;line-height:1.15}
+.h-hero .tg{opacity:.9;margin-top:4px}
+.h-hero .addr{font-size:13.5px;opacity:.8;margin-top:8px}
+.h-cta{display:flex;gap:10px;margin-top:18px}
+.h-cta .btn{margin:0}
+.btn.orange{background:var(--orange);color:#fff;box-shadow:0 6px 18px #f05a2255}
+.btn.white{background:#fff;color:var(--g)}
+.adm-pill{display:inline-flex;align-items:center;gap:6px;background:#fff2;border:1px solid #fff5;border-radius:30px;padding:4px 12px;font-size:13px;font-weight:600;margin-bottom:12px}
+.adm-pill i{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 #4ade80;animation:pulse 1.6s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px #4ade8000}100%{box-shadow:0 0 0 0 #4ade8000}}
+.h-main{max-width:640px;margin:-18px auto 0;padding:0 14px 40px;position:relative}
+.h-sec{font-size:19px;font-weight:700;margin:22px 2px 10px;display:flex;align-items:center;gap:8px}
+.h-sec small{font-size:12.5px;color:var(--mute);font-weight:500;margin-left:auto}
+.hl-note{background:#fff7e0;border:1px solid #f6dd9a;color:#7a5600;border-radius:16px;padding:12px 14px;font-weight:600;font-size:15px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:6px 14px;font-weight:600;font-size:14px;white-space:nowrap;cursor:pointer;color:var(--mute)}
+.tabs button.on{background:var(--g2);border-color:var(--g2);color:#fff}
+.stars{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end}
+.star{background:#fff;border-radius:18px;padding:14px 6px 12px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.06);position:relative}
+.star.s1{order:2;padding-top:20px;background:linear-gradient(180deg,#fff8dc,#fff);border:1.5px solid #f6dd9a}
+.star.s2{order:1}.star.s3{order:3}
+.star .sp{width:64px;height:64px;border-radius:50%;margin:0 auto 8px;background:var(--mint);display:grid;place-items:center;font-weight:700;font-size:24px;color:var(--g);overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 2px var(--line)}
+.star.s1 .sp{width:78px;height:78px;box-shadow:0 0 0 3px var(--gold)}
+.star .sp img{width:100%;height:100%;object-fit:cover}
+.star .md{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:24px}
+.star b{display:block;font-size:14px;line-height:1.25;word-wrap:break-word}
+.star .si{font-size:11.5px;color:var(--mute);line-height:1.3;margin-top:2px}
+.star .pc{display:inline-block;margin-top:6px;background:var(--mint);color:var(--g);font-family:Poppins;font-weight:800;font-size:13px;border-radius:12px;padding:1px 8px}
+.rt{background:#fff;border-radius:18px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(16,24,40,.06);border-left:5px solid var(--g3)}
+.rt .rb{font-family:Poppins;font-weight:800;color:var(--g);font-size:16px}
+.rt .slot{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.rt .slot:last-child{border:0;padding-bottom:0}
+.rt .day{min-width:92px;font-weight:600}
+.rt .tm{color:var(--ink)}
+.rt .today{background:var(--orange);color:#fff;border-radius:10px;font-size:11.5px;padding:1px 8px;font-weight:700;margin-left:auto}
+.fbw{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.fbw::-webkit-scrollbar{display:none}
+.fb{flex:0 0 84%;scroll-snap-align:start;background:#fff;border-radius:18px;padding:16px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.fb .q{font-size:15px;white-space:pre-wrap}
+.fb .rs{color:var(--gold);letter-spacing:2px;margin-bottom:6px}
+.fb .who{display:flex;gap:10px;align-items:center;margin-top:12px}
+.fb .who .av{width:38px;height:38px;border-radius:50%;background:var(--mint);color:var(--g);display:grid;place-items:center;font-weight:700;overflow:hidden;flex:none}
+.fb .who .av img{width:100%;height:100%;object-fit:cover}
+.lnk{display:flex;align-items:center;gap:12px;background:#fff;border-radius:18px;padding:14px 16px;margin-bottom:10px;text-decoration:none;color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.lnk .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:#fff;font-size:22px;flex:none}
+.lnk b{display:block}
+.lnk span{font-size:13px;color:var(--mute)}
+.lnk .ar{margin-left:auto;color:var(--mute);font-size:20px}
+.vids{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.vids a{display:block;border-radius:14px;overflow:hidden;position:relative;background:#000;aspect-ratio:16/9}
+.vids img{width:100%;height:100%;object-fit:cover;opacity:.9}
+.vids a::after{content:"▶";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:26px;text-shadow:0 2px 8px #000a}
+.inst{background:linear-gradient(135deg,var(--navy),var(--g2));color:#fff;border-radius:18px;padding:16px;display:flex;gap:12px;align-items:center;margin-top:22px}
+.inst img{width:52px;height:52px;border-radius:14px;flex:none}
+.inst .btn{width:auto;margin:0;padding:10px 14px}
+.sheet{position:fixed;inset:0;background:#0007;z-index:60;display:flex;align-items:flex-end}
+.sheet>div{background:#fff;border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));width:100%;max-width:640px;margin:0 auto}
+.sheet ol{padding-left:22px;margin:10px 0}
+.sheet li{margin:8px 0}
+.h-foot{text-align:center;color:var(--mute);font-size:13px;margin-top:26px;line-height:1.7}
+.rate{display:flex;gap:4px;font-size:28px;margin:4px 0}
+.rate span{cursor:pointer;color:#d6dbe1}
+.rate span.on{color:var(--gold)}
 </style>
 </head>
 <body>
 
+<!-- ============ পাবলিক হোম পেজ ============ -->
+<section id="homeView" class="hidden">
+  <div class="h-top">
+    <img src="icon-192.png" alt="BIO NERDS">
+    <b>BIO NERDS</b>
+    <button class="btn sm" onclick="show('loginView')">🔐 লগইন</button>
+  </div>
+  <div class="h-hero">
+    <div id="hAdmPill"></div>
+    <div class="hl"><img src="icon-512.png" alt="BIO NERDS লোগো"></div>
+    <h1>BIO NERDS</h1>
+    <div class="tg" id="hTag"></div>
+    <div class="addr" id="hAddr"></div>
+    <div class="h-cta" id="hCta"></div>
+  </div>
+  <div class="h-main" id="homeMain"><div class="card"><div class="spin"></div></div></div>
+</section>
+
 <!-- ============ লগইন ============ -->
 <section id="loginView" class="hidden">
   <div class="login-top">
-    <div class="logo"><span>BN</span></div>
+    <button class="btn sm" style="position:absolute;left:14px;top:14px;background:#fff2;color:#fff" onclick="show('homeView')">← হোম</button>
+    <div class="logo img"><img src="icon-192.png" alt="BIO NERDS"></div>
     <h1 class="brand" id="lgName">BIO NERDS</h1>
     <p>স্টুডেন্ট পোর্টাল</p>
   </div>
@@ -207,6 +312,7 @@ nav.bottom button{position:relative}
     <button data-tab="exams"><i>📝</i>পরীক্ষা</button>
     <button data-tab="anotices"><i>📢</i>নোটিশ</button>
     <button data-tab="amsg"><i>💬</i>মেসেজ</button>
+    <button data-tab="ahome"><i>🌐</i>হোম পেজ</button>
     <button data-tab="settings"><i>⚙️</i>সেটিংস</button>
   </nav>
 </section>
@@ -232,7 +338,8 @@ function toast(msg, ms=2600){
   document.body.appendChild(t); setTimeout(()=>t.remove(), ms);
 }
 function show(id){
-  ["loginView","pwView","stuView","admView"].forEach(v => $("#"+v).classList.toggle("hidden", v!==id));
+  if(id==="homeView") loadHome();
+  ["homeView","loginView","pwView","stuView","admView"].forEach(v => $("#"+v).classList.toggle("hidden", v!==id));
   window.scrollTo(0,0);
 }
 const configured = () => !SUPABASE_URL.includes("PASTE_") && !SUPABASE_KEY.includes("PASTE_");
@@ -253,7 +360,7 @@ async function rpc(fn, args={}){
   }
   return data;
 }
-function logoutLocal(){ TOKEN=null; ROLE=null; ME=null; store.del("bn_token"); store.del("bn_role"); $("#lgPass").value=""; show("loginView"); }
+function logoutLocal(){ TOKEN=null; ROLE=null; ME=null; store.del("bn_token"); store.del("bn_role"); $("#lgPass").value=""; show("homeView"); }
 async function logout(){ try{ await rpc("logout",{p_token:TOKEN}); }catch(e){} logoutLocal(); }
 
 /* ---------------- লগইন ---------------- */
@@ -345,6 +452,13 @@ async function stuHome(){
     ${n ? resultCard(RESULTS[0]) : '<div class="card muted">এখনো কোনো রেজাল্ট আসেনি। পরীক্ষার পর এখানে দেখতে পাবে।</div>'}
     <div id="homeNotice"></div>
     <div class="card">
+      <h3>⭐ BIO NERDS সম্পর্কে তোমার মতামত</h3>
+      <div class="muted">ক্লাস, পড়ানো বা পরীক্ষা নিয়ে তোমার অভিজ্ঞতা লেখো। স্যার অনুমোদন দিলে হোম পেজে তোমার নাম ও ছবিসহ দেখাবে।</div>
+      <div class="rate" id="fbRate">${[1,2,3,4,5].map(i=>`<span data-v="${i}" class="on">★</span>`).join("")}</div>
+      <textarea id="fbBody" style="font-family:inherit;min-height:90px" maxlength="600" placeholder="যেমন: স্যারের পড়ানোর কারণে কোষ বিভাজন এখন খুব সহজ লাগে..."></textarea>
+      <button class="btn sec" id="fbSend">পাঠাও</button>
+    </div>
+    <div class="card">
       <h3>👤 আমার প্রোফাইল</h3>
       <table class="tbl">
         <tr><td class="muted">ক্লাস</td><td>${esc(ME.class_name)||"-"}</td></tr>
@@ -355,8 +469,17 @@ async function stuHome(){
       </table>
       <button class="btn sec" onclick="stuProfile(false)">✏️ প্রোফাইল এডিট করো</button>
       <button class="btn ghost" onclick="openChangePw()">🔑 পাসওয়ার্ড বদলাও</button>
+      <button class="btn ghost" onclick="show('homeView')">🌐 কোচিংয়ের হোম পেজ</button>
       <button class="btn danger" onclick="logout()">লগআউট</button>
     </div>`;
+  let rating = 5;
+  document.querySelectorAll("#fbRate span").forEach(s => s.onclick = () => { rating = +s.dataset.v;
+    document.querySelectorAll("#fbRate span").forEach(x => x.classList.toggle("on", +x.dataset.v <= rating)); });
+  $("#fbSend").onclick = async () => {
+    const v = $("#fbBody").value.trim(); if(v.length < 5){ toast("মতামত একটু বিস্তারিত লেখো"); return; }
+    try{ await rpc("submit_feedback",{p_token:TOKEN,p_body:v,p_rating:rating}); $("#fbBody").value=""; toast("ধন্যবাদ! মতামত পাঠানো হয়েছে ✅"); }
+    catch(ex){ toast(ex.message); }
+  };
   try{
     const ns = await rpc("get_notices",{p_token:TOKEN});
     if(ns.length) $("#homeNotice").innerHTML = '<div class="sec-title">নতুন নোটিশ</div>' + noticeCard(ns[0]);
@@ -602,7 +725,7 @@ function admTab(t){
   document.querySelectorAll("#admNav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
   window.scrollTo(0,0);
   clearInterval(CHAT_TIMER);
-  ({students:admStudents, exams:admExams, anotices:admNotices, settings:admSettings, amsg:admMsg})[t]();
+  ({students:admStudents, exams:admExams, anotices:admNotices, settings:admSettings, amsg:admMsg, ahome:admHome})[t]();
 }
 function parseLines(text){
   return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>l.split(/\t|,|;/).map(x=>x.trim()));
@@ -763,8 +886,166 @@ function admSettings(){
     <div class="card"><button class="btn danger" style="margin-top:0" onclick="logout()">লগআউট</button></div>`;
 }
 
+/* ---------------- পাবলিক হোম পেজ ---------------- */
+const BN_DIGITS = s => String(s).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+const DAYS = ["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
+let HOME = null, STAR_TAB = null, INSTALL_EVT = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALL_EVT = e; if(!$("#homeView").classList.contains("hidden")) paintInstall(); });
+const isStandalone = () => window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+function parseRoutine(txt){
+  return String(txt||"").split(/\r?\n/).map(l=>l.trim()).filter(l=>l.includes("=")).map(l=>{
+    const i=l.indexOf("="), batch=l.slice(0,i).trim();
+    const slots=l.slice(i+1).split(",").map(s=>s.trim()).filter(Boolean).map(s=>{ const k=s.indexOf(" "); return k>0?{day:s.slice(0,k),time:s.slice(k+1)}:{day:s,time:""}; });
+    return {batch, slots};
+  });
+}
+function ytId(u){ const m=String(u).match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m?m[1]:null; }
+function admissionMsg(){ return "আসসালামু আলাইকুম, আমি BIO NERDS-এ ভর্তি হতে চাই।\nনাম: \nক্লাস/ব্যাচ: \nকলেজ/স্কুল: "; }
+async function loadHome(){
+  $("#hTag").textContent = COACHING.tagline;
+  $("#hAddr").textContent = "📍 " + COACHING.address;
+  const topBtn = document.querySelector("#homeView .h-top .btn");
+  if(TOKEN){ topBtn.textContent = ROLE==="admin" ? "⚙️ অ্যাডমিন" : "👤 আমার পোর্টাল"; topBtn.onclick = start; }
+  else { topBtn.textContent = "🔐 লগইন"; topBtn.onclick = () => show("loginView"); }
+  if(!HOME){
+    paintHomeMain({settings:{}, stars:[], feedback:[]}, true);
+    try{ HOME = await rpc("public_home"); }catch(e){ HOME = {settings:{}, stars:[], feedback:[], failed:true}; }
+  }
+  paintHomeMain(HOME, false);
+}
+function paintHomeMain(h, loading){
+  const s = h.settings || {};
+  const open = s.admission_open !== false;
+  $("#hAdmPill").innerHTML = open ? '<span class="adm-pill"><i></i>ভর্তি চলছে</span>' : "";
+  $("#hCta").innerHTML = (open ? `<button class="btn orange" onclick="openAdmission()">📝 ভর্তি হতে চাই</button>` : "") +
+    `<a class="btn white" style="text-decoration:none" href="tel:${COACHING.phones.split(",")[0].trim()}">📞 কল করো</a>`;
+  const routine = parseRoutine(s.routine);
+  const today = DAYS[new Date().getDay()];
+  const vids = String(s.videos||"").split(/\s+/).map(ytId).filter(Boolean).slice(0,6);
+  let html = "";
+  if(s.highlight) html += `<div class="hl-note"><span>📌</span><span>${esc(s.highlight)}</span></div>`;
+  if(open && s.admission_text) html += `<div class="card" style="margin-top:12px;border-left:5px solid var(--orange)"><b>🎓 ${esc(s.admission_text)}</b>
+    <div class="muted" style="margin-top:4px">WhatsApp-এ মেসেজ দাও বা সরাসরি কোচিংয়ে চলে আসো।</div>
+    <button class="btn orange" onclick="openAdmission()">📲 WhatsApp-এ ভর্তির জন্য মেসেজ</button></div>`;
+
+  // Star of the Week
+  const stars = h.stars || [];
+  const sb = [...new Set(stars.map(x=>x.batch))];
+  if(loading) html += `<div class="h-sec">🌟 Star of the Week</div><div class="card"><div class="spin"></div></div>`;
+  else if(sb.length){
+    if(!sb.includes(STAR_TAB)) STAR_TAB = sb[0];
+    const list = stars.filter(x=>x.batch===STAR_TAB), r0 = list[0]||{};
+    html += `<div class="h-sec">🌟 Star of the Week <small>${r0.from?BN_DIGITS(fmtShort(r0.from))+" – "+BN_DIGITS(fmtShort(r0.to)):""}</small></div>
+      ${sb.length>1?`<div class="tabs">${sb.map(b=>`<button class="${b===STAR_TAB?"on":""}" data-b="${esc(b)}" onclick="STAR_TAB=this.dataset.b;paintHomeMain(HOME,false)">${esc(b)}</button>`).join("")}</div>`:""}
+      <div class="stars">${list.map(x=>`<div class="star s${x.rank}"><span class="md">${["🥇","🥈","🥉"][x.rank-1]}</span>
+        <div class="sp">${x.photo?`<img src="${x.photo}" alt="" loading="lazy">`:esc((x.name||"?").trim().charAt(0))}</div>
+        <b>${esc(x.name)}</b><div class="si">${esc(x.institution||"")}</div><span class="pc">${num(x.pct)}%</span></div>`).join("")}</div>
+      <div class="muted" style="text-align:center;margin-top:8px;font-size:12.5px">সপ্তাহের পরীক্ষাগুলোর গড় নম্বরের ভিত্তিতে</div>`;
+  }
+
+  // রুটিন
+  if(routine.length){
+    html += `<div class="h-sec">🗓️ ক্লাস রুটিন <small>আজ ${today}</small></div>` + routine.map(r=>`<div class="rt"><div class="rb">${esc(r.batch)}</div>
+      ${r.slots.map(sl=>`<div class="slot"><span class="day">${esc(sl.day)}</span><span class="tm">${esc(sl.time)}</span>${sl.day===today?'<span class="today">আজ</span>':""}</div>`).join("")}</div>`).join("");
+  }
+
+  // মতামত
+  const fb = h.feedback || [];
+  if(fb.length){
+    html += `<div class="h-sec">💬 স্টুডেন্টদের মতামত</div><div class="fbw">${fb.map(f=>`<div class="fb">
+      <div class="rs">${"★".repeat(f.rating||5)}</div><div class="q">“${esc(f.body)}”</div>
+      <div class="who"><div class="av">${f.photo?`<img src="${f.photo}" alt="" loading="lazy">`:esc((f.name||"?").trim().charAt(0))}</div>
+      <div style="min-width:0"><b>${esc(f.name||"")}</b><div class="muted" style="font-size:12.5px">${esc(f.meta||"")}</div></div></div></div>`).join("")}</div>`;
+  }
+
+  // YouTube + Facebook
+  const yt = s.youtube || "https://youtube.com/@bionerds-tq4bk", fbk = s.facebook || "https://www.facebook.com/share/1DK7J9zFNW/";
+  html += `<div class="h-sec">🎬 ফ্রি ক্লাস ও আপডেট</div>` +
+    (vids.length?`<div class="vids">${vids.map(id=>`<a href="https://youtu.be/${id}" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy"></a>`).join("")}</div>`:"") +
+    `<a class="lnk" href="${esc(yt)}" target="_blank" rel="noopener"><span class="ic" style="background:#ff0000">▶</span><div><b>YouTube — ফ্রি ক্লাস</b><span>BIO NERDS চ্যানেলে বায়োলজির ফ্রি ক্লাস দেখো</span></div><span class="ar">›</span></a>
+    <a class="lnk" href="${esc(fbk)}" target="_blank" rel="noopener"><span class="ic" style="background:#1877f2;font-family:Poppins;font-weight:800">f</span><div><b>Facebook পেজ</b><span>নোটিশ, রেজাল্ট আর আপডেট সবার আগে</span></div><span class="ar">›</span></a>
+    <a class="lnk" href="${waLink(COACHING.whatsapp,"আসসালামু আলাইকুম")}" target="_blank" rel="noopener"><span class="ic" style="background:#25d366">✆</span><div><b>WhatsApp</b><span>${esc(COACHING.whatsapp)}</span></div><span class="ar">›</span></a>`;
+
+  html += `<div id="instBox"></div>
+    <div class="h-foot"><b class="brand" style="color:var(--g)">BIO NERDS</b> — Seek For Knowledge<br>📍 ${esc(COACHING.address)}<br>📞 ${esc(COACHING.phones)}</div>`;
+  $("#homeMain").innerHTML = html;
+  paintInstall();
+}
+function fmtShort(d){ const x=new Date(d); return isNaN(x)?d:x.toLocaleDateString("en-GB",{day:"numeric",month:"short"}).replace(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/,m=>({Jan:"জানু",Feb:"ফেব্রু",Mar:"মার্চ",Apr:"এপ্রিল",May:"মে",Jun:"জুন",Jul:"জুলাই",Aug:"আগস্ট",Sep:"সেপ্টে",Oct:"অক্টো",Nov:"নভে",Dec:"ডিসে"}[m])); }
+function openAdmission(){ window.open(waLink(COACHING.whatsapp, admissionMsg()), "_blank"); }
+function paintInstall(){
+  const box = $("#instBox"); if(!box) return;
+  if(isStandalone() || (!INSTALL_EVT && !isIOS())){ box.innerHTML=""; return; }
+  box.innerHTML = `<div class="inst"><img src="icon-192.png" alt=""><div style="flex:1;min-width:0"><b>অ্যাপ হিসেবে ইনস্টল করো</b><div style="font-size:13px;opacity:.85">ফোনের হোম স্ক্রিনে BIO NERDS — এক ট্যাপে রেজাল্ট ও রুটিন</div></div><button class="btn white" onclick="doInstall()">ইনস্টল</button></div>`;
+}
+async function doInstall(){
+  if(INSTALL_EVT){ INSTALL_EVT.prompt(); try{ await INSTALL_EVT.userChoice; }catch(e){} INSTALL_EVT=null; paintInstall(); return; }
+  const sh=document.createElement("div"); sh.className="sheet"; sh.onclick=e=>{ if(e.target===sh) sh.remove(); };
+  sh.innerHTML = `<div><h3>📲 iPhone-এ ইনস্টল করার নিয়ম</h3><ol>
+    <li><b>Safari</b> দিয়ে এই সাইট খোলো (bionerdsbd.github.io)</li>
+    <li>নিচের <b>Share</b> বাটনে (⬆️ বক্স থেকে তীর) চাপো</li>
+    <li>নিচে স্ক্রল করে <b>“Add to Home Screen”</b> চাপো</li>
+    <li>উপরে ডানে <b>Add</b> চাপো — হোম স্ক্রিনে BIO NERDS অ্যাপ চলে আসবে ✅</li></ol>
+    <button class="btn" onclick="this.closest('.sheet').remove()">বুঝেছি</button></div>`;
+  document.body.appendChild(sh);
+}
+
+/* ---------------- অ্যাডমিন: হোম পেজ ---------------- */
+async function admHome(){
+  $("#admMain").innerHTML = '<div class="spin"></div>';
+  let s = {};
+  try{ s = await rpc("admin_get_site",{p_token:TOKEN}); }catch(ex){ $("#admMain").innerHTML='<div class="err">'+esc(ex.message)+'<br>হোম পেজের SQL চালানো হয়েছে তো?</div>'; return; }
+  $("#admMain").innerHTML = `
+    <div class="card"><div class="row between"><h3 style="margin:0">🌐 পাবলিক হোম পেজ</h3><button class="btn sm sec" onclick="HOME=null;show('homeView')">দেখো ↗</button></div>
+      <label style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="hsOpen" style="width:22px;height:22px" ${s.admission_open!==false?"checked":""}> “ভর্তি চলছে” দেখাও</label>
+      <label>ভর্তির লেখা</label><input id="hsAdm" value="${esc(s.admission_text||"")}">
+      <label>📌 বিশেষ ঘোষণা (খালি রাখলে দেখাবে না)</label><textarea id="hsHl" style="font-family:inherit;min-height:70px">${esc(s.highlight||"")}</textarea>
+      <label>🗓️ ক্লাস রুটিন — প্রতি লাইনে: <b>ব্যাচ = দিন সময়, দিন সময়</b></label>
+      <textarea id="hsRt" style="font-family:inherit">${esc(s.routine||"")}</textarea>
+      <div class="hint" style="margin-top:4px">Star of the Week শুধু রুটিনে থাকা ব্যাচগুলোর জন্য দেখাবে।</div>
+      <label>🎬 YouTube ভিডিও লিংক (ঐচ্ছিক, প্রতি লাইনে একটা — হোম পেজে থাম্বনেইল দেখাবে)</label>
+      <textarea id="hsVid" style="font-family:inherit;min-height:80px" placeholder="https://youtu.be/...">${esc(s.videos||"")}</textarea>
+      <label>YouTube চ্যানেল</label><input id="hsYt" value="${esc(s.youtube||"")}">
+      <label>Facebook পেজ</label><input id="hsFb" value="${esc(s.facebook||"")}">
+      <button class="btn" id="hsSave">সেভ করো</button><div id="hsMsg"></div></div>
+    <div class="sec-title">💬 মতামত</div>
+    <div class="card"><h3>➕ নিজে মতামত যোগ করো</h3><div class="muted">পুরনো স্টুডেন্ট বা অভিভাবকের মতামত (সরাসরি হোম পেজে যাবে)</div>
+      <label>নাম</label><input id="afN" placeholder="যেমন: রাহাত হাসান">
+      <label>পরিচয়</label><input id="afM" placeholder="যেমন: HSC'25 • এখন CuMC-তে">
+      <label>মতামত</label><textarea id="afB" style="font-family:inherit;min-height:80px"></textarea>
+      <button class="btn sec" id="afSave">যোগ করো</button></div>
+    <div id="fbList"><div class="spin"></div></div>`;
+  $("#hsSave").onclick = async () => {
+    const v = {...s, admission_open:$("#hsOpen").checked, admission_text:$("#hsAdm").value.trim(), highlight:$("#hsHl").value.trim(),
+      routine:$("#hsRt").value.trim(), videos:$("#hsVid").value.trim(), youtube:$("#hsYt").value.trim(), facebook:$("#hsFb").value.trim()};
+    try{ await rpc("admin_save_site",{p_token:TOKEN,p_value:v}); s=v; HOME=null; $("#hsMsg").innerHTML='<div class="ok">✅ সেভ হয়েছে — হোম পেজে এখনই দেখাবে</div>'; }
+    catch(ex){ $("#hsMsg").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+  };
+  $("#afSave").onclick = async () => {
+    if(!$("#afN").value.trim() || !$("#afB").value.trim()){ toast("নাম আর মতামত দুটোই লাগবে"); return; }
+    try{ await rpc("admin_add_feedback",{p_token:TOKEN,p_name:$("#afN").value,p_meta:$("#afM").value,p_body:$("#afB").value,p_rating:5});
+      ["#afN","#afM","#afB"].forEach(x=>$(x).value=""); HOME=null; toast("যোগ হয়েছে ✅"); loadFb(); }catch(ex){ toast(ex.message); }
+  };
+  loadFb();
+}
+async function loadFb(){
+  try{
+    const l = await rpc("admin_feedback",{p_token:TOKEN});
+    $("#fbList").innerHTML = l.length ? l.map(f=>`<div class="card" style="border-left:5px solid ${f.approved?"var(--g3)":"var(--gold)"}">
+      <div class="row between"><div><b>${esc(f.name||"")}</b> ${f.roll?`<span class="muted">• ${esc(f.roll)}</span>`:""}<div class="muted" style="font-size:12.5px">${esc(f.meta||"")} • ${fmtDate(f.created_at)}</div></div>
+      <span class="chip ${f.approved?"":"warn"}">${f.approved?"হোম পেজে আছে":"অপেক্ষায়"}</span></div>
+      <div style="color:var(--gold);margin-top:6px">${"★".repeat(f.rating||5)}</div><p style="white-space:pre-wrap">${esc(f.body)}</p>
+      <div class="row" style="gap:8px;margin-top:10px">${f.approved?`<button class="btn sm ghost" onclick="setFb(${f.id},false)">হোম পেজ থেকে সরাও</button>`:`<button class="btn sm" onclick="setFb(${f.id},true)">✅ হোম পেজে দেখাও</button>`}
+      <button class="btn sm danger" onclick="delFb(${f.id})">🗑</button></div></div>`).join("") : '<div class="card muted">এখনো কোনো মতামত আসেনি। স্টুডেন্টরা পোর্টালের হোম থেকে মতামত দিতে পারবে।</div>';
+  }catch(ex){ $("#fbList").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
+}
+async function setFb(id,ok){ try{ await rpc("admin_feedback_set",{p_token:TOKEN,p_id:id,p_approved:ok}); HOME=null; loadFb(); }catch(ex){ toast(ex.message); } }
+async function delFb(id){ if(!confirm("মতামতটা মুছবে?")) return; try{ await rpc("admin_feedback_delete",{p_token:TOKEN,p_id:id}); HOME=null; loadFb(); }catch(ex){ toast(ex.message); } }
+
 /* ---------------- শুরু ---------------- */
-if (TOKEN && configured()) start(); else show("loginView");
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+if (TOKEN && configured()) start(); else show("homeView");
 </script>
 </body>
 </html>
