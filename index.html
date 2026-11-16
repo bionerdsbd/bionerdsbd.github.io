@@ -398,6 +398,40 @@ details summary{cursor:pointer}
   #printArea{display:grid!important;grid-template-columns:repeat(2,85.6mm);gap:5mm 6mm;justify-content:center}
   #printArea img{width:85.6mm;height:54mm;outline:.2mm dashed #bbb;break-inside:avoid;page-break-inside:avoid}
 }
+/* ✍️ লিখিত পরীক্ষা */
+.cq-sec{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;background:var(--g);color:#fff;border-radius:14px;padding:10px 14px;margin:16px 0 10px}
+.cq-sec b{font-size:16.5px}.cq-sec span{font-size:13px;opacity:.85}
+.cqparts{margin-top:10px;border-top:1px dashed var(--line);padding-top:4px}
+.cqparts div{display:flex;gap:8px;padding:6px 0;font-size:15.5px;line-height:1.5;align-items:flex-start}
+.cqparts .l{font-weight:700;color:var(--g2);flex:none}.cqparts .t{flex:1}
+.cqparts .m{flex:none;font-weight:700;color:var(--mute);font-size:13px;background:var(--bg);border-radius:8px;padding:1px 8px}
+.cq-secs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.cq-secs span{background:var(--bg);border-radius:10px;padding:3px 10px;font-size:13px;font-weight:600}
+.cq-pgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;margin-top:12px}
+.cq-pg{position:relative;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
+.cq-pg .im{aspect-ratio:3/4;display:grid;place-items:center;overflow:hidden}
+.cq-pg .im img{max-width:100%;max-height:100%;object-fit:contain;transition:transform .2s}
+.cq-pg .no{position:absolute;top:5px;left:5px;z-index:2;background:var(--g);color:#fff;border-radius:8px;font-size:12px;font-weight:700;padding:1px 8px}
+.cq-pg .st{position:absolute;left:0;right:0;top:0;bottom:36px;display:grid;place-items:center;background:#fffd;font-size:13px;font-weight:700;text-align:center;padding:6px;cursor:pointer}
+.cq-pg .act{display:flex;border-top:1px solid var(--line);background:#fff}
+.cq-pg .act button{flex:1;border:0;background:none;padding:8px 0;font-size:15px;cursor:pointer}
+.cq-pg .act button[disabled]{opacity:.25}
+.cq-page{background:#fff;border-radius:14px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 3px rgba(16,24,40,.08)}
+.cq-page .h{display:flex;align-items:center;gap:8px;padding:8px 12px;font-weight:700;font-size:14px}
+.rot{position:relative;width:100%;overflow:hidden;background:#eef0f2}
+.cq-g{border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:10px;background:#fff}
+.cq-g.ch{border-color:#a9dcc4;background:#f6fcf9}
+.cq-g .h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cq-g .h .sc{margin-left:auto;font-weight:800;font-family:Poppins;font-size:16px}
+.cq-pin{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:6px;margin-top:8px}
+.cq-pin label{margin:0;font-size:13.5px;text-align:center}
+.cq-pin input{text-align:center;padding:10px 4px;margin-top:3px;font-size:17px;font-weight:700}
+.cq-g .cq-c{margin-top:8px;padding:9px 12px;font-size:14.5px}
+label.cq-x{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--mute);margin:8px 0 0}
+.cq-x input{width:18px;height:18px;flex:none}
+.cq-bar{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom));z-index:4;background:#fff;border-radius:16px;box-shadow:0 -2px 16px rgba(16,24,40,.14);padding:10px 12px;margin-top:14px}
+.cq-mk{display:flex;gap:6px}.cq-mk span{flex:1;text-align:center;font-weight:700;font-size:13px}.cq-mk input{text-align:center;padding:9px 4px;margin-top:3px}
+.cq-ed{border:1.5px solid var(--line);border-radius:16px;padding:12px;margin-top:12px;background:#fbfdfc}
+.sbar{height:10px;background:var(--bg);border-radius:6px;overflow:hidden}.sbar i{display:block;height:100%}
 </style>
 </head>
 <body>
@@ -1986,7 +2020,12 @@ function sheet(html){
 const closeSheet = () => document.querySelectorAll(".asheet-bg").forEach(x => x.remove());
 
 async function exLoad(){
-  const r = await rpc("oe_list", {p_token: exTok()});
+  const [r, c] = await Promise.all([rpc("oe_list", {p_token: exTok()}), rpc("cq_list", {p_token: exTok()}).catch(() => null)]);
+  if(c && c.exams && c.exams.length){
+    const O = {live:0, upcoming:1, ended:2};
+    r.exams = r.exams.concat(c.exams.map(x => ({...x, cq:true}))).sort((a,b) => (O[a.status]-O[b.status]) ||
+      (a.status === "ended" ? new Date(b.ends_at) - new Date(a.ends_at) : new Date(a.starts_at) - new Date(b.starts_at)));
+  }
   EX_SKEW = new Date(r.now).getTime() - Date.now();
   if(GTOKEN && !TOKEN && (!r.me || r.me.kind !== "guest")){ GTOKEN = null; store.del("bn_gtoken"); }
   EXL = r; return r;
@@ -1994,6 +2033,7 @@ async function exLoad(){
 
 /* ---------- পরীক্ষার কার্ড ---------- */
 function exCard(e, compact){
+  if(e.cq) return cqCard(e, compact);
   const my = e.my, st = e.status;
   const aud = e.audience === "free" ? '<span class="chip">🆓 ফ্রি পরীক্ষা</span>'
     : `<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ") || "BIO NERDS স্টুডেন্ট")}</span>`;
@@ -2361,9 +2401,9 @@ function exPracticeResult(){
 }
 
 /* ---------- মেরিট লিস্ট ---------- */
-async function exMerit(id){
+async function exMerit(id, cq){
   exOpenPage("🏆 মেরিট লিস্ট");
-  let m; try{ m = await rpc("oe_merit", {p_exam:id, p_token:exTok(), p_limit:100}); }
+  let m; try{ m = await rpc(cq ? "cq_merit" : "oe_merit", {p_exam:id, p_token:exTok(), p_limit:100}); }
   catch(ex){ $("#exMain").innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; return; }
   const L = m.list, top = L.filter(x=>x.rank<=3), rest = L.filter(x=>x.rank>3), mine = L.find(x=>x.me);
   const av = x => x.photo ? `<img src="${x.photo}" alt="">` : initials(x.name);
@@ -2375,10 +2415,10 @@ async function exMerit(id){
       <div class="sp">${av(x)}</div><b>${esc(x.name)}</b><div class="si">${esc(x.inst||"")}</div><span class="pc">${BN_DIGITS(num(x.score))}</span></div>`).join("")}</div>
     <div class="card" style="padding:6px 10px">${L.map(x=>`<div class="mrow ${x.me?"me":""}"><div class="rk">${x.rank<=3?["🥇","🥈","🥉"][x.rank-1]:BN_DIGITS(x.rank)}</div>
       <div class="av">${av(x)}</div><div class="nm"><b>${esc(x.name)}${x.bn?'<span class="bnb">BIO NERDS</span>':""}</b><span>${esc(x.inst||"")}</span></div>
-      <div class="sc"><b>${BN_DIGITS(num(x.score))}</b><span>⏱ ${secTxt(x.secs)}</span></div></div>`).join("")}</div>
-    <div class="hint" style="text-align:center">সমান নম্বর হলে যে কম সময়ে শেষ করেছে সে আগে।</div>`
+      <div class="sc"><b>${BN_DIGITS(num(x.score))}</b>${x.secs != null ? `<span>⏱ ${secTxt(x.secs)}</span>` : ""}</div></div>`).join("")}</div>
+    <div class="hint" style="text-align:center">${cq ? "লিখিত পরীক্ষা • শুধু অনুমোদিত খাতা • সমান নম্বরে একই পজিশন" : "সমান নম্বর হলে যে কম সময়ে শেষ করেছে সে আগে।"}</div>`
     : '<div class="card muted">এখনো কেউ অংশ নেয়নি।</div>'}
-    <button class="btn" onclick="exPractice(${id})">🔁 এই পরীক্ষাটা প্র্যাকটিস করো</button>`;
+    ${cq ? `<button class="btn" onclick="cqPaperView(${id})">📖 প্রশ্ন ও নমুনা উত্তর</button>` : `<button class="btn" onclick="exPractice(${id})">🔁 এই পরীক্ষাটা প্র্যাকটিস করো</button>`}`;
 }
 
 /* ---------- রেজাল্ট কার্ড (শেয়ারের ছবি) ---------- */
@@ -2436,6 +2476,7 @@ async function stuExamBanner(){
   const box = $("#exLiveCard"); if(!box) return;
   try{
     const r = await rpc("oe_list", {p_token:TOKEN}); EX_SKEW = new Date(r.now).getTime() - Date.now();
+    try{ const c = await rpc("cq_list", {p_token:TOKEN}); r.exams = c.exams.filter(x => x.status === "live" && (!x.my || x.my.state === "writing" || x.my.state === "upload")).map(x => ({...x, my:x.my ? {state:"running"} : null})).concat(r.exams); }catch(e){}
     const e = r.exams.find(x => x.status==="live" && (!x.my || x.my.state==="running")) ||
               r.exams.find(x => x.status==="upcoming" && new Date(x.starts_at).getTime() - nowSrv() < 2*86400e3);
     if(!e || !$("#exLiveCard")) return;
@@ -2451,10 +2492,10 @@ async function stuExamBanner(){
 let AEX_TAB = "online";
 function admExams(){
   $("#admMain").innerHTML = `<div class="tabs" id="aexTabs">
-      <button data-t="online">🖥️ অনলাইন পরীক্ষা</button><button data-t="offline">📄 অফলাইন রেজাল্ট</button><button data-t="leads">👥 বাইরের স্টুডেন্ট</button></div>
+      <button data-t="online">🖥️ অনলাইন MCQ</button><button data-t="cq">✍️ লিখিত (CQ)</button><button data-t="offline">📄 অফলাইন রেজাল্ট</button><button data-t="leads">👥 বাইরের স্টুডেন্ট</button></div>
     <div id="aexBody"></div>`;
   document.querySelectorAll("#aexTabs button").forEach(b => { b.classList.toggle("on", b.dataset.t===AEX_TAB); b.onclick = () => { AEX_TAB = b.dataset.t; admExams(); }; });
-  ({online:oeAdm, offline:admOffline, leads:oeLeads})[AEX_TAB]();
+  ({online:oeAdm, cq:cqAdm, offline:admOffline, leads:oeLeads})[AEX_TAB]();
 }
 const OE_ST = {draft:'<span class="chip" style="background:#eef1f4;color:var(--mute)">📝 খসড়া</span>', upcoming:'<span class="chip warn">⏳ আসছে</span>',
   live:'<span class="live-pill"><i></i>লাইভ</span>', ended:'<span class="chip">✅ শেষ</span>'};
@@ -2748,12 +2789,824 @@ async function oeLeadDel(gid){
   try{ await rpc("oe_admin_guest_delete", {p_token:TOKEN, p_gid:gid}); LEADS = LEADS.filter(x=>x.gid!==gid); paintLeads(); }catch(ex){ toast(ex.message); }
 }
 
+/* ================================================================
+   ✍️ লিখিত / সৃজনশীল (CQ) পরীক্ষা — অনলাইন পরীক্ষা ধাপ ২
+   স্টুডেন্ট প্রশ্ন দেখে খাতায় লেখে → খাতার ছবি আপলোড → অ্যাডমিন/Claude নম্বর দেয় → অনুমোদনের পর স্টুডেন্ট দেখে
+   ================================================================ */
+const CQ_BUCKET = "cq", CQ_LET = ["ক","খ","গ","ঘ","ঙ","চ"];
+const SB = () => SUPABASE_URL.replace(/\/$/,"");
+const cqPath = p => String(p).split("/").map(encodeURIComponent).join("/");
+const cqUrl = p => SB() + "/storage/v1/object/public/" + CQ_BUCKET + "/" + cqPath(p);
+const cqLink = id => SITE_URL + "/#cq=" + id;
+function stHeaders(extra){ const h = Object.assign({"apikey": SUPABASE_KEY}, extra||{}); if(SUPABASE_KEY.startsWith("eyJ")) h["Authorization"] = "Bearer " + SUPABASE_KEY; return h; }
+async function stUpload(path, blob){
+  let res;
+  try{ res = await fetch(SB() + "/storage/v1/object/" + CQ_BUCKET + "/" + cqPath(path), {method:"POST", headers: stHeaders({"Content-Type": blob.type || "image/jpeg", "x-upsert":"false"}), body: blob}); }
+  catch(e){ throw new Error("ইন্টারনেট সংযোগ নেই — আবার চেষ্টা করো"); }
+  if(!res.ok){ let m = ""; try{ const j = await res.json(); m = j.message || j.error || ""; }catch(e){} throw new Error("ছবি আপলোড হয়নি" + (m ? " (" + m + ")" : "")); }
+}
+async function stDelete(paths){
+  const res = await fetch(SB() + "/storage/v1/object/" + CQ_BUCKET, {method:"DELETE", headers: stHeaders({"Content-Type":"application/json"}), body: JSON.stringify({prefixes: paths})});
+  if(!res.ok) throw new Error("ছবি মোছা যায়নি (" + res.status + ")");
+  try{ return await res.json(); }catch(e){ return []; }
+}
+// ফোনের বড় ছবি ছোট করা (লম্বা দিক ১৬০০px, JPEG) — এক পাতা মোটামুটি ২০০–৪০০ KB
+async function cqCompress(file){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await loadImg(url), M = 1600, sc = Math.min(1, M / Math.max(img.width, img.height));
+    const W = Math.round(img.width * sc), H = Math.round(img.height * sc), c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0,0,W,H); x.drawImage(img, 0, 0, W, H);
+    let q = .72, b = await new Promise(ok => c.toBlob(ok, "image/jpeg", q));
+    while(b && b.size > 550000 && q > .4){ q -= .08; b = await new Promise(ok => c.toBlob(ok, "image/jpeg", q)); }
+    if(!b) throw new Error("x");
+    return b;
+  } finally { setTimeout(() => URL.revokeObjectURL(url), 1000); }
+}
+// ঘোরানো ছবি ঠিকমতো দেখানো (r = 0/90/180/270)
+function rotFix(img){
+  const r = +img.dataset.r || 0, box = img.parentElement;
+  if(r % 180 === 0){ img.style.cssText = `width:100%;display:block;transform:rotate(${r}deg)`; box.style.aspectRatio = ""; return; }
+  const w = img.naturalWidth, h = img.naturalHeight; if(!w || !h) return;
+  box.style.aspectRatio = h + " / " + w;
+  img.style.cssText = `position:absolute;left:50%;top:50%;width:${w/h*100}%;max-width:none;transform:translate(-50%,-50%) rotate(${r}deg)`;
+}
+const pageHtml = (pg, i, extra) => `<div class="cq-page"><div class="h">📄 পাতা ${BN_DIGITS(i+1)}${extra||""}<a class="lnkbtn" style="margin-left:auto" target="_blank" rel="noopener" href="${cqUrl(pg.p)}">🔍 বড় করে</a></div>
+  <div class="rot"><img loading="lazy" data-r="${pg.r||0}" src="${cqUrl(pg.p)}" onload="rotFix(this)" alt="পাতা ${i+1}"></div></div>`;
+
+/* ---------- নম্বরের হিসাব (সার্ভারের মতোই — বোর্ডের নিয়ম) ---------- */
+const qMax = q => (q.parts||[]).reduce((a,p) => a + (+p.m||0), 0);
+function cqNeed(s, n){ const need = +s.need || 0; return (need <= 0 || need > n) ? n : need; }
+function cqFull(secs, qs){
+  return (secs||[]).reduce((a,s,si) => { const L = qs.filter(q => q.sec === si); return a + cqNeed(s, L.length) * Math.max(0, ...L.map(qMax)); }, 0);
+}
+function cqCalc(secs, qs, marks){
+  marks = marks || {}; const per = {}; let tot = 0;
+  (secs||[]).forEach((s,si) => {
+    const L = qs.filter(q => q.sec === si).sort((a,b) => a.no - b.no || a.k - b.k), need = cqNeed(s, L.length); let cnt = 0;
+    L.forEach(q => {
+      const m = marks[q.k]; if(!m) return;
+      let any = false, sc = 0;
+      (q.parts||[]).forEach((p,i) => { const v = m.p ? m.p[i] : null; if(v !== null && v !== undefined && v !== "" && !isNaN(+v)){ any = true; sc += Math.min(Math.max(+v, 0), +p.m || 0); } });
+      if(!any) return;
+      let counted = false;
+      if(!m.x && cnt < need){ cnt++; counted = true; tot += sc; }
+      per[q.k] = {sc: Math.round(sc*100)/100, max: qMax(q), counted, x: !!m.x, over: !m.x && !counted};
+    });
+  });
+  return {tot: Math.round(tot*100)/100, per};
+}
+function cqSecLine(s, n){
+  const need = cqNeed(s, n);
+  return need < n ? `${BN_DIGITS(n)}টি থেকে যেকোনো ${BN_DIGITS(need)}টির উত্তর দাও` : `${BN_DIGITS(n)}টি প্রশ্নের উত্তর দাও`;
+}
+
+/* ---------- প্রশ্নপত্র ---------- */
+function cqQHtml(q, s, withSol){
+  const short = s.type === "short";
+  return `<div class="qc" id="cqq${q.k}"><div class="qn">${short ? BN_DIGITS(q.no) + "." : "প্রশ্ন " + BN_DIGITS(q.no)}${short ? `<span class="dn" style="color:var(--mute)">মান ${BN_DIGITS(num(qMax(q)))}</span>` : ""}</div>
+    <div class="qt"${short ? "" : ' style="font-weight:500"'}>${esc(q.stem)}</div>${q.img ? `<img class="qi" src="${q.img}" alt="">` : ""}
+    ${short ? "" : `<div class="cqparts">${q.parts.map(p => `<div><span class="l">${esc(p.l)}.</span><span class="t">${esc(p.t)}</span><span class="m">${BN_DIGITS(num(p.m))}</span></div>`).join("")}</div>`}
+    ${withSol && q.sol ? `<div class="expl">💡 নমুনা উত্তর\n${esc(q.sol)}</div>` : ""}</div>`;
+}
+function cqPaperHtml(e, qs, withSol){
+  return (e.instructions ? `<div class="hl-note" style="margin-bottom:10px"><span>📌</span><span>${esc(e.instructions)}</span></div>` : "") +
+    `<div class="card" style="text-align:center;padding:12px"><b>${esc(e.title)}</b>${e.subject ? `<div class="muted">${esc(e.subject)}</div>` : ""}<div class="muted">পূর্ণমান ${BN_DIGITS(num(cqFull(e.sections, qs)))}</div></div>` +
+    (e.sections||[]).map((s,si) => {
+      const L = qs.filter(q => q.sec === si); if(!L.length) return "";
+      const need = cqNeed(s, L.length), qm = Math.max(0, ...L.map(qMax));
+      return `<div class="cq-sec"><b>${esc(s.t || "বিভাগ " + (si+1))}</b><span>${cqSecLine(s, L.length)} • ${BN_DIGITS(need)} × ${BN_DIGITS(num(qm))} = ${BN_DIGITS(num(need*qm))}</span></div>` + L.map(q => cqQHtml(q, s, withSol)).join("");
+    }).join("");
+}
+
+/* ---------- পরীক্ষার কার্ড ---------- */
+function cqCard(e, compact){
+  const my = e.my, st = e.status, id = e.id;
+  const aud = (e.audience === "free" ? '<span class="chip">🆓 ফ্রি</span>' : `<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ") || "BIO NERDS স্টুডেন্ট")}</span>`) + '<span class="chip org">✍️ লিখিত</span>';
+  const pill = st === "live" ? '<span class="live-pill"><i></i>লাইভ চলছে</span>' : st === "upcoming" ? '<span class="chip warn">⏳ আসছে</span>' : '<span class="chip" style="background:#eef1f4;color:var(--mute)">শেষ হয়েছে</span>';
+  const after = st === "ended" ? `<div class="ex-acts"><button class="btn sec" onclick="exMerit(${id},1)">🏆 মেরিট</button><button class="btn sec" onclick="cqPaperView(${id})">📖 প্রশ্ন ও সমাধান</button></div>` : "";
+  let body = "";
+  const state = my && my.state;
+  if(state === "writing" || state === "upload"){
+    body = `<div class="cdbox"><span>${state === "writing" ? "✍️ লেখার সময় বাকি" : "📷 খাতা আপলোডের সময় বাকি"}</span>${cd(state === "writing" ? my.deadline : my.up_until, "exRefresh")}</div>
+      <button class="btn orange big" onclick="cqRun(${id})">${state === "writing" ? "▶️ প্রশ্নপত্র খোলো" : "📷 খাতার ছবি আপলোড করো"}</button>`;
+  } else if(state === "approved"){
+    body = `<div class="mine"><div><div class="muted" style="font-size:12.5px">তোমার নম্বর</div><div class="sc">${num(my.score)}<small style="font-size:14px;color:var(--mute)"> / ${num(e.total)}</small></div></div>
+      ${my.rank ? `<div style="margin-left:auto;text-align:right"><div class="muted" style="font-size:12.5px">মেরিট পজিশন</div><div class="sc">#${BN_DIGITS(my.rank)}</div></div>` : ""}</div>
+      <div class="ex-acts"><button class="btn" onclick="cqResult(${id})">📊 রেজাল্ট ও মন্তব্য</button>${st === "ended" ? `<button class="btn sec" onclick="exMerit(${id},1)">🏆 মেরিট</button>` : ""}</div>`;
+  } else if(state === "submitted" || state === "checked"){
+    body = `<div class="cdbox g"><span>✅ খাতা জমা হয়েছে (${BN_DIGITS(my.npages)} পাতা)</span><b style="font-size:14px">দেখা চলছে</b></div>` + after;
+  } else if(state === "nosub"){
+    body = `<div class="cdbox"><span>⚠️ সময়ের মধ্যে খাতা জমা হয়নি</span></div><div class="hint">সমস্যা হলে WhatsApp-এ জানাও — সময় বাড়িয়ে দেওয়া যাবে।</div>` + after;
+  } else if(st === "live"){
+    const lastIn = new Date(e.ends_at).getTime() - e.duration_min*60000;
+    body = `<div class="cdbox"><span>🔴 পরীক্ষা শেষ হবে</span>${cd(e.ends_at,"exRefresh")}</div>
+      ${lastIn > nowSrv() ? `<div class="hint" style="margin-top:6px">পুরো ${BN_DIGITS(e.duration_min)} মিনিট পেতে ${bnTime(new Date(lastIn).toISOString())}-এর মধ্যে শুরু করো</div>` : ""}
+      <button class="btn orange big" onclick="cqIntro(${id})">✍️ পরীক্ষা শুরু করো</button>`;
+  } else if(st === "upcoming"){
+    body = `<div class="cdbox g"><span>⏳ শুরু হতে বাকি</span>${cd(e.starts_at,"exRefresh")}</div>`;
+  } else body = after;
+  return `<div class="exc ${st}" id="excq${id}">
+    <div class="top">${aud}${pill}<button class="lnkbtn" style="margin-left:auto" onclick="cqShareLink(${id})">🔗 শেয়ার</button></div>
+    <h4>${esc(e.title)}</h4>${e.subject ? `<div class="sub">📚 ${esc(e.subject)}</div>` : ""}
+    <div class="when">🗓️ ${bnWindow(e)}</div>
+    ${compact ? "" : `<div class="cq-secs">${(e.sections||[]).map(s => `<span>${s.type === "short" ? "📝" : "📘"} ${esc(s.t)}: ${cqNeed(s, s.n) < s.n ? BN_DIGITS(s.n) + "টি থেকে " + BN_DIGITS(cqNeed(s, s.n)) + "টি" : BN_DIGITS(s.n) + "টি"}</span>`).join("")}</div>
+      <div class="ex-meta"><div><b>${BN_DIGITS(e.duration_min)}</b><span>মিনিট লেখা</span></div><div><b>${BN_DIGITS(e.upload_min)}</b><span>মিনিট আপলোড</span></div><div><b>${BN_DIGITS(num(e.total))}</b><span>পূর্ণমান</span></div><div><b>📷</b><span>খাতার ছবি</span></div></div>`}
+    ${body}</div>`;
+}
+async function cqShareLink(id){
+  const e = EXL && EXL.exams.find(x => x.cq && x.id == id); if(!e) return;
+  const text = `✍️ ${COACHING.name} অনলাইন লিখিত পরীক্ষা\n📚 ${e.title}${e.subject ? " — " + e.subject : ""}\n🗓️ ${bnWindow(e)}\n⏱️ ${BN_DIGITS(e.duration_min)} মিনিট • পূর্ণমান ${BN_DIGITS(num(e.total))}\n📷 খাতায় লিখে ছবি আপলোড — শিক্ষক খাতা দেখে নম্বর ও মন্তব্য দেবেন\n👉 `;
+  if(navigator.share){ try{ await navigator.share({title:e.title, text, url:cqLink(id)}); return; }catch(err){ if(err.name === "AbortError") return; } }
+  copyText(text + cqLink(id));
+}
+
+/* ---------- শুরুর আগে নিয়ম ---------- */
+function cqIntro(id){
+  if(!exTok()){ exAuth(() => cqIntro(id)); return; }
+  const e = EXL && EXL.exams.find(x => x.cq && x.id == id); if(!e){ openExams("q" + id); return; }
+  const left = Math.floor((new Date(e.ends_at).getTime() - nowSrv())/60000), get = Math.min(e.duration_min, left);
+  sheet(`<h3>✍️ ${esc(e.title)}</h3><div class="muted">${esc(e.subject||"")}</div>
+    <ul class="rules">
+      <li><span>⏱️</span><span>লেখার সময় <b>${BN_DIGITS(get)} মিনিট</b>${get < e.duration_min ? ` <span class="c-bad">(পরীক্ষা ${bnTime(e.ends_at)}-এ শেষ, তাই পুরো ${BN_DIGITS(e.duration_min)} মিনিট পাবে না)</span>` : ""}। শুরু করলেই টাইমার চালু — থামানো যাবে না।</span></li>
+      <li><span>📄</span><span>প্রশ্ন ফোনে দেখবে, উত্তর লিখবে <b>নিজের খাতায় / সাদা কাগজে</b>। প্রতি পাতার উপরে নাম, রোল/আইডি আর পাতা নম্বর লিখো।</span></li>
+      ${(e.sections||[]).map(s => `<li><span>${s.type === "short" ? "📝" : "📘"}</span><span><b>${esc(s.t)}</b>: ${cqSecLine(s, s.n)}</span></li>`).join("")}
+      <li><span>📷</span><span>লেখা শেষে (বা সময় শেষ হলে) খাতার প্রতিটা পাতার ছবি তুলে আপলোড করবে — এর জন্য বাড়তি <b>${BN_DIGITS(e.upload_min)} মিনিট</b>। এরপর আর জমা নেওয়া হবে না।</span></li>
+      <li><span>💡</span><span>ভালো আলোতে, পাতা সোজা রেখে, পুরো পাতা ফ্রেমে এনে ছবি তোলো। ঝাপসা ছবির নম্বর কাটা যেতে পারে।</span></li>
+      <li><span>🏆</span><span>শিক্ষক খাতা দেখে প্রশ্নভিত্তিক নম্বর ও মন্তব্য দিলে রেজাল্ট দেখতে পাবে। বোর্ডের নিয়মে বেশি প্রশ্নের উত্তর দিলে প্রথমগুলো গোনা হবে।</span></li>
+      ${e.instructions ? `<li><span>📌</span><span>${esc(e.instructions)}</span></li>` : ""}
+    </ul>
+    <button class="btn orange big" onclick="closeSheet();cqRun(${id})">✍️ শুরু করো</button>
+    <button class="btn ghost" onclick="closeSheet()">এখন না</button>`);
+}
+
+/* ---------- পরীক্ষা চলাকালীন (প্রশ্নপত্র + খাতা আপলোড) ---------- */
+let CQ = null;
+async function cqRun(id){
+  const ov = document.createElement("div"); ov.className = "overlay"; ov.innerHTML = '<div><div class="spin"></div>প্রশ্নপত্র আসছে...</div>'; document.body.appendChild(ov);
+  let d;
+  try{ d = await rpc("cq_start", {p_token:exTok(), p_exam:id}); }
+  catch(ex){ ov.remove(); toast(ex.message, 3500); exRefresh(); return; }
+  ov.remove();
+  EX_SKEW = new Date(d.now).getTime() - Date.now();
+  if(CQ && CQ.timer) clearInterval(CQ.timer);
+  CQ = { id, uid:d.uid, key:d.up_key, exam:d.exam, qs:d.questions, start:new Date(d.started_at).getTime(),
+    deadline:new Date(d.deadline).getTime(), upUntil:new Date(d.up_until).getTime(),
+    pages:(d.pages||[]).map(p => ({id:Math.random().toString(36).slice(2), p:p.p, r:p.r||0, st:"ok"})),
+    chosen:new Set((d.chosen||[]).map(Number)), warned:{}, chain:Promise.resolve() };
+  CQ.mode = nowSrv() < CQ.deadline ? "paper" : "upload";
+  show("runView");
+  $("#runView").innerHTML = `
+    <div class="run-top"><div class="r1"><button class="lnkbtn" style="color:#fff;font-size:20px;padding:0 4px" onclick="cqExit()" aria-label="বের হও">←</button>
+      <div class="tt"><b>✍️ ${esc(CQ.exam.title)}</b><small id="cqPh">লেখার সময়</small></div><div class="timer" id="rT">--:--</div></div>
+      <div class="tbar"><i id="rB" style="width:100%"></i></div></div>
+    <div id="rNet"></div><div class="run-main" id="cqMain"></div><div class="run-bot" id="cqBot"></div>`;
+  cqMode(CQ.mode);
+  CQ.timer = setInterval(cqTick, 500); cqTick();
+  window.onbeforeunload = () => "পরীক্ষা চলছে!";
+}
+function cqExit(){
+  if(CQ && !CQ.over && !confirm("পরীক্ষা চলতেই থাকবে, টাইমার থামবে না। পরে পরীক্ষার পাতা থেকে আবার ঢুকে খাতা আপলোড করতে পারবে। বের হবে?")) return;
+  if(CQ){ clearInterval(CQ.timer); CQ = null; }
+  window.onbeforeunload = null; exHome();
+}
+function cqOkPages(){ return CQ.pages.filter(p => p.st === "ok"); }
+function cqMode(m){
+  const C = CQ; if(!C) return; C.mode = m;
+  $("#cqMain").innerHTML = m === "paper"
+    ? cqPaperHtml(C.exam, C.qs, false) + `<button class="btn orange big" onclick="cqMode('upload')">📷 লেখা শেষ — খাতার ছবি তুলি</button>`
+    : cqUploadHtml();
+  cqBot();
+  if(m === "upload"){ cqPaintPages(); cqUpInfo(); C.exam.sections.forEach((s,si) => cqChCount(si)); }
+  window.scrollTo(0,0);
+}
+function cqBot(){
+  const C = CQ, n = cqOkPages().length;
+  $("#cqBot").innerHTML = C.mode === "paper"
+    ? `<div class="cnt">উত্তর খাতায় লেখো<br><b>${BN_DIGITS(n)}</b> পাতা আপলোড হয়েছে</div><button class="btn orange" onclick="cqMode('upload')">📷 খাতা আপলোড</button>`
+    : `<div class="cnt"><b>${BN_DIGITS(n)}</b> পাতা আপলোড হয়েছে<br><button class="lnkbtn" onclick="cqMode('paper')">📄 প্রশ্নপত্র দেখো</button></div><button class="btn orange" onclick="cqSubmitAsk()">📤 জমা দাও</button>`;
+}
+function cqUpInfo(){
+  const box = $("#cqUpInfo"); if(!box || !CQ) return;
+  const writing = nowSrv() < CQ.deadline;
+  box.innerHTML = writing
+    ? `<div class="cdbox g" style="margin-top:0"><span>✍️ লেখার সময় এখনো বাকি</span>${cd(new Date(CQ.deadline).toISOString())}</div><div class="hint">লেখা শেষ হলে ছবি তুলে জমা দাও। সময় শেষ হলেও বাড়তি ${BN_DIGITS(CQ.exam.upload_min || "")} মিনিট পাবে শুধু ছবি তোলার জন্য।</div>`
+    : `<div class="cdbox" style="margin-top:0"><span>⏰ লেখার সময় শেষ — আপলোডের সময় বাকি</span>${cd(new Date(CQ.upUntil).toISOString())}</div><div class="hint">এখন আর লিখবে না — শুধু খাতার ছবি তুলে জমা দাও।</div>`;
+}
+function cqUploadHtml(){
+  const C = CQ, secs = C.exam.sections || [];
+  return `<div class="card" id="cqUpInfo"></div>
+    <div class="card"><h3>১. কোন প্রশ্নগুলোর উত্তর লিখেছ?</h3><div class="muted">যেগুলো লিখেছ সেগুলোতে টিক দাও — খাতা দেখতে সুবিধা হবে।</div>
+      ${secs.map((s,si) => { const L = C.qs.filter(q => q.sec === si); if(!L.length) return "";
+        return `<div style="margin-top:12px;font-weight:700">${esc(s.t)} <span class="muted" style="font-weight:500" id="cqCh${si}"></span></div>
+          <div class="pre-chips">${L.map(q => `<button type="button" class="${C.chosen.has(q.k) ? "on" : ""}" onclick="cqChoose(${q.k},${si},this)">${BN_DIGITS(q.no)}</button>`).join("")}</div>`; }).join("")}</div>
+    <div class="card"><h3>২. খাতার পাতার ছবি</h3>
+      <div class="muted">প্রতিটা পাতার আলাদা ছবি দাও, ক্রম ঠিক রাখো (◀ ▶ দিয়ে সরানো যায়)। উল্টো এলে ⟳ চাপো, ঝাপসা হলে 🗑 দিয়ে মুছে আবার তোলো।</div>
+      <div class="cq-pgs" id="cqPgs"></div>
+      <div class="row" style="gap:8px;margin-top:12px"><button class="btn" style="margin:0" onclick="$('#cqCam').click()">📷 ক্যামেরা</button><button class="btn sec" style="margin:0" onclick="$('#cqGal').click()">🖼️ গ্যালারি থেকে</button></div>
+      <input type="file" id="cqCam" accept="image/*" capture="environment" class="hidden" onchange="cqPick(this)">
+      <input type="file" id="cqGal" accept="image/*" multiple class="hidden" onchange="cqPick(this)"></div>
+    <button class="btn orange big" onclick="cqSubmitAsk()">📤 খাতা জমা দাও</button>`;
+}
+function cqChCount(si){
+  const el = $("#cqCh" + si); if(!el || !CQ) return;
+  const s = CQ.exam.sections[si], L = CQ.qs.filter(q => q.sec === si), need = cqNeed(s, L.length), n = L.filter(q => CQ.chosen.has(q.k)).length;
+  el.innerHTML = `(${BN_DIGITS(n)}/${BN_DIGITS(need)})` + (n > need ? ` <span class="c-bad">— বেশি হয়ে গেছে, বোর্ডের নিয়মে প্রথম ${BN_DIGITS(need)}টা গোনা হবে</span>` : "");
+}
+function cqChoose(k, si, b){
+  CQ.chosen.has(k) ? CQ.chosen.delete(k) : CQ.chosen.add(k);
+  b.classList.toggle("on", CQ.chosen.has(k)); cqChCount(si);
+  clearTimeout(CQ.deb); CQ.deb = setTimeout(() => cqSync(), 2500);
+}
+function cqPaintPages(){
+  const box = $("#cqPgs"); if(!box || !CQ) return;
+  const P = CQ.pages;
+  box.innerHTML = P.length ? P.map((pg,i) => `<div class="cq-pg"><span class="no">${BN_DIGITS(i+1)}</span>
+      <div class="im"><img src="${pg.url || cqUrl(pg.p)}" style="transform:rotate(${pg.r||0}deg)" alt=""></div>
+      ${pg.st === "up" ? '<div class="st"><div><div class="spin" style="margin:0 auto 6px;width:22px;height:22px"></div>আপলোড হচ্ছে...</div></div>'
+        : pg.st === "err" ? `<div class="st" style="color:var(--red)" onclick="cqRetry('${pg.id}')">⚠️ আপলোড হয়নি<br><u>আবার চেষ্টা</u></div>` : ""}
+      <div class="act"><button onclick="cqMove('${pg.id}',-1)" ${i ? "" : "disabled"}>◀</button><button onclick="cqRot('${pg.id}')">⟳</button><button onclick="cqDelPg('${pg.id}')">🗑</button><button onclick="cqMove('${pg.id}',1)" ${i < P.length-1 ? "" : "disabled"}>▶</button></div></div>`).join("")
+    : '<div class="muted" style="grid-column:1/-1;text-align:center;padding:18px;border:2px dashed var(--line);border-radius:14px">এখনো কোনো পাতা আপলোড হয়নি</div>';
+  cqBot();
+}
+async function cqPick(input){
+  const files = [...input.files]; input.value = ""; if(!files.length || !CQ) return;
+  for(const f of files){
+    const pg = {id:Math.random().toString(36).slice(2), r:0, st:"up", url:URL.createObjectURL(f), file:f};
+    CQ.pages.push(pg); cqPaintPages();
+    await cqUp(pg);
+  }
+  cqSync();
+}
+async function cqUp(pg){
+  const C = CQ; if(!C) return;
+  pg.st = "up"; cqPaintPages();
+  try{
+    if(!pg.blob) pg.blob = await cqCompress(pg.file);
+    const path = `${C.id}/${C.uid}/${C.key}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+    await stUpload(path, pg.blob);
+    pg.p = path; pg.st = "ok"; pg.file = null;
+  }catch(ex){ pg.st = "err"; toast(ex.message || "ছবিটা খোলা যায়নি", 3500); }
+  cqPaintPages();
+}
+async function cqRetry(id){ const pg = CQ && CQ.pages.find(x => x.id === id); if(pg){ await cqUp(pg); cqSync(); } }
+function cqRot(id){ const pg = CQ.pages.find(x => x.id === id); if(!pg) return; pg.r = ((pg.r||0) + 90) % 360; cqPaintPages(); clearTimeout(CQ.deb); CQ.deb = setTimeout(() => cqSync(), 1500); }
+function cqMove(id, d){ const P = CQ.pages, i = P.findIndex(x => x.id === id), j = i + d; if(i < 0 || j < 0 || j >= P.length) return; [P[i], P[j]] = [P[j], P[i]]; cqPaintPages(); clearTimeout(CQ.deb); CQ.deb = setTimeout(() => cqSync(), 1500); }
+async function cqDelPg(id){
+  const pg = CQ.pages.find(x => x.id === id); if(!pg || !confirm("এই পাতার ছবিটা মুছবে?")) return;
+  CQ.pages = CQ.pages.filter(x => x !== pg); cqPaintPages();
+  if(pg.p){ try{ await stDelete([pg.p]); }catch(e){} }
+  cqSync();
+}
+// পাতার তালিকা সার্ভারে সেভ (একটার পর একটা)
+function cqSync(final){
+  const C = CQ; if(!C) return Promise.resolve(null);
+  const run = async () => {
+    const pages = C.pages.filter(p => p.st === "ok").map(p => ({p:p.p, r:p.r||0}));
+    const r = await rpc("cq_save", {p_token:exTok(), p_exam:C.id, p_pages:pages, p_chosen:[...C.chosen], p_final:!!final});
+    const nb = $("#rNet"); if(nb) nb.innerHTML = "";
+    return r;
+  };
+  const p = C.chain.then(run, run);
+  C.chain = p.catch(ex => { const nb = $("#rNet"); if(nb && isNetErr(ex)) nb.innerHTML = '<div class="netbar">📶 নেট নেই — নেট এলে আবার চেষ্টা করো</div>'; });
+  return p;
+}
+function cqTick(){
+  const C = CQ; if(!C || C.over) return;
+  const t = $("#rT"); if(!t) return;
+  const now = nowSrv(), w = C.deadline - now, u = C.upUntil - now;
+  if(w > 0){
+    t.textContent = cdText(w); t.className = "timer" + (w < 60000 ? " danger" : w < 300000 ? " warn" : "");
+    $("#rB").style.width = Math.max(0, Math.min(100, w/(C.deadline - C.start)*100)) + "%";
+    if(w < 300000 && w > 240000 && !C.warned.f){ C.warned.f = 1; toast("⏰ লেখার আর ৫ মিনিট বাকি!"); }
+  } else {
+    if(!C.warned.sw){ C.warned.sw = 1; $("#cqPh").textContent = "📷 খাতা আপলোডের সময়";
+      if(C.start < now - 3000) toast("⏰ লেখার সময় শেষ! এখন খাতার ছবি তুলে জমা দাও", 5000);
+      if(C.mode !== "upload") cqMode("upload"); else cqUpInfo(); }
+    t.textContent = cdText(u); t.className = "timer" + (u < 120000 ? " danger" : " warn");
+    $("#rB").style.width = Math.max(0, Math.min(100, u/(C.upUntil - C.deadline)*100)) + "%";
+    if(u < 120000 && !C.warned.u2){ C.warned.u2 = 1; toast("⏰ আর ২ মিনিট — এখনই জমা দাও!", 4000); }
+    if(u <= 0 && !C.warned.end){ C.warned.end = 1;
+      if(cqOkPages().length) cqSubmit(true);
+      else { C.over = true; clearInterval(C.timer); window.onbeforeunload = null;
+        $("#cqMain").innerHTML = `<div class="done-wrap"><div class="done-ic" style="background:#fdeaea">⏰</div><h2>আপলোডের সময় শেষ</h2><p class="muted" style="margin-top:6px">কোনো পাতা আপলোড হয়নি। সমস্যা হলে এখনই WhatsApp-এ (${esc(COACHING.whatsapp)}) জানাও।</p><button class="btn" onclick="cqExit()">← পরীক্ষার পাতায় ফিরে যাও</button></div>`;
+        $("#cqBot").innerHTML = ""; } }
+  }
+}
+window.addEventListener("online", () => { if(CQ && !CQ.over){ CQ.pages.filter(p => p.st === "err").forEach(p => cqUp(p)); cqSync(); } });
+function cqSubmitAsk(){
+  const C = CQ, ok = cqOkPages().length, up = C.pages.filter(p => p.st === "up").length, bad = C.pages.filter(p => p.st === "err").length;
+  if(!ok && !up){ toast("আগে খাতার পাতার ছবি তোলো 📷", 3000); if(C.mode !== "upload") cqMode("upload"); return; }
+  const warn = C.exam.sections.map((s,si) => { const L = C.qs.filter(q => q.sec === si), need = cqNeed(s, L.length), n = L.filter(q => C.chosen.has(q.k)).length;
+    return n < need ? `<div class="muted">• ${esc(s.t)}: ${BN_DIGITS(n)}টা টিক দিয়েছ (লাগবে ${BN_DIGITS(need)}টা)</div>` : ""; }).join("");
+  const writing = nowSrv() < C.deadline;
+  sheet(`<h3>📤 খাতা জমা দেবে?</h3>
+    <div class="rs-grid" style="margin:14px 0"><div><b class="c-ok">${BN_DIGITS(ok)}</b><span>পাতা আপলোড</span></div><div><b class="${up ? "c-sk" : ""}">${BN_DIGITS(up)}</b><span>আপলোড হচ্ছে</span></div><div><b class="${bad ? "c-bad" : ""}">${BN_DIGITS(bad)}</b><span>আপলোড হয়নি</span></div></div>
+    ${bad ? '<div class="err" style="margin-top:0">⚠️ কিছু পাতা আপলোড হয়নি — ওগুলোতে চেপে আবার চেষ্টা করো, নাহলে সেগুলো জমা হবে না।</div>' : ""}
+    ${warn}${writing ? `<div class="hint">লেখার সময় এখনো বাকি। জমা দিলে আর কোনো পাতা যোগ করা যাবে না।</div>` : ""}
+    <button class="btn orange big" onclick="closeSheet();cqSubmit(false)">✅ হ্যাঁ, জমা দাও</button>
+    <button class="btn ghost" onclick="closeSheet()">ফিরে যাও</button>`);
+}
+async function cqSubmit(auto){
+  const C = CQ; if(!C || C.over) return;
+  C.over = true; closeSheet();
+  const ov = document.createElement("div"); ov.className = "overlay";
+  ov.innerHTML = `<div><div class="spin"></div>${auto ? "⏰ সময় শেষ — " : ""}খাতা জমা হচ্ছে...</div>`; document.body.appendChild(ov);
+  for(let i = 0; i < 60 && C.pages.some(p => p.st === "up"); i++) await new Promise(ok => setTimeout(ok, 1000));
+  let r = null, lastErr = null;
+  for(let i = 0; i < 5 && !r; i++){
+    try{ r = await cqSync(true); }
+    catch(ex){ lastErr = ex; if(!isNetErr(ex)) break; await new Promise(ok => setTimeout(ok, 3000)); }
+  }
+  ov.remove();
+  if(!r){
+    C.over = false;
+    toast(lastErr ? lastErr.message : "জমা হয়নি", 4000);
+    if(lastErr && !isNetErr(lastErr) && /সময় শেষ/.test(lastErr.message)){ cqExit(); }
+    return;
+  }
+  clearInterval(C.timer); window.onbeforeunload = null;
+  $("#cqBot").innerHTML = ""; window.scrollTo(0,0);
+  $("#cqMain").innerHTML = `<div class="done-wrap"><div class="done-ic">✅</div>
+    <h2>খাতা জমা হয়েছে!</h2><p class="muted" style="margin-top:4px">${BN_DIGITS(r.npages ?? cqOkPages().length)} পাতা জমা পড়েছে। শুভকামনা 🤲</p>
+    <div class="card" style="margin-top:16px;text-align:left">👨‍🏫 শিক্ষক খাতা দেখে প্রশ্নভিত্তিক নম্বর আর মন্তব্য দেবেন। নম্বর প্রকাশ হলে পরীক্ষার পাতায় “📊 রেজাল্ট” দেখতে পাবে।</div>
+    <button class="btn" onclick="cqExit()">🏠 পরীক্ষার পাতায় ফিরে যাও</button></div>`;
+  CQ = null;
+}
+
+/* ---------- রেজাল্ট (স্টুডেন্ট) ---------- */
+function cqBreakHtml(e, qs, marks, chosen){
+  const calc = cqCalc(e.sections, qs, marks);
+  return (e.sections||[]).map((s,si) => {
+    const L = qs.filter(q => q.sec === si && calc.per[q.k]);
+    if(!L.length) return "";
+    return `<div class="ex-sec" style="font-size:16px">${esc(s.t)}</div>` + L.map(q => {
+      const p = calc.per[q.k], m = marks[q.k] || {};
+      return `<div class="qc" style="padding:12px 14px"><div class="qn" style="font-size:14px;color:var(--ink)">${s.type === "short" ? "প্রশ্ন " + BN_DIGITS(q.no) : "সৃজনশীল " + BN_DIGITS(q.no)}
+          <span class="dn" style="font-family:Poppins;font-size:16px;color:${p.counted ? "var(--g2)" : "var(--mute)"}">${BN_DIGITS(num(p.sc))} / ${BN_DIGITS(num(p.max))}</span></div>
+        ${s.type === "short" ? "" : `<div class="muted" style="font-size:13.5px">${q.parts.map((pt,i) => `${esc(pt.l)} ${BN_DIGITS(num(m.p && m.p[i] != null && m.p[i] !== "" ? Math.min(+m.p[i], +pt.m) : 0))}/${BN_DIGITS(num(pt.m))}`).join(" • ")}</div>`}
+        ${p.counted ? "" : `<div class="tag sk" style="display:inline-block;margin-top:6px">গোনা হয়নি — ${p.x ? "অতিরিক্ত উত্তর" : "বিভাগে প্রয়োজনের বেশি উত্তর"}</div>`}
+        ${m.c ? `<div class="expl" style="background:#fff8ea;border-left-color:var(--gold)">✍️ ${esc(m.c)}</div>` : ""}</div>`;
+    }).join("");
+  }).join("");
+}
+async function cqResult(id){
+  if(!exTok()){ exAuth(() => cqResult(id), "login"); return; }
+  exOpenPage("📊 লিখিত পরীক্ষার রেজাল্ট");
+  let r; try{ r = await rpc("cq_result", {p_token:exTok(), p_exam:id}); }
+  catch(ex){ $("#exMain").innerHTML = '<div class="err">' + esc(ex.message) + '</div>'; return; }
+  if(r.pending){
+    const M = {submitted:["⏳","খাতা জমা হয়েছে — শিক্ষক খাতা দেখছেন", "নম্বর প্রকাশ হলে এখানে দেখতে পাবে।"], checked:["⏳","খাতা দেখা হয়েছে — শীঘ্রই নম্বর প্রকাশ হবে", ""],
+      running:["📷","খাতা এখনো জমা হয়নি", ""], nosub:["⚠️","খাতা সময়ের মধ্যে জমা হয়নি", "সমস্যা হলে WhatsApp-এ জানাও।"]}[r.status] || ["⏳","রেজাল্ট এখনো প্রকাশ হয়নি",""];
+    $("#exMain").innerHTML = `<div class="done-wrap"><div class="done-ic">${M[0]}</div><h2>${M[1]}</h2><p class="muted" style="margin-top:6px">${esc(r.title)}${r.status !== "nosub" && r.npages ? " • " + BN_DIGITS(r.npages) + " পাতা" : ""}<br>${M[2]}</p>
+      ${r.status === "running" ? `<button class="btn orange" onclick="cqRun(${id})">📷 খাতা আপলোড করো</button>` : ""}<button class="btn" onclick="exHome()">← ফিরে যাও</button></div>`;
+    return;
+  }
+  const e = r.exam, qs = r.questions, total = +e.total || cqFull(e.sections, qs), pct = total ? r.score/total*100 : 0, pass = pct >= (+e.pass_pct || 40);
+  window.__res = {exam:{id:e.id, title:e.title, subject:e.subject, audience:"cq", total}, me:r.me, score:r.score, rank:r.rank, participants:r.participants};
+  $("#exMain").innerHTML = `
+    <div class="rs-hero"><div style="font-weight:700">${esc(e.title)}</div><div style="opacity:.8;font-size:13.5px">${esc(e.subject||"")} • লিখিত</div>
+      ${ringHtml(pct, BN_DIGITS(num(r.score)), "/ " + BN_DIGITS(num(total)) + " নম্বর")}
+      <span class="pf ${pass ? "p" : "f"}">${pass ? "🎉 পাস" : "আরও চেষ্টা লাগবে"} • ${BN_DIGITS(Math.round(pct))}%</span>
+      ${r.rank ? `<div style="margin-top:12px;font-size:15px"><b style="font-size:26px;font-family:Poppins">#${BN_DIGITS(r.rank)}</b><br>${BN_DIGITS(r.participants)} জনের মধ্যে মেরিট পজিশন</div>`
+        : `<div style="margin-top:10px;font-size:13.5px;opacity:.85">পরীক্ষা শেষ হলে মেরিট পজিশন দেখাবে</div>`}</div>
+    ${r.rank ? `<div class="rs-grid"><div><b>${BN_DIGITS(num(r.highest))}</b><span>সর্বোচ্চ</span></div><div><b>${BN_DIGITS(num(r.average))}</b><span>গড়</span></div><div><b>${BN_DIGITS(r.participants)}</b><span>জন</span></div></div>` : ""}
+    ${r.remark ? `<div class="card" style="border-left:4px solid var(--gold)"><b>👨‍🏫 শিক্ষকের মন্তব্য</b><div style="white-space:pre-wrap;margin-top:4px">${esc(r.remark)}</div></div>` : ""}
+    ${r.rank ? `<button class="btn orange" onclick="exShareCard()">📤 রেজাল্ট কার্ড শেয়ার করো</button>` : ""}
+    ${e.ended ? `<div class="ex-acts"><button class="btn sec" onclick="exMerit(${id},1)">🏆 মেরিট লিস্ট</button><button class="btn sec" onclick="cqPaperView(${id})">📖 প্রশ্ন ও সমাধান</button></div>` : ""}
+    <div class="ex-sec">🧮 প্রশ্নভিত্তিক নম্বর</div>${cqBreakHtml(e, qs, r.marks || {}, r.chosen) || '<div class="card muted">বিস্তারিত নম্বর দেওয়া নেই।</div>'}
+    ${(r.pages||[]).length ? `<details class="card" style="margin-top:12px"><summary class="lnkbtn">📄 আমার খাতা দেখো (${BN_DIGITS(r.pages.length)} পাতা)</summary><div style="margin-top:10px">${r.pages.map((p,i) => pageHtml(p,i)).join("")}</div></details>`
+      : e.purged ? '<div class="hint">খাতার ছবি জায়গা বাঁচাতে মুছে ফেলা হয়েছে — নম্বর ও মন্তব্য থাকছে।</div>' : ""}
+    ${e.ended ? "" : '<div class="hint">পরীক্ষা শেষ হলে প্রশ্নের নমুনা উত্তর আর মেরিট লিস্ট দেখা যাবে।</div>'}
+    ${r.me.kind === "guest" ? admCtaHtml() : ""}`;
+}
+async function cqPaperView(id){
+  exOpenPage("📖 প্রশ্ন ও নমুনা উত্তর");
+  let p; try{ p = await rpc("cq_paper", {p_exam:id, p_token:exTok()}); }
+  catch(ex){ $("#exMain").innerHTML = '<div class="err">' + esc(ex.message) + '</div>'; return; }
+  $("#exMain").innerHTML = cqPaperHtml(p, p.questions, true);
+}
+
+/* ================================================================
+   ⚙️ অ্যাডমিন: লিখিত পরীক্ষা
+   ================================================================ */
+let CQ_LIST = [];
+const mbTxt = b => BN_DIGITS((b/1048576).toFixed(b < 10485760 ? 1 : 0)) + " MB";
+async function cqAdm(){
+  $("#aexBody").innerHTML = `<button class="btn orange" style="margin-top:0" onclick="cqEdit()">➕ নতুন লিখিত (CQ) পরীক্ষা বানাও</button>
+    <p class="hint">টিপস: প্রশ্ন Claude-কে দিয়ে “পোর্টালে লিখিত পরীক্ষা বানাও” বললে সরাসরি এখানে চলে আসবে। খাতাও Claude-কে দিয়ে দেখাতে পারো — তুমি দেখে ✅ অনুমোদন দিলেই স্টুডেন্ট নম্বর দেখবে।</p>
+    <div id="cqStore"></div><div id="cqList"><div class="spin"></div></div>`;
+  cqStorage();
+  try{
+    CQ_LIST = await rpc("cq_admin_list", {p_token:TOKEN});
+    $("#cqList").innerHTML = CQ_LIST.length ? CQ_LIST.map(e => { const todo = e.submitted - e.checked - e.approved;
+      return `<div class="card">
+      <div class="row" style="gap:6px;flex-wrap:wrap">${OE_ST[e.status]}${e.audience === "free" ? '<span class="chip">🆓 ফ্রি</span>' : `<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ") || "সব স্টুডেন্ট")}</span>`}<span class="chip org">✍️ লিখিত</span></div>
+      <b style="display:block;font-size:17px;margin-top:6px">${esc(e.title)}</b><div class="muted">${esc(e.subject||"")}</div>
+      <div class="muted" style="margin-top:4px">🗓️ ${bnWindow(e)}</div>
+      <div class="grid4"><div><b>${BN_DIGITS(num(e.total))}</b><span>পূর্ণমান</span></div><div><b>${BN_DIGITS(e.submitted)}</b><span>খাতা জমা</span></div><div><b>${BN_DIGITS(e.checked)}</b><span>অনুমোদন বাকি</span></div><div><b>${BN_DIGITS(e.approved)}</b><span>অনুমোদিত</span></div></div>
+      ${todo > 0 ? `<div class="hl-note" style="margin-top:10px;font-size:14px"><span>🆕</span><span>${BN_DIGITS(todo)}টা খাতা দেখা বাকি</span></div>` : ""}
+      <div class="row" style="gap:6px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn sm" onclick="cqScripts(${e.id})">📝 খাতা দেখো</button>
+        <button class="btn sm sec" onclick="cqEdit(${e.id})">✏️ এডিট</button>
+        <button class="btn sm sec" onclick="cqPromo(${e.id})">📢 প্রচার</button>
+        <button class="btn sm sec" onclick="cqEdit(${e.id},true)">📑 কপি</button>
+        <button class="btn sm danger" onclick="cqDel(${e.id})">🗑</button></div></div>`; }).join("")
+      : '<div class="card muted">এখনো কোনো লিখিত পরীক্ষা নেই। উপরের বাটন চেপে প্রথমটা বানাও।</div>';
+  }catch(ex){ $("#cqList").innerHTML = '<div class="err">' + esc(ex.message) + '<br>লিখিত পরীক্ষার SQL (cq-exam.sql) চালানো হয়েছে তো?</div>'; }
+}
+async function cqStorage(){
+  const box = $("#cqStore"); if(!box) return;
+  let s; try{ s = await rpc("cq_admin_storage", {p_token:TOKEN}); }catch(e){ box.innerHTML = ""; return; }
+  const LIM = 1073741824, pct = s.all_bytes / LIM * 100;
+  window.__cqSt = s;
+  box.innerHTML = `<div class="card"><h3>💾 খাতার ছবির জায়গা</h3>
+    <div class="sbar"><i style="width:${Math.max(1, Math.min(100, pct))}%;background:${pct > 80 ? "var(--red)" : pct > 60 ? "var(--gold)" : "var(--g3)"}"></i></div>
+    <div class="muted" style="margin-top:6px">${mbTxt(s.all_bytes)} / ১০২৪ MB ব্যবহার হয়েছে (ফ্রি প্ল্যানে ১ জিবি) • এর মধ্যে খাতার ছবি ${mbTxt(s.cq_bytes)}</div>
+    ${pct > 80 ? '<div class="err">⚠️ জায়গা প্রায় শেষ — পুরনো পরীক্ষার খাতার ছবি মুছে ফেলো।</div>' : ""}
+    ${s.exams.length ? `<details style="margin-top:8px"><summary class="lnkbtn">🗑 পুরনো খাতার ছবি মুছো</summary>
+      <div class="hint" style="margin-top:6px">ছবি মুছলেও নম্বর, মন্তব্য আর রেজাল্ট থেকে যাবে — শুধু খাতার ছবি আর দেখা যাবে না।</div>
+      <table class="tbl" style="margin-top:6px">${s.exams.map(x => `<tr><td><b>${esc(x.title)}</b><div class="muted" style="font-size:12px">শেষ: ${bnDay(x.ends_at)} • ${BN_DIGITS(x.files)}টা ছবি • ${mbTxt(x.bytes)}${x.pending ? ` • <span class="c-bad">${BN_DIGITS(x.pending)}টা খাতা অনুমোদন বাকি</span>` : ""}</div></td>
+        <td style="text-align:right"><button class="btn sm danger" onclick="cqPurge(${x.id})">🗑 মুছো</button></td></tr>`).join("")}</table></details>` : '<div class="hint">এখনো কোনো খাতার ছবি নেই।</div>'}</div>`;
+}
+async function cqPurge(id){
+  const x = (window.__cqSt && window.__cqSt.exams.find(e => e.id == id)) || {};
+  if(!confirm(`“${x.title || ""}” পরীক্ষার ${BN_DIGITS(x.files || "")}টা খাতার ছবি একেবারে মুছে যাবে (${mbTxt(x.bytes || 0)})।\nনম্বর, মন্তব্য, রেজাল্ট থেকে যাবে।` + (x.pending ? `\n\n⚠️ ${x.pending}টা খাতার এখনো অনুমোদন বাকি!` : "") + "\n\nমুছবে?")) return;
+  const ov = document.createElement("div"); ov.className = "overlay"; ov.innerHTML = '<div><div class="spin"></div><span id="cqPurgeMsg">ছবি মোছা হচ্ছে...</span></div>'; document.body.appendChild(ov);
+  try{
+    let done = 0;
+    for(let round = 0; round < 30; round++){
+      const names = await rpc("cq_admin_purge_start", {p_token:TOKEN, p_exam:id});
+      for(let i = 0; i < names.length; i += 100){ await stDelete(names.slice(i, i+100)); done += Math.min(100, names.length - i); const m = $("#cqPurgeMsg"); if(m) m.textContent = BN_DIGITS(done) + "টা ছবি মোছা হয়েছে..."; }
+      const r = await rpc("cq_admin_purge_done", {p_token:TOKEN, p_exam:id});
+      if(!r.left) break;
+      if(!names.length) throw new Error("কিছু ছবি মোছা যায়নি");
+    }
+    toast("🗑 খাতার ছবি মুছে ফেলা হয়েছে", 3000);
+  }catch(ex){ toast(ex.message, 4000); }
+  ov.remove(); cqStorage();
+}
+function cqPromo(id){
+  const e = CQ_LIST.find(x => x.id == id); if(!e) return;
+  const t = `✍️ ${COACHING.name} অনলাইন লিখিত পরীক্ষা ✍️\n\n📚 ${e.title}${e.subject ? "\n📖 " + e.subject : ""}\n🗓️ ${bnWindow(e)}\n⏱️ লেখার সময় ${BN_DIGITS(e.duration_min)} মিনিট • পূর্ণমান ${BN_DIGITS(num(e.total))}\n\n📄 প্রশ্ন দেখবে পোর্টালে, উত্তর লিখবে খাতায়\n📷 লেখা শেষে খাতার ছবি আপলোড (বাড়তি ${BN_DIGITS(e.upload_min)} মিনিট)\n👨‍🏫 বোর্ডের নিয়মে খাতা দেখে প্রশ্নভিত্তিক নম্বর ও মন্তব্য\n🏆 মেরিট লিস্ট\n\n👉 ${cqLink(id)}\n\n📞 ${COACHING.phones}`;
+  sheet(`<h3>📢 Facebook / WhatsApp পোস্ট</h3><div class="muted">কপি করে পেজ বা গ্রুপে পোস্ট করো।</div>
+    <div class="pwlist" style="max-height:50vh;font-family:inherit;font-size:14.5px">${esc(t)}</div>
+    <button class="btn" onclick="copyText(this.dataset.t)" data-t="${esc(t)}">📋 লেখা কপি করো</button>
+    <a class="btn sec" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(t)}">📲 WhatsApp-এ পাঠাও</a>`);
+}
+async function cqDel(id){
+  const e = CQ_LIST.find(x => x.id == id);
+  if(!confirm(`“${e ? e.title : ""}” পরীক্ষা, এর প্রশ্ন আর সবার নম্বর মুছে যাবে। নিশ্চিত?`)) return;
+  try{ await rpc("cq_admin_delete", {p_token:TOKEN, p_exam:id}); toast("মুছে ফেলা হয়েছে"); cqAdm(); }catch(ex){ toast(ex.message, 4500); }
+}
+
+/* --- প্রশ্ন পার্স করা (সৃজনশীল / সংক্ষিপ্ত) --- */
+function cqStripMark(t){ return t.replace(/([?？।:.)\]])\s*[\[(]?\s*[০-৯\d](?:\.[০-৯\d])?\s*[\])]?\s*$/, "$1").trim(); }
+function parseCQ(text, type, nParts){
+  const qs = [], errs = []; let cur = null, mode = null, blank = false;
+  const reQ = /^(প্রশ্ন\s*(?:নং|নম্বর)?\s*[:-]?\s*)?([০-৯\d]{1,3})\s*[.)।:]\s*(.*)$/;
+  const reP = /^\(?\s*([কখগঘঙচ]|[a-fA-F])\s*[.)।:]\s*(.*)$/;
+  const reS = /^(?:সমাধান|নমুনা\s*উত্তর|উত্তর|উঃ|Ans(?:wer)?|Solution)\s*[:：ঃ.\-]\s*(.*)$/i;
+  const push = () => { if(cur){ cur.stem = cur.stem.trim(); cur.sol = (cur.sol||"").trim(); qs.push(cur); } };
+  String(text||"").split(/\r?\n/).forEach(raw => {
+    const l = raw.trim();
+    if(!l){ blank = true; if(cur && mode === "s") cur.sol += "\n"; else if(cur && mode === "q") cur.stem += "\n"; return; }
+    const wasBlank = blank; blank = false; let m;
+    if((m = l.match(reQ))){
+      const kw = !!m[1];
+      const canNew = !cur || (type === "short" ? (mode !== "s" || wasBlank || kw) : (mode === "p" || (mode === "s" && (wasBlank || kw)) || (kw && mode !== "q")));
+      if(canNew){ push(); cur = {stem:m[3], parts:[], sol:""}; mode = "q"; return; }
+    }
+    if(cur && mode !== "s" && (m = l.match(reS))){ cur.sol = m[1]; mode = "s"; return; }
+    if(cur && type === "cq" && mode !== "s" && (m = l.match(reP))){ cur.parts.push(cqStripMark(m[2])); mode = "p"; return; }
+    if(!cur){ cur = {stem:l, parts:[], sol:""}; mode = "q"; return; }
+    if(mode === "q") cur.stem += "\n" + l;
+    else if(mode === "s") cur.sol += "\n" + l;
+    else if(mode === "p") cur.parts[cur.parts.length-1] += " " + l;
+  });
+  push();
+  qs.forEach((q,i) => {
+    if(type === "short") q.stem = cqStripMark(q.stem);
+    if(!q.stem.trim()) errs.push(`প্রশ্ন ${i+1}: প্রশ্ন/উদ্দীপক খালি`);
+    if(type === "cq" && q.parts.length !== nParts) errs.push(`প্রশ্ন ${i+1}: ${nParts}টা অংশ (${CQ_LET.slice(0,nParts).join(", ")}) দরকার, পাওয়া গেছে ${q.parts.length}টা`);
+  });
+  return {qs, errs};
+}
+function cqToText(qs, type){
+  return qs.map((q,i) => type === "short"
+    ? `${i+1}. ${q.stem}` + (q.sol ? `\nসমাধান: ${q.sol}` : "")
+    : `${i+1}. ${q.stem}\n` + q.parts.map((p,j) => `${CQ_LET[j]}. ${p.t}`).join("\n") + (q.sol ? `\nসমাধান: ${q.sol}` : "")).join("\n\n");
+}
+
+/* --- এডিটর --- */
+let CQ_ED = null;
+const CQ_PRESET = {
+  hsc:   {t:"সৃজনশীল প্রশ্ন", type:"cq", need:5, marks:[1,2,3,4], hint:"৮টি থেকে ৫টি"},
+  ssc:   {t:"সৃজনশীল প্রশ্ন", type:"cq", need:4, marks:[1,2,3,4], hint:"৭টি থেকে ৪টি"},
+  short: {t:"সংক্ষিপ্ত প্রশ্ন", type:"short", need:5, marks:[2], hint:"১০টি থেকে ৫টি"},
+};
+async function cqEdit(id, copy){
+  let e = {title:"", subject:"", audience:"batch", batches:[], starts_at:fromLocalInput(nextFri(19)), ends_at:fromLocalInput(nextFri(22)),
+    duration_min:120, upload_min:10, pass_pct:40, published:false, instructions:"", sections:[{...CQ_PRESET.hsc}], questions:[], participants:0};
+  if(id){ $("#aexBody").innerHTML = '<div class="spin"></div>';
+    try{ e = await rpc("cq_admin_get", {p_token:TOKEN, p_exam:id}); }catch(ex){ toast(ex.message); return; } }
+  if(copy) e = {...e, id:null, title:e.title + " (কপি)", published:false, participants:0};
+  CQ_ED = {id: copy ? null : (id||null), aud:e.audience, batches:new Set(e.batches||[]), live: !copy && id && e.participants > 0, imgs:{},
+    secs:(e.sections||[]).map((s,si) => { const L = (e.questions||[]).filter(q => q.sec === si);
+      L.forEach((q,i) => { if(q.img) CQ_ED_IMG[si + "_" + i] = q.img; });
+      return {t:s.t||"", type:s.type||"cq", need:+s.need||0, marks:(s.marks||[1,2,3,4]).map(Number), text:cqToText(L, s.type)}; })};
+  CQ_ED.imgs = CQ_ED_IMG; CQ_ED_IMG = {};
+  window.scrollTo(0,0);
+  $("#aexBody").innerHTML = `
+    <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="cqAdm()">← সব লিখিত পরীক্ষা</button><b style="margin-left:4px">${CQ_ED.id ? "✏️ এডিট" : "➕ নতুন লিখিত পরীক্ষা"}</b></div>
+    ${CQ_ED.live ? `<div class="hl-note" style="margin-bottom:12px"><span>⚠️</span><span>${BN_DIGITS(e.participants)} জন এই পরীক্ষা দিয়ে ফেলেছে। প্রশ্নের ক্রম বদলিও না — নম্বর প্রশ্ন ধরে রাখা আছে। মান বদলালে সবার নম্বর আবার হিসাব হবে।</span></div>` : ""}
+    <div class="card"><h3>১. পরীক্ষার তথ্য</h3>
+      <label>পরীক্ষার নাম</label><input id="cT" value="${esc(e.title)}" placeholder="যেমন: HSC'27 লিখিত পরীক্ষা ০১">
+      <label>বিষয় / অধ্যায়</label><input id="cS" value="${esc(e.subject||"")}" placeholder="যেমন: জীববিজ্ঞান ১ম পত্র — কোষ বিভাজন">
+      <label>কার জন্য</label>
+      <div class="aud" id="cAud"><button type="button" data-a="batch">🔒 শুধু আমার স্টুডেন্ট<small>পোর্টালের আইডিতে</small></button>
+        <button type="button" data-a="free">🆓 ফ্রি — সবার জন্য<small>বাইরের স্টুডেন্টরাও</small></button></div>
+      <div id="cBat" class="pre-chips" style="margin-top:10px"></div></div>
+    <div class="card"><h3>২. সময়</h3>
+      <label>পরীক্ষা শুরু (এই সময় থেকে ঢোকা যাবে)</label><input id="cSt" type="datetime-local" value="${toLocalInput(e.starts_at)}">
+      <label>পরীক্ষা শেষ (এরপর আর শুরু করা যাবে না)</label><input id="cEn" type="datetime-local" value="${toLocalInput(e.ends_at)}">
+      <label>লেখার সময় (মিনিট)</label><input id="cDu" type="number" inputmode="numeric" value="${e.duration_min}">
+      <div class="pre-chips" id="cDuC">${[30,45,60,90,120,150,180].map(m => `<button type="button" data-m="${m}">${BN_DIGITS(m)} মি.</button>`).join("")}</div>
+      <label>খাতার ছবি তোলার বাড়তি সময় (মিনিট)</label><input id="cUp" type="number" inputmode="numeric" value="${e.upload_min}">
+      <div class="pre-chips" id="cUpC">${[5,10,15,20,30].map(m => `<button type="button" data-m="${m}">${BN_DIGITS(m)} মি.</button>`).join("")}</div>
+      <div class="hint" id="cWin"></div></div>
+    <div class="card"><h3>৩. বিভাগ ও প্রশ্ন</h3>
+      <div class="muted">প্রতি বিভাগে মান আর কয়টার উত্তর দিতে হবে ঠিক করো, তারপর প্রশ্ন পেস্ট করো।</div>
+      <details style="margin-top:8px"><summary class="muted">📋 প্রশ্ন কোন ফরম্যাটে দেবে? (চাপো)</summary>
+        <div class="pwlist" style="font-family:inherit">সৃজনশীল:\n1. রহিম একটি কোষ পর্যবেক্ষণ করে দেখল...(উদ্দীপক)\nক. অ্যামাইটোসিস কী?\nখ. স্পিন্ডল তন্তুর কাজ লেখো।\nগ. উদ্দীপকের বিভাজনটি ব্যাখ্যা করো।\nঘ. মাইটোসিসের সাথে তুলনা করো।\nসমাধান: (ঐচ্ছিক — নমুনা উত্তর/মার্কিং গাইড)\n\n2. পরের উদ্দীপক...\n\nসংক্ষিপ্ত:\n1. সেন্ট্রোমিয়ার কী?\n2. ক্যারিওকাইনেসিস কাকে বলে?</div>
+        <div class="hint">• প্রশ্নগুলোর মাঝে একটা ফাঁকা লাইন রাখো\n• অংশ ক/খ/গ/ঘ বা a/b/c/d — দুটোই চলবে; লাইনের শেষে মান (১, ২…) থাকলে নিজে থেকে বাদ যাবে\n• “সমাধান:” ঐচ্ছিক — পরীক্ষা শেষে স্টুডেন্টরা নমুনা উত্তর হিসেবে দেখবে, Claude খাতা দেখার সময় এটা ধরে নম্বর দেবে\n• উদ্দীপকের ছবি নিচের প্রিভিউ থেকে যোগ করো</div></details>
+      <div id="cSecs"></div>
+      <div class="pre-chips" style="margin-top:10px"><span class="muted" style="width:100%">➕ বিভাগ যোগ করো:</span>
+        <button type="button" onclick="cqSecAdd('hsc')">📘 সৃজনশীল (HSC ৮→৫)</button><button type="button" onclick="cqSecAdd('ssc')">📘 সৃজনশীল (SSC ৭→৪)</button><button type="button" onclick="cqSecAdd('short')">📝 সংক্ষিপ্ত</button></div>
+      <div id="cTot" style="margin-top:12px"></div></div>
+    <div class="card"><h3>৪. অন্যান্য</h3>
+      <label style="margin-top:0">পাস (%)</label><input id="cPs" type="number" inputmode="numeric" value="${e.pass_pct}">
+      <label>বিশেষ নির্দেশনা (ঐচ্ছিক)</label><input id="cIn" value="${esc(e.instructions||"")}" placeholder="যেমন: চিত্রসহ উত্তর দাও"></div>
+    <button class="btn orange big" onclick="cqSave(true)">🚀 প্রকাশ করো</button>
+    <button class="btn sec" onclick="cqSave(false)">💾 খসড়া হিসেবে রাখো (স্টুডেন্টরা দেখবে না)</button>
+    <div id="cMsg"></div>
+    <input type="file" id="cImgIn" accept="image/*" class="hidden" onchange="cqImgPicked(event)">`;
+  const paintAud = () => {
+    document.querySelectorAll("#cAud button").forEach(b => b.classList.toggle("on", b.dataset.a === CQ_ED.aud));
+    $("#cBat").innerHTML = CQ_ED.aud === "batch" ? `<span class="muted" style="width:100%">কোন ব্যাচ? (কিছু না বাছলে সব স্টুডেন্ট)</span>` +
+      COACHING.batches.map(b => `<button type="button" class="${CQ_ED.batches.has(b) ? "on" : ""}" data-b="${esc(b)}">${esc(b)}</button>`).join("") : "";
+    document.querySelectorAll("#cBat button").forEach(x => x.onclick = () => { CQ_ED.batches.has(x.dataset.b) ? CQ_ED.batches.delete(x.dataset.b) : CQ_ED.batches.add(x.dataset.b); paintAud(); });
+  };
+  document.querySelectorAll("#cAud button").forEach(b => b.onclick = () => { CQ_ED.aud = b.dataset.a; paintAud(); });
+  paintAud();
+  const chips = (inp, box) => { const f = () => document.querySelectorAll(box + " button").forEach(b => b.classList.toggle("on", +b.dataset.m === +$(inp).value));
+    document.querySelectorAll(box + " button").forEach(b => b.onclick = () => { $(inp).value = b.dataset.m; f(); cqWin(); }); $(inp).oninput = () => { f(); cqWin(); }; f(); };
+  chips("#cDu", "#cDuC"); chips("#cUp", "#cUpC");
+  $("#cSt").onchange = cqWin; $("#cEn").onchange = cqWin; cqWin();
+  cqSecsPaint();
+}
+let CQ_ED_IMG = {};
+function cqWin(){
+  const s = fromLocalInput($("#cSt").value), e = fromLocalInput($("#cEn").value), d = +$("#cDu").value, u = +$("#cUp").value;
+  if(!s || !e){ $("#cWin").textContent = ""; return; }
+  const mins = (new Date(e) - new Date(s))/60000;
+  $("#cWin").innerHTML = mins <= 0 ? '<span class="c-bad">⚠️ শেষের সময় শুরুর পরে হতে হবে</span>'
+    : `🗓️ ${bnWindow({starts_at:s, ends_at:e})}<br>পুরো ${BN_DIGITS(d)} মিনিট পেতে শেষ ঢোকার সময় ${bnTime(new Date(new Date(e).getTime() - d*60000).toISOString())} • শেষ খাতা জমা ${bnTime(new Date(new Date(e).getTime() + u*60000).toISOString())}` + (d > mins ? '<br><span class="c-bad">⚠️ লেখার সময় উইন্ডোর চেয়ে বেশি</span>' : "");
+}
+function cqSecsPaint(){
+  $("#cSecs").innerHTML = CQ_ED.secs.map((s,si) => `<div class="cq-ed">
+    <div class="row" style="gap:6px"><b style="flex:1">বিভাগ ${BN_DIGITS(si+1)}</b>${si > 0 ? `<button class="btn sm ghost" onclick="cqSecMove(${si})">↑ উপরে</button>` : ""}<button class="btn sm danger" onclick="cqSecDel(${si})">🗑</button></div>
+    <label>বিভাগের নাম</label><input value="${esc(s.t)}" oninput="CQ_ED.secs[${si}].t=this.value">
+    <div class="aud" style="margin-top:10px"><button type="button" class="${s.type === "cq" ? "on" : ""}" onclick="cqSecType(${si},'cq')">📘 সৃজনশীল<small>উদ্দীপক + ক/খ/গ/ঘ</small></button>
+      <button type="button" class="${s.type === "short" ? "on" : ""}" onclick="cqSecType(${si},'short')">📝 সংক্ষিপ্ত<small>প্রতিটা একটা প্রশ্ন</small></button></div>
+    <label>${s.type === "cq" ? "প্রতি অংশের মান" : "প্রতি প্রশ্নের মান"}</label>
+    <div class="cq-mk">${s.marks.map((m,i) => `<span>${s.type === "cq" ? CQ_LET[i] : "মান"}<input type="number" inputmode="decimal" step="any" value="${m}" oninput="cqMk(${si},${i},this.value)"></span>`).join("")}
+      ${s.type === "cq" ? `<span style="flex:none;display:flex;flex-direction:column;gap:4px;justify-content:flex-end">${s.marks.length < 6 ? `<button class="btn sm ghost" style="padding:4px 8px" onclick="cqParts(${si},1)">＋</button>` : ""}${s.marks.length > 1 ? `<button class="btn sm ghost" style="padding:4px 8px" onclick="cqParts(${si},-1)">−</button>` : ""}</span>` : ""}</div>
+    <label>কয়টার উত্তর দিতে হবে</label><input type="number" inputmode="numeric" value="${s.need || ""}" placeholder="খালি = সবগুলো" oninput="CQ_ED.secs[${si}].need=+this.value||0;cqSecPrev(${si})">
+    <label>প্রশ্ন পেস্ট করো</label>
+    <textarea style="min-height:220px" oninput="cqSecText(${si},this.value)" placeholder="${s.type === "cq" ? "1. উদ্দীপক...\nক. ...\nখ. ...\nগ. ...\nঘ. ..." : "1. প্রশ্ন...\n2. প্রশ্ন..."}">${esc(s.text)}</textarea>
+    <div id="cP${si}"></div></div>`).join("") || '<div class="hint">নিচ থেকে একটা বিভাগ যোগ করো।</div>';
+  CQ_ED.secs.forEach((s,si) => cqSecPrev(si));
+}
+function cqSecAdd(k){ CQ_ED.secs.push({...CQ_PRESET[k], marks:[...CQ_PRESET[k].marks], text:""}); cqSecsPaint(); }
+function cqSecDel(si){ if(CQ_ED.secs[si].text.trim() && !confirm("বিভাগটা আর এর প্রশ্নগুলো সরাবে?")) return; CQ_ED.secs.splice(si,1);
+  const I = CQ_ED.imgs, n = {}; Object.keys(I).forEach(key => { const [s,i] = key.split("_").map(Number); if(s !== si) n[(s > si ? s-1 : s) + "_" + i] = I[key]; }); CQ_ED.imgs = n;
+  cqSecsPaint(); }
+function cqSecMove(si){ const S = CQ_ED.secs; [S[si-1], S[si]] = [S[si], S[si-1]]; cqImgShift(si-1, si); cqSecsPaint(); }
+function cqImgShift(a, b){ // বিভাগ সরালে ছবির চাবি ঠিক রাখা
+  const I = CQ_ED.imgs, n = {}; Object.keys(I).forEach(key => { const [s,i] = key.split("_").map(Number); n[(s === a ? b : s === b ? a : s) + "_" + i] = I[key]; }); CQ_ED.imgs = n;
+}
+function cqSecType(si, t){ const s = CQ_ED.secs[si]; if(s.type === t) return; s.type = t; s.marks = t === "cq" ? [1,2,3,4] : [2]; if(t === "short" && s.t === "সৃজনশীল প্রশ্ন") s.t = "সংক্ষিপ্ত প্রশ্ন"; if(t === "cq" && s.t === "সংক্ষিপ্ত প্রশ্ন") s.t = "সৃজনশীল প্রশ্ন"; cqSecsPaint(); }
+function cqParts(si, d){ const s = CQ_ED.secs[si]; if(d > 0) s.marks.push(s.marks[s.marks.length-1] || 1); else s.marks.pop(); cqSecsPaint(); }
+function cqMk(si, i, v){ CQ_ED.secs[si].marks[i] = +v || 0; cqSecPrev(si); }
+let CQ_T = {};
+function cqSecText(si, v){ CQ_ED.secs[si].text = v; clearTimeout(CQ_T[si]); CQ_T[si] = setTimeout(() => cqSecPrev(si), 500); }
+function cqSecPrev(si){
+  const s = CQ_ED.secs[si], box = $("#cP" + si); if(!box) return;
+  const {qs, errs} = parseCQ(s.text, s.type, s.marks.length); s.qs = qs; s.errs = errs;
+  const qm = s.marks.reduce((a,b) => a + (+b||0), 0), need = cqNeed(s, qs.length);
+  box.innerHTML = !qs.length ? "" : (errs.length
+    ? `<div class="err">⚠️ ${BN_DIGITS(qs.length)}টি প্রশ্ন পাওয়া গেছে, কিন্তু সমস্যা আছে:<br>${errs.slice(0,8).map(esc).join("<br>")}${errs.length > 8 ? "<br>..." : ""}</div>`
+    : `<div class="ok">✅ ${BN_DIGITS(qs.length)}টি প্রশ্ন • ${need < qs.length ? `যেকোনো ${BN_DIGITS(need)}টি` : "সবগুলো"} × ${BN_DIGITS(num(qm))} = <b>${BN_DIGITS(num(need*qm))}</b> নম্বর</div>`)
+    + (+s.need > qs.length && qs.length ? `<div class="hint c-bad">⚠️ ${BN_DIGITS(s.need)}টার উত্তর দিতে বলেছ, কিন্তু প্রশ্ন আছে ${BN_DIGITS(qs.length)}টা</div>` : "")
+    + (qs.length ? `<details style="margin-top:8px"><summary class="lnkbtn">👀 প্রশ্নগুলো দেখো ও ছবি যোগ করো</summary>${qs.map((q,i) => { const key = si + "_" + i, img = CQ_ED.imgs[key];
+      return `<div class="pq ${s.type === "cq" && q.parts.length !== s.marks.length ? "bad" : ""}"><div class="pqt">${BN_DIGITS(i+1)}. ${esc(q.stem)}</div>
+        ${img ? `<img src="${img}" alt="">` : ""}
+        ${s.type === "cq" ? `<ol>${q.parts.map((p,j) => `<li>${CQ_LET[j]}. ${esc(p)} <span class="muted">[${BN_DIGITS(num(s.marks[j] ?? "?"))}]</span></li>`).join("")}</ol>` : ""}
+        ${q.sol ? `<div class="ex">💡 ${esc(q.sol.length > 160 ? q.sol.slice(0,160) + "…" : q.sol)}</div>` : ""}
+        <div class="row" style="gap:6px;margin-top:6px"><button class="btn sm sec" onclick="cqImg('${key}')">🖼️ ${img ? "ছবি বদলাও" : "ছবি যোগ করো"}</button>
+        ${img ? `<button class="btn sm danger" onclick="delete CQ_ED.imgs['${key}'];cqSecPrev(${si})">ছবি সরাও</button>` : ""}</div></div>`; }).join("")}</details>` : "");
+  cqTotal();
+}
+function cqTotal(){
+  const box = $("#cTot"); if(!box) return;
+  const parts = CQ_ED.secs.map(s => { const n = (s.qs||[]).length, need = cqNeed(s, n), qm = s.marks.reduce((a,b) => a + (+b||0), 0); return {t:s.t, need, qm, n}; });
+  const tot = parts.reduce((a,p) => a + p.need*p.qm, 0);
+  box.innerHTML = `<div class="ok" style="font-size:15px">📊 পূর্ণমান: <b>${BN_DIGITS(num(tot))}</b>${parts.length > 1 ? `<div class="muted" style="font-size:13px">${parts.map(p => `${esc(p.t)} ${BN_DIGITS(p.need)}×${BN_DIGITS(num(p.qm))}`).join(" + ")}</div>` : ""}</div>`;
+}
+function cqImg(key){ CQ_ED.imgFor = key; $("#cImgIn").click(); }
+async function cqImgPicked(ev){
+  const f = ev.target.files[0]; ev.target.value = ""; if(!f) return;
+  try{
+    const img = await loadImg(URL.createObjectURL(f));
+    const W = Math.min(900, img.width), H = Math.round(img.height * W / img.width), c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0,0,W,H); x.drawImage(img,0,0,W,H);
+    let q = .8, d = c.toDataURL("image/jpeg", q); while(d.length > 160000 && q > .3){ q -= .1; d = c.toDataURL("image/jpeg", q); }
+    CQ_ED.imgs[CQ_ED.imgFor] = d; cqSecPrev(+CQ_ED.imgFor.split("_")[0]); toast("ছবি যোগ হয়েছে ✅");
+  }catch(e){ toast("ছবিটা খোলা যায়নি"); }
+}
+async function cqSave(publish){
+  const msg = $("#cMsg"); msg.innerHTML = "";
+  CQ_ED.secs.forEach((s,si) => cqSecPrev(si));
+  const fail = t => { msg.innerHTML = '<div class="err">' + t + '</div>'; msg.scrollIntoView({behavior:"smooth"}); };
+  const e = { id:CQ_ED.id, title:$("#cT").value.trim(), subject:$("#cS").value.trim(), audience:CQ_ED.aud,
+    batches: CQ_ED.aud === "batch" ? [...CQ_ED.batches] : null,
+    starts_at:fromLocalInput($("#cSt").value), ends_at:fromLocalInput($("#cEn").value),
+    duration_min:+$("#cDu").value || 60, upload_min:+$("#cUp").value || 10, pass_pct:+$("#cPs").value || 40,
+    published:publish, instructions:$("#cIn").value.trim(),
+    sections: CQ_ED.secs.map(s => ({t:s.t.trim() || (s.type === "cq" ? "সৃজনশীল প্রশ্ন" : "সংক্ষিপ্ত প্রশ্ন"), type:s.type, need:+s.need || 0, marks:s.marks.map(m => +m || 0)})) };
+  if(!e.title) return fail("পরীক্ষার নাম দাও");
+  if(!e.starts_at || !e.ends_at) return fail("শুরু আর শেষের সময় দাও");
+  if(new Date(e.ends_at) <= new Date(e.starts_at)) return fail("শেষের সময় শুরুর সময়ের পরে হতে হবে");
+  if(!CQ_ED.secs.length) return fail("অন্তত একটা বিভাগ দাও");
+  const bad = []; CQ_ED.secs.forEach((s,si) => { if(!(s.qs||[]).length) bad.push(`বিভাগ ${si+1}: প্রশ্ন দাও`); (s.errs||[]).slice(0,4).forEach(x => bad.push(`বিভাগ ${si+1} — ${x}`)); if(s.marks.some(m => !(+m > 0))) bad.push(`বিভাগ ${si+1}: মান ঠিক নেই`); });
+  if(bad.length) return fail("ঠিক করতে হবে:<br>" + bad.slice(0,8).map(esc).join("<br>"));
+  if(publish && new Date(e.ends_at) < new Date() && !confirm("শেষের সময় পার হয়ে গেছে — কেউ আর পরীক্ষা দিতে পারবে না। তবুও প্রকাশ করবে?")) return;
+  const qs = []; CQ_ED.secs.forEach((s,si) => s.qs.forEach((q,i) => qs.push({sec:si, stem:q.stem, img:CQ_ED.imgs[si + "_" + i] || null, sol:q.sol || null,
+    parts: s.type === "cq" ? q.parts.map((t,j) => ({l:CQ_LET[j], t, m:+s.marks[j]})) : [{l:"", t:"", m:+s.marks[0]}]})));
+  try{
+    const r = await rpc("cq_admin_save", {p_token:TOKEN, p_exam:e, p_qs:qs});
+    CQ_ED.id = r.id;
+    toast(publish ? "🚀 লিখিত পরীক্ষা প্রকাশ হয়েছে!" : "💾 খসড়া সেভ হয়েছে", 3000);
+    await cqAdm(); if(publish) cqPromo(r.id);
+  }catch(ex){ fail(esc(ex.message)); }
+}
+
+/* --- খাতা দেখা (অ্যাডমিন) --- */
+let CQS = null, CQG = null, CQS_F = "todo";
+const CQ_STL = {writing:'<span class="chip warn">✍️ লিখছে</span>', upload:'<span class="chip warn">📷 আপলোড করছে</span>', submitted:'<span class="chip org">🆕 দেখা বাকি</span>',
+  checked:'<span class="chip navy">⏳ অনুমোদন বাকি</span>', approved:'<span class="chip">✅ অনুমোদিত</span>', nosub:'<span class="chip" style="background:#fdeaea;color:var(--red)">❌ খাতা দেয়নি</span>'};
+async function cqScripts(id, keepF){
+  window.scrollTo(0,0);
+  $("#aexBody").innerHTML = '<div class="spin"></div>';
+  let e, A;
+  try{ [e, A] = await Promise.all([rpc("cq_admin_get", {p_token:TOKEN, p_exam:id}), rpc("cq_admin_attempts", {p_token:TOKEN, p_exam:id})]); }
+  catch(ex){ $("#aexBody").innerHTML = '<div class="err">' + esc(ex.message) + '</div>'; return; }
+  CQS = {id, e, A};
+  if(!keepF) CQS_F = A.some(a => a.status === "submitted" || a.status === "checked") ? "todo" : "all";
+  cqScriptsPaint();
+}
+function cqScriptsPaint(){
+  const {id, e, A} = CQS, total = +e.total, ended = new Date(e.ends_at) < new Date();
+  const cnt = s => A.filter(a => a.status === s).length, chk = cnt("checked"), appr = A.filter(a => a.status === "approved");
+  const rk = {}; appr.forEach(a => rk[a.uid] = 1 + appr.filter(b => +b.score > +a.score).length);
+  const msgFor = a => `${COACHING.name} লিখিত পরীক্ষা\n${e.title}${e.subject ? " (" + e.subject + ")" : ""}\nনাম: ${a.name}\n${a.kind === "stu" ? "রোল" : "আইডি"}: ${a.uid}\nপ্রাপ্ত নম্বর: ${num(a.score)}/${num(total)}${ended ? `\nমেরিট পজিশন: ${rk[a.uid]} (মোট ${appr.length} জন)` : ""}\n\nপ্রশ্নভিত্তিক নম্বর ও মন্তব্য: ${cqLink(id)}`;
+  const F = {todo: a => a.status === "submitted" || a.status === "checked", appr: a => a.status === "approved", run: a => ["writing","upload","nosub"].includes(a.status), all: () => true};
+  const L = A.filter(F[CQS_F]);
+  $("#aexBody").innerHTML = `
+    <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="cqAdm()">← সব লিখিত পরীক্ষা</button></div>
+    <div class="card"><b style="font-size:17px">${esc(e.title)}</b><div class="muted">${esc(e.subject||"")} • পূর্ণমান ${BN_DIGITS(num(total))}</div><div class="muted">🗓️ ${bnWindow(e)}</div>
+      <div class="grid4"><div><b>${BN_DIGITS(cnt("submitted"))}</b><span>দেখা বাকি</span></div><div><b>${BN_DIGITS(chk)}</b><span>অনুমোদন বাকি</span></div><div><b>${BN_DIGITS(appr.length)}</b><span>অনুমোদিত</span></div><div><b>${BN_DIGITS(A.filter(F.run).length)}</b><span>চলছে/দেয়নি</span></div></div>
+      ${chk ? `<button class="btn" onclick="cqApproveAll(${id})">✅ চেক করা ${BN_DIGITS(chk)}টা খাতা একসাথে অনুমোদন করো</button>` : ""}
+      <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btn sm sec" onclick="cqClaudeHelp()">🤖 Claude-কে দিয়ে খাতা দেখাও</button>
+        ${appr.length ? `<button class="btn sm sec" onclick="copyText(this.dataset.t)" data-t="${esc(appr.slice().sort((a,b) => rk[a.uid] - rk[b.uid]).map(a => rk[a.uid] + ". " + a.name + " (" + (a.inst||a.batch||"") + ") — " + num(a.score)).join("\n"))}">📋 মেধাক্রম কপি</button>` : ""}</div></div>
+    <div class="tabs" id="cqF"><button data-f="todo">দেখা বাকি (${BN_DIGITS(A.filter(F.todo).length)})</button><button data-f="appr">অনুমোদিত (${BN_DIGITS(appr.length)})</button><button data-f="run">চলছে/দেয়নি (${BN_DIGITS(A.filter(F.run).length)})</button><button data-f="all">সব (${BN_DIGITS(A.length)})</button></div>
+    <div class="card" style="padding:10px">${L.length ? `<table class="tbl">${L.map(a => `<tr>
+      <td><b>${esc(a.name || "")}</b> ${a.kind === "guest" ? '<span class="chip org" style="font-size:11px">বাইরের</span>' : a.kind === "admin" ? '<span class="chip" style="font-size:11px">অ্যাডমিন</span>' : ""}
+        <div class="muted" style="font-size:12px">${esc(a.uid)} • ${esc(a.inst || a.batch || "")}</div>
+        <div style="margin-top:3px">${CQ_STL[a.status] || ""}${a.graded_by === "claude" && a.status !== "approved" ? ' <span class="chip navy">🤖 Claude</span>' : ""} <span class="muted" style="font-size:12px">📄 ${BN_DIGITS(a.npages)}</span></div></td>
+      <td style="text-align:right;white-space:nowrap">${a.score != null ? `<b style="font-family:Poppins">${BN_DIGITS(num(a.score))}</b><span class="muted">/${BN_DIGITS(num(total))}</span><br>` : ""}
+        ${a.npages ? `<button class="btn sm ${a.status === "submitted" ? "" : "sec"}" style="margin-top:4px" onclick="cqGrade('${esc(a.uid)}')">${a.status === "submitted" ? "✍️ দেখো" : "খোলো"}</button>` : ""}
+        ${["writing","upload","nosub","submitted"].includes(a.status) ? `<button class="btn sm ghost" style="margin-top:4px" title="আপলোডের সময় বাড়াও" onclick="cqExtend('${esc(a.uid)}')">⏰</button>` : ""}
+        <button class="btn sm ghost" style="margin-top:4px" title="খাতা মুছে আবার দেওয়ার সুযোগ" onclick="cqReset('${esc(a.uid)}')">♻️</button>
+        ${a.status === "approved" ? "<br>" + waBtns(a, msgFor(a), "cq" + id + "|" + a.uid) : ""}</td></tr>`).join("")}</table>` : '<p class="muted" style="padding:8px">এখানে কিছু নেই।</p>'}</div>
+    <p class="hint">⏰ = নেট/ফোনের সমস্যায় কেউ খাতা আপলোড করতে না পারলে ১৫ মিনিট সময় বাড়িয়ে দাও (স্টুডেন্ট পরীক্ষার পাতা থেকে আবার আপলোড করতে পারবে) • ♻️ = খাতা মুছে নতুন করে দেওয়ার সুযোগ (পরীক্ষার সময়ের মধ্যে)।</p>`;
+  document.querySelectorAll("#cqF button").forEach(b => { b.classList.toggle("on", b.dataset.f === CQS_F); b.onclick = () => { CQS_F = b.dataset.f; cqScriptsPaint(); }; });
+}
+function cqClaudeHelp(){
+  const e = CQS.e, t = `BIO NERDS পোর্টালের লিখিত পরীক্ষা “${e.title}” (আইডি ${e.id})-এর জমা হওয়া খাতাগুলো দেখে বোর্ডের নিয়মে প্রশ্নভিত্তিক (ক, খ, গ, ঘ) নম্বর আর মন্তব্য দাও। অনুমোদন দিও না — আমি দেখে অনুমোদন দেবো।`;
+  sheet(`<h3>🤖 Claude-কে দিয়ে খাতা দেখানো</h3>
+    <div class="muted">নিচের লেখাটা কপি করে এই প্রজেক্টের Claude চ্যাটে পাঠাও। Claude খাতার ছবি পড়ে নম্বর ও মন্তব্য বসিয়ে দেবে — স্টুডেন্টরা তখনো দেখবে না। তুমি এখানে “⏳ অনুমোদন বাকি” তালিকায় একেকটা খুলে দেখে ঠিক করে ✅ অনুমোদন দেবে।</div>
+    <div class="pwlist" style="font-family:inherit;font-size:14.5px">${esc(t)}</div>
+    <button class="btn" onclick="copyText(this.dataset.t)" data-t="${esc(t)}">📋 কপি করো</button>
+    <div class="hint">টিপস: প্রশ্নে “সমাধান:” (নমুনা উত্তর/মার্কিং গাইড) দেওয়া থাকলে Claude আরও ঠিকঠাক নম্বর দিতে পারে।</div>`);
+}
+async function cqApproveAll(id){
+  if(!confirm("চেক করা সব খাতা অনুমোদন দেবে? এরপর স্টুডেন্টরা নিজেদের নম্বর দেখতে পাবে।")) return;
+  try{ const n = await rpc("cq_admin_approve_all", {p_token:TOKEN, p_exam:id}); toast(`✅ ${BN_DIGITS(n)}টা খাতা অনুমোদিত`); cqScripts(id, true); }catch(ex){ toast(ex.message); }
+}
+async function cqExtend(uid){
+  const m = prompt(uid + " — কত মিনিট সময় বাড়াবে? (এই সময়ের মধ্যে খাতা আপলোড করে জমা দিতে পারবে)", "15"); if(m === null) return;
+  try{ await rpc("cq_admin_extend", {p_token:TOKEN, p_exam:CQS.id, p_uid:uid, p_mins:+m || 15}); toast(`⏰ ${BN_DIGITS(+m || 15)} মিনিট সময় দেওয়া হয়েছে — স্টুডেন্টকে জানাও`, 3500); cqScripts(CQS.id, true); }catch(ex){ toast(ex.message, 3500); }
+}
+async function cqReset(uid){
+  if(!confirm(uid + "-এর খাতা আর নম্বর মুছে আবার দেওয়ার সুযোগ দেবে?")) return;
+  try{ await rpc("cq_admin_reset", {p_token:TOKEN, p_exam:CQS.id, p_uid:uid}); toast("✅ এখন আবার দিতে পারবে (পরীক্ষার সময়ের মধ্যে)"); cqScripts(CQS.id, true); }catch(ex){ toast(ex.message); }
+}
+async function cqGrade(uid){
+  const {id, e} = CQS;
+  window.scrollTo(0,0);
+  $("#aexBody").innerHTML = '<div class="spin"></div>';
+  let s; try{ s = await rpc("cq_admin_script", {p_token:TOKEN, p_exam:id, p_uid:uid}); }
+  catch(ex){ $("#aexBody").innerHTML = '<div class="err">' + esc(ex.message) + '</div>'; return; }
+  CQG = {uid, s, marks:JSON.parse(JSON.stringify(s.marks || {})), chosen:new Set((s.chosen||[]).map(Number)), all:false};
+  const qs = e.questions, todo = CQS.A.filter(a => (a.status === "submitted" || a.status === "checked") && a.uid !== uid && a.npages);
+  $("#aexBody").innerHTML = `
+    <div class="row" style="margin-bottom:10px;gap:6px"><button class="btn sm ghost" onclick="cqScripts(${id},true)">← খাতার তালিকা</button>${todo.length ? `<button class="btn sm sec" style="margin-left:auto" onclick="cqGrade('${esc(todo[0].uid)}')">পরের খাতা ›</button>` : ""}</div>
+    <div class="card"><b style="font-size:17px">${esc(s.name || "")}</b> <span class="muted">${esc(s.uid)}</span><div class="muted">${esc(s.inst || "")}</div>
+      <div style="margin-top:6px">${CQ_STL[s.status] || ""}${s.graded_by ? ` <span class="chip navy">${s.graded_by === "claude" ? "🤖 Claude চেক করেছে" : "👤 তুমি চেক করেছ"}</span>` : ""}</div>
+      <div class="muted" style="margin-top:4px;font-size:13px">📄 ${BN_DIGITS((s.pages||[]).length)} পাতা${s.submitted_at ? " • জমা " + bnWhen(s.submitted_at) : ""}</div>
+      <div class="muted" style="font-size:13px">স্টুডেন্ট যেগুলো লিখেছে বলেছে: ${e.sections.map((sc,si) => { const L = qs.filter(q => q.sec === si && CQG.chosen.has(q.k)).map(q => BN_DIGITS(q.no)); return L.length ? esc(sc.t) + " " + L.join(", ") : ""; }).filter(Boolean).join(" • ") || "টিক দেয়নি"}</div>
+      <div class="row" style="gap:6px;margin-top:8px"><a class="btn sm sec" href="#cqMarks" onclick="event.preventDefault();$('#cqMarks').scrollIntoView({behavior:'smooth'})">✍️ নম্বর দেওয়ার ঘরে যাও ↓</a></div></div>
+    <div id="cqPages">${(s.pages||[]).length ? s.pages.map((p,i) => pageHtml(p, i, `<button class="btn sm ghost" style="padding:2px 8px" onclick="cqRotView(this)">⟳</button>`)).join("") : '<div class="card muted">খাতার ছবি নেই (মুছে ফেলা হয়েছে বা আপলোড হয়নি)।</div>'}</div>
+    <div id="cqMarks" style="scroll-margin-top:10px"></div>`;
+  cqMarksPaint();
+}
+function cqRotView(b){ const img = b.closest(".cq-page").querySelector("img"); img.dataset.r = ((+img.dataset.r || 0) + 90) % 360; rotFix(img); }
+function cqMarksPaint(){
+  const e = CQS.e, qs = e.questions, s = CQG.s, M = CQG.marks;
+  const show = q => CQG.all || CQG.chosen.has(q.k) || M[q.k] || !CQG.chosen.size;
+  $("#cqMarks").innerHTML = `<div class="ex-sec">✍️ নম্বর দাও</div>
+    <label class="cq-x" style="margin:0 2px 6px!important"><input type="checkbox" ${CQG.all ? "checked" : ""} onchange="CQG.all=this.checked;cqMarksPaint()"> সব প্রশ্ন দেখাও (শুধু টিক দেওয়াগুলো নয়)</label>
+    ${e.sections.map((sc,si) => { const L = qs.filter(q => q.sec === si && show(q)); if(!L.length) return "";
+      return `<div class="cq-sec" style="margin-top:12px"><b>${esc(sc.t)}</b><span>${cqSecLine(sc, qs.filter(q => q.sec === si).length)}</span></div>` + L.map(q => { const m = M[q.k] || {};
+        return `<div class="cq-g ${CQG.chosen.has(q.k) ? "ch" : ""}" id="cg${q.k}">
+          <div class="h"><b>${sc.type === "short" ? "প্রশ্ন" : "সৃজনশীল"} ${BN_DIGITS(q.no)}</b>${CQG.chosen.has(q.k) ? '<span class="chip" style="font-size:11px">✓ লিখেছে</span>' : ""}
+            <button class="lnkbtn" style="font-size:12.5px" onclick="cqgFull(${q.k})">পূর্ণ নম্বর</button><button class="lnkbtn" style="font-size:12.5px;color:var(--mute)" onclick="cqgClear(${q.k})">মুছো</button><span class="sc" id="cgs${q.k}"></span></div>
+          <details style="margin-top:4px"><summary class="muted" style="font-size:12.5px">প্রশ্ন ও নমুনা উত্তর দেখো</summary><div style="font-size:14px;white-space:pre-wrap;margin-top:4px">${esc(q.stem)}${sc.type === "short" ? "" : "\n" + q.parts.map(p => p.l + ". " + p.t).join("\n")}</div>${q.sol ? `<div class="expl">💡 ${esc(q.sol)}</div>` : ""}</details>
+          <div class="cq-pin">${q.parts.map((p,i) => `<label>${esc(p.l || "নম্বর")} <small class="muted">/${BN_DIGITS(num(p.m))}</small><input type="number" inputmode="decimal" step="0.5" min="0" max="${p.m}" value="${m.p && m.p[i] != null ? m.p[i] : ""}" oninput="cqgSet(${q.k},${i},this.value)"></label>`).join("")}</div>
+          <input class="cq-c" placeholder="মন্তব্য (ঐচ্ছিক)" value="${esc(m.c || "")}" oninput="cqgCom(${q.k},this.value)">
+          <label class="cq-x"><input type="checkbox" ${m.x ? "checked" : ""} onchange="cqgX(${q.k},this.checked)"> অতিরিক্ত উত্তর — গুনবে না</label></div>`; }).join("");
+    }).join("")}
+    <label>সার্বিক মন্তব্য (স্টুডেন্ট দেখবে)</label><textarea id="cqRm" style="font-family:inherit;min-height:80px" placeholder="যেমন: হাতের লেখা পরিষ্কার, তবে চিত্র আরও দিতে হবে।">${esc(s.remark || "")}</textarea>
+    <div class="cq-bar"><div class="row"><span class="muted">মোট নম্বর</span><b id="cqTotB" style="margin-left:auto;font-family:Poppins;font-size:20px"></b></div>
+      <div id="cqWarn"></div>
+      <div class="row" style="gap:8px;margin-top:8px"><button class="btn sec" style="margin:0" onclick="cqgSave('checked')">💾 সেভ</button><button class="btn" style="margin:0" onclick="cqgSave('approved')">✅ সেভ ও অনুমোদন</button></div>
+      ${s.status === "approved" ? `<button class="btn ghost" style="margin-top:8px" onclick="cqUnapprove()">↩️ অনুমোদন তুলে নাও (স্টুডেন্ট আর দেখবে না)</button>` : ""}
+      <div class="hint" style="margin-top:6px">💾 সেভ = স্টুডেন্ট এখনো দেখবে না • ✅ অনুমোদন = স্টুডেন্ট নম্বর ও মন্তব্য দেখবে</div></div>`;
+  cqgTotals();
+}
+function cqgEnsure(k){ const q = CQS.e.questions.find(x => x.k === k); if(!CQG.marks[k]) CQG.marks[k] = {p:q.parts.map(() => null)}; if(!CQG.marks[k].p) CQG.marks[k].p = q.parts.map(() => null); return CQG.marks[k]; }
+function cqgClean(k){ const m = CQG.marks[k]; if(m && !(m.p||[]).some(v => v != null && v !== "") && !m.c && !m.x) delete CQG.marks[k]; }
+function cqgSet(k, i, v){ const m = cqgEnsure(k); m.p[i] = v === "" ? null : +v; cqgClean(k); cqgTotals(); }
+function cqgCom(k, v){ const m = cqgEnsure(k); m.c = v.trim() ? v : undefined; if(!m.c) delete m.c; cqgClean(k); }
+function cqgX(k, v){ const m = cqgEnsure(k); if(v) m.x = true; else delete m.x; cqgClean(k); cqgTotals(); }
+function cqgFull(k){ const q = CQS.e.questions.find(x => x.k === k), m = cqgEnsure(k); m.p = q.parts.map(p => +p.m); cqMarksPaint(); }
+function cqgClear(k){ delete CQG.marks[k]; cqMarksPaint(); }
+function cqgTotals(){
+  const e = CQS.e, calc = cqCalc(e.sections, e.questions, CQG.marks);
+  e.questions.forEach(q => { const el = $("#cgs" + q.k); if(!el) return; const p = calc.per[q.k];
+    el.innerHTML = p ? `${BN_DIGITS(num(p.sc))}/${BN_DIGITS(num(p.max))}${p.counted ? "" : ' <span class="c-bad" style="font-size:12px;font-family:inherit">গুনবে না</span>'}` : ""; });
+  const tb = $("#cqTotB"); if(tb) tb.textContent = BN_DIGITS(num(calc.tot)) + " / " + BN_DIGITS(num(e.total));
+  const over = e.questions.filter(q => calc.per[q.k] && calc.per[q.k].over);
+  const w = $("#cqWarn"); if(w) w.innerHTML = over.length ? `<div class="hint c-bad" style="margin-top:4px">⚠️ ${over.map(q => BN_DIGITS(q.no)).join(", ")} নম্বর প্রশ্ন গোনা হবে না — বিভাগে প্রয়োজনের বেশি উত্তর (বোর্ডের নিয়মে আগেরগুলো গোনা হয়েছে)। ভুল হলে যেটা বাদ যাবে সেটায় “অতিরিক্ত” টিক দাও।</div>` : "";
+}
+async function cqgSave(status){
+  const {id} = CQS, uid = CQG.uid;
+  Object.keys(CQG.marks).forEach(k => cqgClean(k));
+  const e = CQS.e, bad = e.questions.find(q => { const m = CQG.marks[q.k]; return m && m.p && m.p.some((v,i) => v != null && (v < 0 || v > +q.parts[i].m)); });
+  if(bad){ toast(`প্রশ্ন ${BN_DIGITS(bad.no)}-এ মানের চেয়ে বেশি নম্বর দেওয়া হয়েছে`, 3500); $("#cg" + bad.k).scrollIntoView({behavior:"smooth", block:"center"}); return; }
+  if(!Object.keys(CQG.marks).length && !confirm("কোনো নম্বর দেওয়া হয়নি (মোট ০)। তবুও সেভ করবে?")) return;
+  try{
+    const r = await rpc("cq_admin_grade", {p_token:TOKEN, p_exam:id, p_uid:uid, p_marks:CQG.marks, p_remark:$("#cqRm").value, p_status:status, p_by:"admin"});
+    toast(status === "approved" ? `✅ অনুমোদিত — ${BN_DIGITS(num(r.score))}/${BN_DIGITS(num(r.total))}` : `💾 সেভ হয়েছে — ${BN_DIGITS(num(r.score))}/${BN_DIGITS(num(r.total))}`, 3000);
+    const a = CQS.A.find(x => x.uid === uid); if(a){ a.status = status; a.score = r.score; a.graded_by = "admin"; }
+    const next = CQS.A.find(x => x.status === "submitted" && x.uid !== uid && x.npages) || (status === "approved" ? CQS.A.find(x => x.status === "checked" && x.uid !== uid && x.npages) : null);
+    if(next) cqGrade(next.uid); else cqScripts(id, true);
+  }catch(ex){ toast(ex.message, 3500); }
+}
+async function cqUnapprove(){
+  if(!confirm("অনুমোদন তুলে নেবে? স্টুডেন্ট আর নম্বর দেখবে না, যতক্ষণ না আবার অনুমোদন দাও।")) return;
+  try{ await rpc("cq_admin_unapprove", {p_token:TOKEN, p_exam:CQS.id, p_uid:CQG.uid}); toast("↩️ অনুমোদন তুলে নেওয়া হয়েছে"); cqScripts(CQS.id, true); }catch(ex){ toast(ex.message); }
+}
+
 /* ---------------- শুরু ---------------- */
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
-const EX_HASH = location.hash.match(/exam=(\d+)/) || (location.hash === "#exams" ? [0, ""] : null);
-if (EX_HASH && configured()) openExams(EX_HASH[1] ? +EX_HASH[1] : null);
+const EX_HASH = location.hash.match(/exam=(\d+)/) || (location.hash === "#exams" ? [0, ""] : null), CQ_HASH = location.hash.match(/cq=(\d+)/);
+if (CQ_HASH && configured()) openExams("q" + CQ_HASH[1]);
+else if (EX_HASH && configured()) openExams(EX_HASH[1] ? +EX_HASH[1] : null);
 else if (TOKEN && configured()) start(); else show("homeView");
-window.addEventListener("hashchange", () => { const m = location.hash.match(/exam=(\d+)/); if(m) openExams(+m[1]); });
+window.addEventListener("hashchange", () => { const m = location.hash.match(/exam=(\d+)/), q = location.hash.match(/cq=(\d+)/); if(m) openExams(+m[1]); else if(q) openExams("q" + q[1]); });
 </script>
 <div id="printArea"></div>
 </body>
