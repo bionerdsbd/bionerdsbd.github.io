@@ -432,6 +432,32 @@ label.cq-x{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:50
 .cq-mk{display:flex;gap:6px}.cq-mk span{flex:1;text-align:center;font-weight:700;font-size:13px}.cq-mk input{text-align:center;padding:9px 4px;margin-top:3px}
 .cq-ed{border:1.5px solid var(--line);border-radius:16px;padding:12px;margin-top:12px;background:#fbfdfc}
 .sbar{height:10px;background:var(--bg);border-radius:6px;overflow:hidden}.sbar i{display:block;height:100%}
+/* 📦 প্যাকেজ */
+.pkc{background:#fff;border-radius:18px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 10px rgba(16,24,40,.07);cursor:pointer;border:1.5px solid #ece4f8}
+.pkc:active{transform:scale(.99)}
+.pkc .t{font-size:17px;line-height:1.3}
+.pk-price{font-family:Poppins;font-weight:800;color:var(--g2);font-size:18px;white-space:nowrap;text-align:right}
+.pk-price s{color:var(--mute);font-weight:600;font-size:13px}
+.pk-price.big{font-size:26px;text-align:left;display:block}
+.chip.pk{background:#f1e8ff;color:#5b2a9e}
+.lockbox{display:flex;align-items:center;gap:8px;background:#f6f1fd;border:1px dashed #cdb8ea;border-radius:12px;padding:9px 12px;margin-top:10px;font-size:14px;color:#4c2a85}
+.pk-hero{background:radial-gradient(circle at 90% 0%,#f2b63240 0,transparent 40%),linear-gradient(150deg,#3b1d6e 0%,#13684c 100%);color:#fff;border-radius:22px;padding:20px 18px;margin-bottom:14px}
+.pk-hero .bd{display:inline-block;background:#ffffff22;border:1px solid #ffffff44;border-radius:20px;padding:3px 12px;font-size:12.5px;font-weight:700}
+.pk-hero h2{font-size:22px;line-height:1.3;margin:10px 0 6px}
+.pk-hero p{opacity:.9;font-size:14.5px}
+.pk-buy{border-left:5px solid var(--orange)}.pk-buy.ok2{border-left-color:var(--g3)}.pk-buy.wait{border-left-color:var(--gold)}
+.pk-feat{list-style:none}.pk-feat li{padding:4px 0 4px 24px;position:relative}.pk-feat li:before{content:"✓";position:absolute;left:4px;color:var(--g3);font-weight:800}
+.pk-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.pk-row:last-child{border:0}
+.pk-row .ic{font-size:18px;width:26px;text-align:center;flex:none}
+.pk-row .m,.pk-it .m{flex:1;min-width:0}.pk-row .m b,.pk-it .m b{display:block;font-size:15px;line-height:1.35}.pk-row .m span,.pk-it .m span{font-size:12.5px;color:var(--mute)}
+.pk-row .go{color:var(--mute);font-size:20px}
+.pk-pay{display:flex;justify-content:space-between;align-items:center;background:var(--mint);border-radius:12px;padding:10px 14px;margin-top:12px}.pk-pay b{font-family:Poppins;font-size:24px;color:var(--g)}
+.pk-it{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.pk-smp{display:flex;align-items:center;gap:4px;margin:0;font-size:12.5px;white-space:nowrap}.pk-smp input{width:18px;height:18px}
+.pk-bp{display:flex;align-items:center;gap:8px;margin-top:6px}.pk-bp b{width:64px;flex:none;font-size:14px}.pk-bp select{flex:1;padding:9px 10px}.pk-bp input{width:90px;flex:none;padding:9px 10px}
+.aud button:nth-child(3):last-child{grid-column:1/-1}
+.chtag{display:inline-block;background:#eef3ff;color:#2b4a8b;border-radius:8px;font-size:11.5px;padding:0 7px;margin-bottom:3px;font-weight:600}
 </style>
 </head>
 <body>
@@ -899,6 +925,7 @@ async function refreshBadge(){
   try{
     if(ROLE==="admin"){ rpc("admin_admission_count",{p_token:TOKEN}).then(n=>setBadge("#admNav","students",n)).catch(()=>{});
       rpc("admin_pay_request_count",{p_token:TOKEN}).then(n=>setBadge("#admNav","fees",n)).catch(()=>{});
+      rpc("pkg_admin_order_count",{p_token:TOKEN}).then(n=>setBadge("#admNav","exams",n)).catch(()=>{});
       setBadge("#admNav","amsg", await rpc("admin_unread",{p_token:TOKEN})); }
     else setBadge("#stuNav","msg", await rpc("my_unread",{p_token:TOKEN}));
   }catch(e){}
@@ -2032,11 +2059,19 @@ async function exLoad(){
 }
 
 /* ---------- পরীক্ষার কার্ড ---------- */
+function audChip(e, short){
+  if(e.audience === "free") return `<span class="chip">🆓 ফ্রি${short ? "" : " পরীক্ষা"}</span>`;
+  if(e.audience === "package"){
+    if(e.sample) return '<span class="chip">🎁 ফ্রি নমুনা</span>';
+    const p = (e.pkgs || []).find(x => x.v !== false) || (e.pkgs || [])[0];
+    return `<span class="chip pk">📦 ${esc(p ? p.title : "প্যাকেজ")}</span>`;
+  }
+  return `<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ") || "BIO NERDS স্টুডেন্ট")}</span>`;
+}
 function exCard(e, compact){
   if(e.cq) return cqCard(e, compact);
   const my = e.my, st = e.status;
-  const aud = e.audience === "free" ? '<span class="chip">🆓 ফ্রি পরীক্ষা</span>'
-    : `<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ") || "BIO NERDS স্টুডেন্ট")}</span>`;
+  const aud = audChip(e);
   const pill = st === "live" ? '<span class="live-pill"><i></i>লাইভ চলছে</span>'
     : st === "upcoming" ? '<span class="chip warn">⏳ আসছে</span>' : '<span class="chip" style="background:#eef1f4;color:var(--mute)">শেষ হয়েছে</span>';
   let body = "";
@@ -2058,6 +2093,7 @@ function exCard(e, compact){
       <div class="ex-acts"><button class="btn" onclick="exResult(${e.id})">📊 রেজাল্ট ও সমাধান</button><button class="btn sec" onclick="exMerit(${e.id})">🏆 মেরিট</button></div>`;
     else body = `<div class="ex-acts"><button class="btn sec" onclick="exMerit(${e.id})">🏆 মেরিট লিস্ট</button><button class="btn" onclick="exPractice(${e.id})">🔁 প্র্যাকটিস করো</button></div>`;
   }
+  if(e.locked) body = pkgLockHtml(e);
   return `<div class="exc ${st}" id="exc${e.id}">
     <div class="top">${aud}${pill}<button class="lnkbtn" style="margin-left:auto" onclick="exShareLink(${e.id})">🔗 শেয়ার</button></div>
     <h4>${esc(e.title)}</h4>${e.subject?`<div class="sub">📚 ${esc(e.subject)}</div>`:""}
@@ -2091,7 +2127,9 @@ function exRefresh(){
 async function exPaintHub(box, pub){
   let r;
   try{ r = await exLoad(); }catch(ex){ box.innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; return; }
-  const ex = r.exams, me = r.me;
+  const now = nowSrv(), me = r.me;
+  const ex = r.exams.filter(e => !e.locked || e.status === "live" || (e.status === "upcoming" && new Date(e.starts_at).getTime() - now < 3*86400e3))
+    .filter(e => !(e.audience === "package" && e.status === "ended" && now - new Date(e.ends_at).getTime() > 60*86400e3));
   const live = ex.filter(e=>e.status==="live"), up = ex.filter(e=>e.status==="upcoming"), done = ex.filter(e=>e.status==="ended");
   let h = "";
   if(pub) h += `<div class="ex-hero"><span class="bd">🔥 BIO NERDS লাইভ পরীক্ষা</span>
@@ -2109,11 +2147,13 @@ async function exPaintHub(box, pub){
       <div class="ex-acts"><button class="btn orange" onclick="exAuth(exRefresh,'reg')">📝 রেজিস্টার</button><button class="btn sec" onclick="exAuth(exRefresh,'login')">🔐 লগইন</button></div></div>`;
   }
   if(live.length) h += `<div class="ex-sec">🔴 এখন লাইভ</div>` + live.map(e=>exCard(e)).join("");
+  h += `<div id="pkgHub"></div>`;
   if(up.length) h += `<div class="ex-sec">⏳ আসছে</div>` + up.map(e=>exCard(e)).join("");
   if(!live.length && !up.length) h += `<div class="card empty-ex"><div>📅</div><b>এই মুহূর্তে কোনো লাইভ পরীক্ষা নেই</b><br>নতুন পরীক্ষার ঘোষণা পেতে আমাদের Facebook পেজে চোখ রাখো।</div>`;
   if(done.length) h += `<div class="ex-sec">✅ আগের পরীক্ষা <small>মেরিট • সমাধান • প্র্যাকটিস</small></div>` + done.map(e=>exCard(e)).join("");
   if(pub && (!me || me.kind==="guest")) h += admCtaHtml();
   box.innerHTML = h;
+  pkgHub();
   if(EX_FOCUS){ const el = $("#exc"+EX_FOCUS); EX_FOCUS = null;
     if(el){ el.classList.add("focus"); setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"center"}),150); setTimeout(()=>el.classList.remove("focus"),4000); } }
 }
@@ -2187,7 +2227,8 @@ async function exGuestLogout(){
 /* ---------- শুরু করার আগে নিয়ম ---------- */
 function exIntro(id){
   if(!exTok()){ exAuth(() => exIntro(id)); return; }
-  const e = (EXL && EXL.exams.find(x=>x.id==id)) || HOME_EX.find(x=>x.id==id); if(!e){ openExams(id); return; }
+  const e = (EXL && EXL.exams.find(x=>x.id==id && !x.cq)) || HOME_EX.find(x=>x.id==id); if(!e){ openExams(id); return; }
+  if(e.locked){ const p = (e.pkgs||[])[0]; if(p) pkgOpen(p.id); return; }
   const left = Math.floor((new Date(e.ends_at).getTime() - nowSrv())/60000);
   const get = Math.min(e.duration_min, left);
   sheet(`<h3>🚀 ${esc(e.title)}</h3><div class="muted">${esc(e.subject||"")}</div>
@@ -2461,14 +2502,18 @@ let HOME_EX = [], HOME_EX_AT = 0;
 async function homeExams(force){
   const box = $("#homeExams"); if(!box) return;
   if(force || Date.now() - HOME_EX_AT > 60000){
-    try{ const r = await rpc("oe_list", {p_token:exTok()}); EX_SKEW = new Date(r.now).getTime() - Date.now(); HOME_EX = r.exams; HOME_EX_AT = Date.now(); }catch(e){ return; }
+    try{
+      const [r, pk] = await Promise.all([rpc("oe_list", {p_token:exTok()}), rpc("pkg_list", {p_token:exTok()}).catch(() => null)]);
+      EX_SKEW = new Date(r.now).getTime() - Date.now(); HOME_EX = r.exams; HOME_PK = pk ? (pk.packages || []) : []; HOME_EX_AT = Date.now();
+    }catch(e){ return; }
   }
   const box2 = $("#homeExams"); if(!box2) return;
   const free = HOME_EX.filter(e => e.audience === "free");
   let list = free.filter(e => e.status !== "ended").slice(0, 2);
   if(!list.length) list = free.slice(0, 1);
-  if(!list.length){ box2.innerHTML = ""; return; }
-  box2.innerHTML = `<div class="h-sec">📝 ফ্রি লাইভ এক্সাম <small><button class="lnkbtn" onclick="openExams()">সব দেখো ›</button></small></div>` + list.map(e => exCard(e)).join("");
+  let h = list.length ? `<div class="h-sec">📝 ফ্রি লাইভ এক্সাম <small><button class="lnkbtn" onclick="openExams()">সব দেখো ›</button></small></div>` + list.map(e => exCard(e)).join("") : "";
+  if(HOME_PK.length) h += `<div class="h-sec">📦 পরীক্ষার প্যাকেজ <small><button class="lnkbtn" onclick="openExams()">সব পরীক্ষা ›</button></small></div>` + HOME_PK.slice(0, 3).map(pkgCardHtml).join("");
+  box2.innerHTML = h;
 }
 
 /* ---------- স্টুডেন্ট হোমে লাইভ পরীক্ষার ব্যানার ---------- */
@@ -2476,9 +2521,9 @@ async function stuExamBanner(){
   const box = $("#exLiveCard"); if(!box) return;
   try{
     const r = await rpc("oe_list", {p_token:TOKEN}); EX_SKEW = new Date(r.now).getTime() - Date.now();
-    try{ const c = await rpc("cq_list", {p_token:TOKEN}); r.exams = c.exams.filter(x => x.status === "live" && (!x.my || x.my.state === "writing" || x.my.state === "upload")).map(x => ({...x, my:x.my ? {state:"running"} : null})).concat(r.exams); }catch(e){}
-    const e = r.exams.find(x => x.status==="live" && (!x.my || x.my.state==="running")) ||
-              r.exams.find(x => x.status==="upcoming" && new Date(x.starts_at).getTime() - nowSrv() < 2*86400e3);
+    try{ const c = await rpc("cq_list", {p_token:TOKEN}); r.exams = c.exams.filter(x => !x.locked && x.status === "live" && (!x.my || x.my.state === "writing" || x.my.state === "upload")).map(x => ({...x, my:x.my ? {state:"running"} : null})).concat(r.exams); }catch(e){}
+    const e = r.exams.find(x => !x.locked && x.status==="live" && (!x.my || x.my.state==="running")) ||
+              r.exams.find(x => !x.locked && x.status==="upcoming" && new Date(x.starts_at).getTime() - nowSrv() < 2*86400e3);
     if(!e || !$("#exLiveCard")) return;
     $("#exLiveCard").innerHTML = `<div class="exc ${e.status}" style="cursor:pointer" onclick="stuTab('exam')">
       <div class="top">${e.status==="live"?'<span class="live-pill"><i></i>লাইভ চলছে</span>':'<span class="chip warn">⏳ আসছে</span>'}<span class="lnkbtn" style="margin-left:auto">দেখো ›</span></div>
@@ -2490,12 +2535,13 @@ async function stuExamBanner(){
    ⚙️ অ্যাডমিন: অনলাইন পরীক্ষা
    ================================================================ */
 let AEX_TAB = "online";
-function admExams(){
+function aexGo(t, fn){ AEX_TAB = t; admExams(true); fn(); }
+function admExams(noBody){
   $("#admMain").innerHTML = `<div class="tabs" id="aexTabs">
-      <button data-t="online">🖥️ অনলাইন MCQ</button><button data-t="cq">✍️ লিখিত (CQ)</button><button data-t="offline">📄 অফলাইন রেজাল্ট</button><button data-t="leads">👥 বাইরের স্টুডেন্ট</button></div>
+      <button data-t="online">🖥️ অনলাইন MCQ</button><button data-t="cq">✍️ লিখিত (CQ)</button><button data-t="pkg">📦 প্যাকেজ</button><button data-t="offline">📄 অফলাইন রেজাল্ট</button><button data-t="leads">👥 বাইরের স্টুডেন্ট</button></div>
     <div id="aexBody"></div>`;
   document.querySelectorAll("#aexTabs button").forEach(b => { b.classList.toggle("on", b.dataset.t===AEX_TAB); b.onclick = () => { AEX_TAB = b.dataset.t; admExams(); }; });
-  ({online:oeAdm, cq:cqAdm, offline:admOffline, leads:oeLeads})[AEX_TAB]();
+  if(!noBody) ({online:oeAdm, cq:cqAdm, pkg:pkgAdm, offline:admOffline, leads:oeLeads})[AEX_TAB]();
 }
 const OE_ST = {draft:'<span class="chip" style="background:#eef1f4;color:var(--mute)">📝 খসড়া</span>', upcoming:'<span class="chip warn">⏳ আসছে</span>',
   live:'<span class="live-pill"><i></i>লাইভ</span>', ended:'<span class="chip">✅ শেষ</span>'};
@@ -2506,9 +2552,9 @@ async function oeAdm(){
     <button class="btn sec" onclick="openExams()">👀 স্টুডেন্টরা যেভাবে দেখবে</button>
     <div id="oeList" style="margin-top:14px"><div class="spin"></div></div>`;
   try{
-    OE_LIST = await rpc("oe_admin_list", {p_token:TOKEN});
+    [OE_LIST] = await Promise.all([rpc("oe_admin_list", {p_token:TOKEN}), pkgLinksLoad()]);
     $("#oeList").innerHTML = OE_LIST.length ? OE_LIST.map(e => `<div class="card">
-      <div class="row" style="gap:6px;flex-wrap:wrap">${OE_ST[e.status]}${e.audience==="free"?'<span class="chip">🆓 ফ্রি</span>':`<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ")||"সব স্টুডেন্ট")}</span>`}</div>
+      <div class="row" style="gap:6px;flex-wrap:wrap">${OE_ST[e.status]}${admAudChip(e,"mcq")}</div>
       <b style="display:block;font-size:17px;margin-top:6px">${esc(e.title)}</b><div class="muted">${esc(e.subject||"")}</div>
       <div class="muted" style="margin-top:4px">🗓️ ${bnWindow(e)}</div>
       <div class="grid4"><div><b>${BN_DIGITS(e.n)}</b><span>প্রশ্ন</span></div><div><b>${BN_DIGITS(e.duration_min)}</b><span>মিনিট</span></div><div><b>${BN_DIGITS(e.participants)}</b><span>জন দিয়েছে</span></div><div><b>${BN_DIGITS(e.guests)}</b><span>বাইরের</span></div></div>
@@ -2523,7 +2569,7 @@ async function oeAdm(){
 }
 function oePromo(id){
   const e = OE_LIST.find(x=>x.id==id); if(!e) return;
-  const t = `🔥 ${COACHING.name} ${e.audience==="free"?"ফ্রি ":""}লাইভ এক্সাম 🔥\n\n📚 ${e.title}${e.subject?"\n📖 "+e.subject:""}\n🗓️ ${bnWindow(e)}\n⏱️ সময় ${BN_DIGITS(e.duration_min)} মিনিট • ${BN_DIGITS(e.n)}টি MCQ${+e.neg_mark?" • নেগেটিভ মার্কিং":""}\n\n✅ যেকোনো সময় উইন্ডোর মধ্যে ঢুকে পরীক্ষা দাও\n🏆 সারা দেশের মেরিট লিস্ট\n📖 ব্যাখ্যাসহ সমাধান\n🆓 সম্পূর্ণ ফ্রি!\n\n👉 এখনই রেজিস্টার করো: ${examLink(id)}\n\n📞 ${COACHING.phones}`;
+  const t = `🔥 ${COACHING.name} ${e.audience==="free"?"ফ্রি ":""}লাইভ এক্সাম 🔥\n\n📚 ${e.title}${e.subject?"\n📖 "+e.subject:""}\n🗓️ ${bnWindow(e)}\n⏱️ সময় ${BN_DIGITS(e.duration_min)} মিনিট • ${BN_DIGITS(e.n)}টি MCQ${+e.neg_mark?" • নেগেটিভ মার্কিং":""}\n\n✅ যেকোনো সময় উইন্ডোর মধ্যে ঢুকে পরীক্ষা দাও\n🏆 সারা দেশের মেরিট লিস্ট\n📖 ব্যাখ্যাসহ সমাধান\n${e.audience==="package"?"📦 প্যাকেজের পরীক্ষা — "+pkgLink(((PKG_LINKS||[]).find(l=>l.k==="mcq"&&l.id==e.id)||{}).pkg||""):"🆓 সম্পূর্ণ ফ্রি!"}\n\n👉 এখনই রেজিস্টার করো: ${examLink(id)}\n\n📞 ${COACHING.phones}`;
   sheet(`<h3>📢 Facebook / WhatsApp পোস্ট</h3><div class="muted">কপি করে পেজ বা গ্রুপে পোস্ট করো।</div>
     <div class="pwlist" style="max-height:50vh;font-family:inherit;font-size:14.5px">${esc(t)}</div>
     <button class="btn" onclick="copyText(this.dataset.t)" data-t="${esc(t)}">📋 লেখা কপি করো</button>
@@ -2546,7 +2592,7 @@ function letterIdx(ch){
   return -1;
 }
 function parseQs(text){
-  const qs = [], errs = []; let cur = null, mode = null;
+  const qs = [], errs = []; let cur = null, mode = null, CH = "";
   const push = () => { if(cur){ cur.q = cur.q.trim(); cur.expl = (cur.expl||"").trim(); qs.push(cur); } };
   const reQ = /^(?:প্রশ্ন\s*|Q\s*)?([০-৯\d]{1,3})\s*[.)।:]\s*(.*)$/i;
   const reO = /^\(?\s*([কখগঘঙ]|[a-eA-E])\s*[.)।:]\s*(.*)$/;
@@ -2554,6 +2600,7 @@ function parseQs(text){
   const reE = /^(?:ব্যাখ্যা|সমাধান|Explanation|Expl|Exp)\s*[:：.\-]\s*(.*)$/i;
   String(text||"").split(/\r?\n/).forEach(raw => {
     const l = raw.trim(); if(!l){ if(mode==="e" && cur) cur.expl += "\n"; return; }
+    if(/^#/.test(l)){ CH = l.replace(/^#+\s*/, "").trim(); if(cur && mode === "q" && !cur.opts.length && cur.q.trim() === ""){ cur.ch = CH; } return; }
     let m;
     if((m = l.match(reA)) && cur){ cur.ans = letterIdx(m[1]); mode = "a"; return; }
     if((m = l.match(reE)) && cur){ cur.expl = m[1]; mode = "e"; return; }
@@ -2564,9 +2611,9 @@ function parseQs(text){
       cur.opts.push(o); mode = "o"; return;
     }
     if((m = l.match(reQ)) && (!cur || mode==="o" || mode==="a" || mode==="e")){
-      push(); cur = {q:m[2], opts:[], ans:-1, expl:""}; mode = "q"; return;
+      push(); cur = {q:m[2], opts:[], ans:-1, expl:"", ch:CH}; mode = "q"; return;
     }
-    if(!cur){ cur = {q:l, opts:[], ans:-1, expl:""}; mode = "q"; return; }
+    if(!cur){ cur = {q:l, opts:[], ans:-1, expl:"", ch:CH}; mode = "q"; return; }
     if(mode === "q") cur.q += "\n" + l;
     else if(mode === "e") cur.expl += (cur.expl ? "\n" : "") + l;
     else if(mode === "o" && cur.opts.length) cur.opts[cur.opts.length-1] += " " + l;
@@ -2579,7 +2626,8 @@ function parseQs(text){
   return {qs, errs};
 }
 function qsToText(qs){
-  return qs.map((q,i) => `${i+1}. ${q.q}\n` + q.opts.map((o,j)=>`${LET[j]}. ${o}`).join("\n") + `\nউত্তর: ${LET[q.ans]}` + (q.expl ? `\nব্যাখ্যা: ${q.expl}` : "")).join("\n\n");
+  let ch = "";
+  return qs.map((q,i) => { const hd = (q.ch || "") !== ch ? `# ${(ch = q.ch || "") || "—"}\n` : ""; return hd + `${i+1}. ${q.q}\n` + q.opts.map((o,j)=>`${LET[j]}. ${o}`).join("\n") + `\nউত্তর: ${LET[q.ans]}` + (q.expl ? `\nব্যাখ্যা: ${q.expl}` : ""); }).join("\n\n");
 }
 const toLocalInput = iso => iso ? new Date(new Date(iso).getTime() + 6*3600e3).toISOString().slice(0,16) : "";
 const fromLocalInput = v => v ? new Date(v + ":00+06:00").toISOString() : null;
@@ -2595,6 +2643,7 @@ async function oeEdit(id, copy){
     try{ e = await rpc("oe_admin_get", {p_token:TOKEN, p_exam:id}); }catch(ex){ toast(ex.message); return; } }
   if(copy){ e = {...e, id:null, title:e.title + " (কপি)", published:false, participants:0}; }
   OE_ED = {id: copy ? null : (id||null), imgs: {}, aud: e.audience, batches: new Set(e.batches||[]), live: !copy && id && e.participants>0};
+  await pkgEditorPrep(OE_ED, "mcq", e);
   (e.questions||[]).forEach((q,i) => { if(q.img) OE_ED.imgs[i] = q.img; });
   window.scrollTo(0,0);
   $("#aexBody").innerHTML = `
@@ -2602,10 +2651,11 @@ async function oeEdit(id, copy){
     ${OE_ED.live?`<div class="hl-note" style="margin-bottom:12px"><span>⚠️</span><span>${BN_DIGITS(e.participants)} জন এই পরীক্ষা দিয়ে ফেলেছে। উত্তর বদলালে সবার নম্বর আবার হিসাব হবে। প্রশ্নের ক্রম বদলিও না।</span></div>`:""}
     <div class="card"><h3>১. পরীক্ষার তথ্য</h3>
       <label>পরীক্ষার নাম</label><input id="oT" value="${esc(e.title)}" placeholder="যেমন: Weekly Free Exam 01">
-      <label>বিষয় / অধ্যায়</label><input id="oS" value="${esc(e.subject||"")}" placeholder="যেমন: জীববিজ্ঞান ১ম পত্র — কোষ ও এর গঠন">
+      <label>বিষয় / অধ্যায়</label><input id="oS" list="subjDL" value="${esc(e.subject||"")}" placeholder="যেমন: জীববিজ্ঞান ১ম পত্র — কোষ ও এর গঠন">${subjDatalist()}
       <label>কার জন্য</label>
       <div class="aud"><button type="button" data-a="free">🆓 ফ্রি — সবার জন্য<small>বাইরের স্টুডেন্টরাও দিতে পারবে</small></button>
-        <button type="button" data-a="batch">🔒 শুধু আমার স্টুডেন্ট<small>পোর্টালের আইডিতে</small></button></div>
+        <button type="button" data-a="batch">🔒 শুধু আমার স্টুডেন্ট<small>পোর্টালের আইডিতে</small></button>
+        <button type="button" data-a="package">📦 প্যাকেজের পরীক্ষা<small>যারা প্যাকেজ কিনেছে (+ ফ্রি নমুনা)</small></button></div>
       <div id="oBat" class="pre-chips" style="margin-top:10px"></div></div>
     <div class="card"><h3>২. সময়</h3>
       <label>পরীক্ষা শুরু (এই সময় থেকে ঢোকা যাবে)</label><input id="oSt" type="datetime-local" value="${toLocalInput(e.starts_at)}">
@@ -2625,7 +2675,7 @@ async function oeEdit(id, copy){
     <div class="card"><h3>৪. প্রশ্ন</h3>
       <details><summary class="muted">📋 কোন ফরম্যাটে প্রশ্ন দেবে? (চাপো)</summary>
         <div class="pwlist" style="font-family:inherit">1. মাইটোকন্ড্রিয়াকে কী বলা হয়?\nক. কোষের মস্তিষ্ক\nখ. কোষের শক্তিঘর\nগ. আত্মঘাতী থলি\nঘ. প্রোটিন কারখানা\nউত্তর: খ\nব্যাখ্যা: এখানে ATP তৈরি হয়।\n\n2. পরের প্রশ্ন...</div>
-        <div class="hint">• অপশন ক/খ/গ/ঘ বা a/b/c/d — দুটোই চলবে\n• “উত্তর: খ” না লিখে সঠিক অপশনের শেষে * দিলেও হবে\n• ব্যাখ্যা ঐচ্ছিক • i, ii, iii লাইনসহ বহুপদী প্রশ্নও চলবে</div></details>
+        <div class="hint">• অধ্যায় ট্যাগ (ঐচ্ছিক): প্রশ্নগুলোর আগে আলাদা লাইনে <b># কোষ বিভাজন</b> লিখলে নিচের প্রশ্নগুলো ওই অধ্যায়ের হবে\n• অপশন ক/খ/গ/ঘ বা a/b/c/d — দুটোই চলবে\n• “উত্তর: খ” না লিখে সঠিক অপশনের শেষে * দিলেও হবে\n• ব্যাখ্যা ঐচ্ছিক • i, ii, iii লাইনসহ বহুপদী প্রশ্নও চলবে</div></details>
       <textarea id="oQ" style="min-height:260px" placeholder="এখানে প্রশ্ন পেস্ট করো...">${esc(qsToText(e.questions||[]))}</textarea>
       <div id="oPrevSum"></div><div id="oPrev"></div></div>
     <button class="btn orange big" onclick="oeSave(true)">🚀 প্রকাশ করো</button>
@@ -2635,8 +2685,9 @@ async function oeEdit(id, copy){
   const paintAud = () => {
     document.querySelectorAll(".aud button").forEach(b => b.classList.toggle("on", b.dataset.a===OE_ED.aud));
     $("#oBat").innerHTML = OE_ED.aud === "batch" ? `<span class="muted" style="width:100%">কোন ব্যাচ? (কিছু না বাছলে সব স্টুডেন্ট)</span>` +
-      COACHING.batches.map(b=>`<button type="button" class="${OE_ED.batches.has(b)?"on":""}" data-b="${esc(b)}">${esc(b)}</button>`).join("") : "";
-    document.querySelectorAll("#oBat button").forEach(x => x.onclick = () => { OE_ED.batches.has(x.dataset.b) ? OE_ED.batches.delete(x.dataset.b) : OE_ED.batches.add(x.dataset.b);
+      COACHING.batches.map(b=>`<button type="button" class="${OE_ED.batches.has(b)?"on":""}" data-b="${esc(b)}">${esc(b)}</button>`).join("") : OE_ED.aud === "package" ? pkgPickHtml(OE_ED) : "";
+    pkgPickBind($("#oBat"), OE_ED, paintAud);
+    document.querySelectorAll("#oBat button[data-b]").forEach(x => x.onclick = () => { OE_ED.batches.has(x.dataset.b) ? OE_ED.batches.delete(x.dataset.b) : OE_ED.batches.add(x.dataset.b);
       const bs = [...OE_ED.batches]; if(bs.length){ $("#oNegOn").checked = bs.some(b => /^HSC/i.test(b)); oeMarks(); } paintAud(); });
   };
   document.querySelectorAll(".aud button").forEach(b => b.onclick = () => { OE_ED.aud = b.dataset.a; paintAud(); });
@@ -2672,9 +2723,9 @@ function oePrev(){
   oeMarks(); const mp = +$("#oMp").value || 1;
   $("#oPrevSum").innerHTML = !qs.length ? "" : errs.length
     ? `<div class="err">⚠️ ${BN_DIGITS(qs.length)}টি প্রশ্ন পাওয়া গেছে, কিন্তু কিছু সমস্যা আছে:<br>${errs.slice(0,8).map(esc).join("<br>")}${errs.length>8?"<br>...":""}</div>`
-    : `<div class="ok">✅ ${BN_DIGITS(qs.length)}টি প্রশ্ন ঠিকঠাক পাওয়া গেছে • মোট নম্বর ${BN_DIGITS(num(qs.length*mp))}</div>`;
+    : `<div class="ok">✅ ${BN_DIGITS(qs.length)}টি প্রশ্ন ঠিকঠাক পাওয়া গেছে • মোট নম্বর ${BN_DIGITS(num(qs.length*mp))}</div>` + chapterNote(qs);
   $("#oPrev").innerHTML = qs.length ? `<details ${qs.length<=5?"open":""} style="margin-top:10px"><summary class="lnkbtn">👀 প্রশ্নগুলো দেখো ও ছবি যোগ করো</summary>${qs.map((q,i)=>`
-    <div class="pq ${q.opts.length<2||q.ans<0?"bad":""}"><div class="pqt">${BN_DIGITS(i+1)}. ${esc(q.q)}</div>
+    <div class="pq ${q.opts.length<2||q.ans<0?"bad":""}">${q.ch?`<span class="chtag">🏷️ ${esc(q.ch)}</span>`:""}<div class="pqt">${BN_DIGITS(i+1)}. ${esc(q.q)}</div>
       ${OE_ED.imgs[i]?`<img src="${OE_ED.imgs[i]}" alt="">`:""}
       <ol>${q.opts.map((o,j)=>`<li class="${j===q.ans?"c":""}">${LET[j]}. ${esc(o)}${j===q.ans?" ✓":""}</li>`).join("")}</ol>
       ${q.expl?`<div class="ex">💡 ${esc(q.expl)}</div>`:""}
@@ -2708,10 +2759,12 @@ async function oeSave(publish){
   if(!qs.length) return fail("প্রশ্ন দাও");
   if(errs.length) return fail("প্রশ্নে সমস্যা আছে:<br>" + errs.slice(0,6).map(esc).join("<br>"));
   if(publish && new Date(e.ends_at) < new Date()) { if(!confirm("শেষের সময় পার হয়ে গেছে — তাহলে শুধু প্র্যাকটিস আর মেরিট দেখা যাবে। তবুও প্রকাশ করবে?")) return; }
-  const payload = qs.map((q,i) => ({q:q.q, opts:q.opts, ans:q.ans, expl:q.expl||null, img:OE_ED.imgs[i]||null}));
+  if(e.audience === "package" && !OE_ED.pk.size) return fail("কোন প্যাকেজের পরীক্ষা, বেছে নাও (না থাকলে আগে 📦 প্যাকেজ বানাও)");
+  const payload = qs.map((q,i) => ({q:q.q, opts:q.opts, ans:q.ans, expl:q.expl||null, img:OE_ED.imgs[i]||null, ch:q.ch||null}));
   try{
     const r = await rpc("oe_admin_save", {p_token:TOKEN, p_exam:e, p_qs:payload});
     OE_ED.id = r.id; HOME_EX_AT = 0;
+    await pkgEditorSave(OE_ED, "mcq", r.id);
     toast(publish ? "🚀 পরীক্ষা প্রকাশ হয়েছে!" : "💾 খসড়া সেভ হয়েছে", 3000);
     if(publish){ await oeAdm(); oePromo(r.id); } else oeAdm();
   }catch(ex){ fail(esc(ex.message)); }
@@ -2882,7 +2935,7 @@ function cqPaperHtml(e, qs, withSol){
 /* ---------- পরীক্ষার কার্ড ---------- */
 function cqCard(e, compact){
   const my = e.my, st = e.status, id = e.id;
-  const aud = (e.audience === "free" ? '<span class="chip">🆓 ফ্রি</span>' : `<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ") || "BIO NERDS স্টুডেন্ট")}</span>`) + '<span class="chip org">✍️ লিখিত</span>';
+  const aud = audChip(e, true) + '<span class="chip org">✍️ লিখিত</span>';
   const pill = st === "live" ? '<span class="live-pill"><i></i>লাইভ চলছে</span>' : st === "upcoming" ? '<span class="chip warn">⏳ আসছে</span>' : '<span class="chip" style="background:#eef1f4;color:var(--mute)">শেষ হয়েছে</span>';
   const after = st === "ended" ? `<div class="ex-acts"><button class="btn sec" onclick="exMerit(${id},1)">🏆 মেরিট</button><button class="btn sec" onclick="cqPaperView(${id})">📖 প্রশ্ন ও সমাধান</button></div>` : "";
   let body = "";
@@ -2906,6 +2959,7 @@ function cqCard(e, compact){
   } else if(st === "upcoming"){
     body = `<div class="cdbox g"><span>⏳ শুরু হতে বাকি</span>${cd(e.starts_at,"exRefresh")}</div>`;
   } else body = after;
+  if(e.locked) body = pkgLockHtml(e);
   return `<div class="exc ${st}" id="excq${id}">
     <div class="top">${aud}${pill}<button class="lnkbtn" style="margin-left:auto" onclick="cqShareLink(${id})">🔗 শেয়ার</button></div>
     <h4>${esc(e.title)}</h4>${e.subject ? `<div class="sub">📚 ${esc(e.subject)}</div>` : ""}
@@ -3198,10 +3252,10 @@ async function cqAdm(){
     <div id="cqStore"></div><div id="cqList"><div class="spin"></div></div>`;
   cqStorage();
   try{
-    CQ_LIST = await rpc("cq_admin_list", {p_token:TOKEN});
+    [CQ_LIST] = await Promise.all([rpc("cq_admin_list", {p_token:TOKEN}), pkgLinksLoad()]);
     $("#cqList").innerHTML = CQ_LIST.length ? CQ_LIST.map(e => { const todo = e.submitted - e.checked - e.approved;
       return `<div class="card">
-      <div class="row" style="gap:6px;flex-wrap:wrap">${OE_ST[e.status]}${e.audience === "free" ? '<span class="chip">🆓 ফ্রি</span>' : `<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ") || "সব স্টুডেন্ট")}</span>`}<span class="chip org">✍️ লিখিত</span></div>
+      <div class="row" style="gap:6px;flex-wrap:wrap">${OE_ST[e.status]}${admAudChip(e,"cq")}<span class="chip org">✍️ লিখিত</span></div>
       <b style="display:block;font-size:17px;margin-top:6px">${esc(e.title)}</b><div class="muted">${esc(e.subject||"")}</div>
       <div class="muted" style="margin-top:4px">🗓️ ${bnWindow(e)}</div>
       <div class="grid4"><div><b>${BN_DIGITS(num(e.total))}</b><span>পূর্ণমান</span></div><div><b>${BN_DIGITS(e.submitted)}</b><span>খাতা জমা</span></div><div><b>${BN_DIGITS(e.checked)}</b><span>অনুমোদন বাকি</span></div><div><b>${BN_DIGITS(e.approved)}</b><span>অনুমোদিত</span></div></div>
@@ -3263,7 +3317,7 @@ async function cqDel(id){
 /* --- প্রশ্ন পার্স করা (সৃজনশীল / সংক্ষিপ্ত) --- */
 function cqStripMark(t){ return t.replace(/([?？।:.)\]])\s*[\[(]?\s*[০-৯\d](?:\.[০-৯\d])?\s*[\])]?\s*$/, "$1").trim(); }
 function parseCQ(text, type, nParts){
-  const qs = [], errs = []; let cur = null, mode = null, blank = false;
+  const qs = [], errs = []; let cur = null, mode = null, blank = false, CH = "";
   const reQ = /^(প্রশ্ন\s*(?:নং|নম্বর)?\s*[:-]?\s*)?([০-৯\d]{1,3})\s*[.)।:]\s*(.*)$/;
   const reP = /^\(?\s*([কখগঘঙচ]|[a-fA-F])\s*[.)।:]\s*(.*)$/;
   const reS = /^(?:সমাধান|নমুনা\s*উত্তর|উত্তর|উঃ|Ans(?:wer)?|Solution)\s*[:：ঃ.\-]\s*(.*)$/i;
@@ -3271,15 +3325,16 @@ function parseCQ(text, type, nParts){
   String(text||"").split(/\r?\n/).forEach(raw => {
     const l = raw.trim();
     if(!l){ blank = true; if(cur && mode === "s") cur.sol += "\n"; else if(cur && mode === "q") cur.stem += "\n"; return; }
+    if(/^#/.test(l)){ CH = l.replace(/^#+\s*/, "").trim(); return; }
     const wasBlank = blank; blank = false; let m;
     if((m = l.match(reQ))){
       const kw = !!m[1];
       const canNew = !cur || (type === "short" ? (mode !== "s" || wasBlank || kw) : (mode === "p" || (mode === "s" && (wasBlank || kw)) || (kw && mode !== "q")));
-      if(canNew){ push(); cur = {stem:m[3], parts:[], sol:""}; mode = "q"; return; }
+      if(canNew){ push(); cur = {stem:m[3], parts:[], sol:"", ch:CH}; mode = "q"; return; }
     }
     if(cur && mode !== "s" && (m = l.match(reS))){ cur.sol = m[1]; mode = "s"; return; }
     if(cur && type === "cq" && mode !== "s" && (m = l.match(reP))){ cur.parts.push(cqStripMark(m[2])); mode = "p"; return; }
-    if(!cur){ cur = {stem:l, parts:[], sol:""}; mode = "q"; return; }
+    if(!cur){ cur = {stem:l, parts:[], sol:"", ch:CH}; mode = "q"; return; }
     if(mode === "q") cur.stem += "\n" + l;
     else if(mode === "s") cur.sol += "\n" + l;
     else if(mode === "p") cur.parts[cur.parts.length-1] += " " + l;
@@ -3293,9 +3348,10 @@ function parseCQ(text, type, nParts){
   return {qs, errs};
 }
 function cqToText(qs, type){
-  return qs.map((q,i) => type === "short"
+  let ch = "";
+  return qs.map((q,i) => { const hd = (q.ch || "") !== ch ? `# ${(ch = q.ch || "") || "—"}\n` : ""; return hd + (type === "short"
     ? `${i+1}. ${q.stem}` + (q.sol ? `\nসমাধান: ${q.sol}` : "")
-    : `${i+1}. ${q.stem}\n` + q.parts.map((p,j) => `${CQ_LET[j]}. ${p.t}`).join("\n") + (q.sol ? `\nসমাধান: ${q.sol}` : "")).join("\n\n");
+    : `${i+1}. ${q.stem}\n` + q.parts.map((p,j) => `${CQ_LET[j]}. ${p.t}`).join("\n") + (q.sol ? `\nসমাধান: ${q.sol}` : "")); }).join("\n\n");
 }
 
 /* --- এডিটর --- */
@@ -3316,16 +3372,18 @@ async function cqEdit(id, copy){
       L.forEach((q,i) => { if(q.img) CQ_ED_IMG[si + "_" + i] = q.img; });
       return {t:s.t||"", type:s.type||"cq", need:+s.need||0, marks:(s.marks||[1,2,3,4]).map(Number), text:cqToText(L, s.type)}; })};
   CQ_ED.imgs = CQ_ED_IMG; CQ_ED_IMG = {};
+  await pkgEditorPrep(CQ_ED, "cq", e);
   window.scrollTo(0,0);
   $("#aexBody").innerHTML = `
     <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="cqAdm()">← সব লিখিত পরীক্ষা</button><b style="margin-left:4px">${CQ_ED.id ? "✏️ এডিট" : "➕ নতুন লিখিত পরীক্ষা"}</b></div>
     ${CQ_ED.live ? `<div class="hl-note" style="margin-bottom:12px"><span>⚠️</span><span>${BN_DIGITS(e.participants)} জন এই পরীক্ষা দিয়ে ফেলেছে। প্রশ্নের ক্রম বদলিও না — নম্বর প্রশ্ন ধরে রাখা আছে। মান বদলালে সবার নম্বর আবার হিসাব হবে।</span></div>` : ""}
     <div class="card"><h3>১. পরীক্ষার তথ্য</h3>
       <label>পরীক্ষার নাম</label><input id="cT" value="${esc(e.title)}" placeholder="যেমন: HSC'27 লিখিত পরীক্ষা ০১">
-      <label>বিষয় / অধ্যায়</label><input id="cS" value="${esc(e.subject||"")}" placeholder="যেমন: জীববিজ্ঞান ১ম পত্র — কোষ বিভাজন">
+      <label>বিষয় / অধ্যায়</label><input id="cS" list="subjDL" value="${esc(e.subject||"")}" placeholder="যেমন: জীববিজ্ঞান ১ম পত্র — কোষ বিভাজন">${subjDatalist()}
       <label>কার জন্য</label>
       <div class="aud" id="cAud"><button type="button" data-a="batch">🔒 শুধু আমার স্টুডেন্ট<small>পোর্টালের আইডিতে</small></button>
-        <button type="button" data-a="free">🆓 ফ্রি — সবার জন্য<small>বাইরের স্টুডেন্টরাও</small></button></div>
+        <button type="button" data-a="free">🆓 ফ্রি — সবার জন্য<small>বাইরের স্টুডেন্টরাও</small></button>
+        <button type="button" data-a="package">📦 প্যাকেজের পরীক্ষা<small>যারা প্যাকেজ কিনেছে (+ ফ্রি নমুনা)</small></button></div>
       <div id="cBat" class="pre-chips" style="margin-top:10px"></div></div>
     <div class="card"><h3>২. সময়</h3>
       <label>পরীক্ষা শুরু (এই সময় থেকে ঢোকা যাবে)</label><input id="cSt" type="datetime-local" value="${toLocalInput(e.starts_at)}">
@@ -3354,8 +3412,9 @@ async function cqEdit(id, copy){
   const paintAud = () => {
     document.querySelectorAll("#cAud button").forEach(b => b.classList.toggle("on", b.dataset.a === CQ_ED.aud));
     $("#cBat").innerHTML = CQ_ED.aud === "batch" ? `<span class="muted" style="width:100%">কোন ব্যাচ? (কিছু না বাছলে সব স্টুডেন্ট)</span>` +
-      COACHING.batches.map(b => `<button type="button" class="${CQ_ED.batches.has(b) ? "on" : ""}" data-b="${esc(b)}">${esc(b)}</button>`).join("") : "";
-    document.querySelectorAll("#cBat button").forEach(x => x.onclick = () => { CQ_ED.batches.has(x.dataset.b) ? CQ_ED.batches.delete(x.dataset.b) : CQ_ED.batches.add(x.dataset.b); paintAud(); });
+      COACHING.batches.map(b => `<button type="button" class="${CQ_ED.batches.has(b) ? "on" : ""}" data-b="${esc(b)}">${esc(b)}</button>`).join("") : CQ_ED.aud === "package" ? pkgPickHtml(CQ_ED) : "";
+    pkgPickBind($("#cBat"), CQ_ED, paintAud);
+    document.querySelectorAll("#cBat button[data-b]").forEach(x => x.onclick = () => { CQ_ED.batches.has(x.dataset.b) ? CQ_ED.batches.delete(x.dataset.b) : CQ_ED.batches.add(x.dataset.b); paintAud(); });
   };
   document.querySelectorAll("#cAud button").forEach(b => b.onclick = () => { CQ_ED.aud = b.dataset.a; paintAud(); });
   paintAud();
@@ -3407,10 +3466,10 @@ function cqSecPrev(si){
   const qm = s.marks.reduce((a,b) => a + (+b||0), 0), need = cqNeed(s, qs.length);
   box.innerHTML = !qs.length ? "" : (errs.length
     ? `<div class="err">⚠️ ${BN_DIGITS(qs.length)}টি প্রশ্ন পাওয়া গেছে, কিন্তু সমস্যা আছে:<br>${errs.slice(0,8).map(esc).join("<br>")}${errs.length > 8 ? "<br>..." : ""}</div>`
-    : `<div class="ok">✅ ${BN_DIGITS(qs.length)}টি প্রশ্ন • ${need < qs.length ? `যেকোনো ${BN_DIGITS(need)}টি` : "সবগুলো"} × ${BN_DIGITS(num(qm))} = <b>${BN_DIGITS(num(need*qm))}</b> নম্বর</div>`)
+    : `<div class="ok">✅ ${BN_DIGITS(qs.length)}টি প্রশ্ন • ${need < qs.length ? `যেকোনো ${BN_DIGITS(need)}টি` : "সবগুলো"} × ${BN_DIGITS(num(qm))} = <b>${BN_DIGITS(num(need*qm))}</b> নম্বর</div>` + chapterNote(qs))
     + (+s.need > qs.length && qs.length ? `<div class="hint c-bad">⚠️ ${BN_DIGITS(s.need)}টার উত্তর দিতে বলেছ, কিন্তু প্রশ্ন আছে ${BN_DIGITS(qs.length)}টা</div>` : "")
     + (qs.length ? `<details style="margin-top:8px"><summary class="lnkbtn">👀 প্রশ্নগুলো দেখো ও ছবি যোগ করো</summary>${qs.map((q,i) => { const key = si + "_" + i, img = CQ_ED.imgs[key];
-      return `<div class="pq ${s.type === "cq" && q.parts.length !== s.marks.length ? "bad" : ""}"><div class="pqt">${BN_DIGITS(i+1)}. ${esc(q.stem)}</div>
+      return `<div class="pq ${s.type === "cq" && q.parts.length !== s.marks.length ? "bad" : ""}">${q.ch ? `<span class="chtag">🏷️ ${esc(q.ch)}</span>` : ""}<div class="pqt">${BN_DIGITS(i+1)}. ${esc(q.stem)}</div>
         ${img ? `<img src="${img}" alt="">` : ""}
         ${s.type === "cq" ? `<ol>${q.parts.map((p,j) => `<li>${CQ_LET[j]}. ${esc(p)} <span class="muted">[${BN_DIGITS(num(s.marks[j] ?? "?"))}]</span></li>`).join("")}</ol>` : ""}
         ${q.sol ? `<div class="ex">💡 ${esc(q.sol.length > 160 ? q.sol.slice(0,160) + "…" : q.sol)}</div>` : ""}
@@ -3452,11 +3511,13 @@ async function cqSave(publish){
   const bad = []; CQ_ED.secs.forEach((s,si) => { if(!(s.qs||[]).length) bad.push(`বিভাগ ${si+1}: প্রশ্ন দাও`); (s.errs||[]).slice(0,4).forEach(x => bad.push(`বিভাগ ${si+1} — ${x}`)); if(s.marks.some(m => !(+m > 0))) bad.push(`বিভাগ ${si+1}: মান ঠিক নেই`); });
   if(bad.length) return fail("ঠিক করতে হবে:<br>" + bad.slice(0,8).map(esc).join("<br>"));
   if(publish && new Date(e.ends_at) < new Date() && !confirm("শেষের সময় পার হয়ে গেছে — কেউ আর পরীক্ষা দিতে পারবে না। তবুও প্রকাশ করবে?")) return;
-  const qs = []; CQ_ED.secs.forEach((s,si) => s.qs.forEach((q,i) => qs.push({sec:si, stem:q.stem, img:CQ_ED.imgs[si + "_" + i] || null, sol:q.sol || null,
+  if(e.audience === "package" && !CQ_ED.pk.size) return fail("কোন প্যাকেজের পরীক্ষা, বেছে নাও (না থাকলে আগে 📦 প্যাকেজ বানাও)");
+  const qs = []; CQ_ED.secs.forEach((s,si) => s.qs.forEach((q,i) => qs.push({sec:si, stem:q.stem, img:CQ_ED.imgs[si + "_" + i] || null, sol:q.sol || null, ch:q.ch || null,
     parts: s.type === "cq" ? q.parts.map((t,j) => ({l:CQ_LET[j], t, m:+s.marks[j]})) : [{l:"", t:"", m:+s.marks[0]}]})));
   try{
     const r = await rpc("cq_admin_save", {p_token:TOKEN, p_exam:e, p_qs:qs});
     CQ_ED.id = r.id;
+    await pkgEditorSave(CQ_ED, "cq", r.id);
     toast(publish ? "🚀 লিখিত পরীক্ষা প্রকাশ হয়েছে!" : "💾 খসড়া সেভ হয়েছে", 3000);
     await cqAdm(); if(publish) cqPromo(r.id);
   }catch(ex){ fail(esc(ex.message)); }
@@ -3600,13 +3661,608 @@ async function cqUnapprove(){
   try{ await rpc("cq_admin_unapprove", {p_token:TOKEN, p_exam:CQS.id, p_uid:CQG.uid}); toast("↩️ অনুমোদন তুলে নেওয়া হয়েছে"); cqScripts(CQS.id, true); }catch(ex){ toast(ex.message); }
 }
 
+/* ================================================================
+   📦 পরীক্ষার প্যাকেজ (পেইড) — স্টুডেন্ট / পাবলিক
+   ================================================================ */
+const PKG_METHOD = {bkash:"বিকাশ", nagad:"নগদ", cash:"ক্যাশ", gift:"উপহার (ফ্রি)"};
+const pkgLink = id => SITE_URL + "/#pkg=" + id;
+let PKGS = [], PKG_CFG = null, PKG_CUR = null, HOME_PK = [];
+function dhakaDate(iso){ const p = bdParts(iso); return BN_DIGITS(p.d) + " " + BN_MON[p.m] + " " + BN_DIGITS(p.y); }
+/* মেয়াদ শেষ = পরের দিনের রাত ১২টা, তাই দেখানোর সময় আগের দিনের তারিখ */
+const expTxt = iso => iso ? dhakaDate(new Date(new Date(iso).getTime() - 60000).toISOString()) : "";
+function pkgValidTxt(p){
+  return p.valid_type === "days" ? `কেনার দিন থেকে ${BN_DIGITS(p.valid_days || 0)} দিন`
+    : p.valid_until ? `${fmtDate(p.valid_until)} পর্যন্ত` : "মেয়াদ নেই";
+}
+function pkgPriceHtml(p, big){
+  const me = p.me || {};
+  if(me.state === "free") return `<span class="pk-price${big?" big":""}">ফ্রি</span>`;
+  const mp = +p.my_price, base = +p.price, old = p.old_price && +p.old_price > mp ? +p.old_price : (mp < base ? base : 0);
+  return `<span class="pk-price${big?" big":""}">${old ? `<s>${tk(old)}</s> ` : ""}${mp > 0 ? tk(mp) : "ফ্রি"}</span>`;
+}
+function pkgStateChip(me){
+  me = me || {};
+  return me.state === "active" ? `<span class="chip">✅ চালু${me.expires_at ? " • " + expTxt(me.expires_at) + " পর্যন্ত" : ""}</span>`
+    : me.state === "free" ? '<span class="chip">🎁 তোমার ব্যাচের জন্য ফ্রি</span>'
+    : me.state === "pending" ? '<span class="chip warn">⏳ টাকা যাচাই চলছে</span>'
+    : me.state === "rejected" ? '<span class="chip" style="background:#fdeaea;color:var(--red)">❌ জমা বাতিল</span>'
+    : me.state === "expired" ? '<span class="chip" style="background:#eef1f4;color:var(--mute)">⌛ মেয়াদ শেষ</span>' : "";
+}
+function pkgCardHtml(p){
+  const n = (+p.n_mcq || 0) + (+p.n_cq || 0), tot = Math.max(+p.n_planned || 0, n), me = p.me || {};
+  const kinds = p.n_mcq && p.n_cq ? "MCQ + লিখিত" : p.n_cq ? "লিখিত" : p.n_mcq ? "MCQ" : "";
+  return `<div class="pkc" onclick="pkgOpen(${p.id})">
+    <div class="row between" style="align-items:flex-start"><b class="t">${esc(p.title)}</b>${pkgPriceHtml(p)}</div>
+    <div class="muted" style="font-size:13.5px;margin-top:3px">${[tot ? BN_DIGITS(tot) + "টা পরীক্ষা" : "", kinds, pkgValidTxt(p)].filter(Boolean).join(" • ")}</div>
+    <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">${pkgStateChip(me)}${(!me.state || me.state === "rejected" || me.state === "expired") && +p.n_sample ? `<span class="chip">🎁 ${BN_DIGITS(p.n_sample)}টা নমুনা পরীক্ষা ফ্রি</span>` : ""}${p.subject ? `<span class="chip navy">📚 ${esc(p.subject)}</span>` : ""}${!p.visible ? '<span class="chip" style="background:#eef1f4;color:var(--mute)">🙈 লুকানো</span>' : ""}<span class="lnkbtn" style="margin-left:auto">দেখো ›</span></div></div>`;
+}
+async function pkgLoad(){ const r = await rpc("pkg_list", {p_token: exTok()}); PKGS = r.packages || []; return r; }
+
+/* পরীক্ষার পাতায় প্যাকেজের তালিকা */
+async function pkgHub(){
+  const box = $("#pkgHub"); if(!box) return;
+  try{ await pkgLoad(); }catch(e){ box.innerHTML = ""; return; }
+  if(!$("#pkgHub")) return;
+  $("#pkgHub").innerHTML = PKGS.length ? `<div class="ex-sec">📦 পরীক্ষার প্যাকেজ <small>রুটিন • নমুনা • কেনো</small></div>` + PKGS.map(pkgCardHtml).join("") : "";
+}
+
+/* তালা দেওয়া পরীক্ষার কার্ডের নিচের অংশ */
+function pkgLockHtml(e){
+  const L = (e.pkgs || []).filter(p => p.v !== false), p = L[0];
+  if(!p) return `<div class="lockbox">🔒 এই পরীক্ষাটা এখন খোলা নেই</div>`;
+  const known = (PKG_CUR && PKG_CUR.id == p.id) ? PKG_CUR : PKGS.find(x => x.id == p.id);
+  if(known && known.me && known.me.state === "pending")
+    return `<div class="lockbox">⏳ <span><b>${esc(p.title)}</b> কেনার টাকা যাচাই চলছে — নিশ্চিত হলেই পরীক্ষাটা খুলে যাবে</span></div>`;
+  return `<div class="lockbox">🔒 <span>এই পরীক্ষাটা <b>${esc(p.title)}</b> প্যাকেজের${L.length > 1 ? ` (আরও ${BN_DIGITS(L.length - 1)}টা প্যাকেজে আছে)` : ""}</span></div>
+    <button class="btn orange" onclick="pkgOpen(${p.id})">📦 প্যাকেজ কিনো</button>`;
+}
+
+/* একটা প্যাকেজের পাতা */
+async function pkgOpen(id){
+  closeSheet();
+  const stu = !$("#stuView").classList.contains("hidden");
+  let box;
+  if(stu){ box = $("#stuMain"); EX_FROM = "stu"; window.scrollTo(0,0); }
+  else { show("examView"); $("#exHead").textContent = "📦 পরীক্ষার প্যাকেজ"; $("#exBackBtn").onclick = () => openExams(); box = $("#exMain"); }
+  box.innerHTML = '<div class="spin"></div>';
+  let r;
+  try{ [r] = await Promise.all([rpc("pkg_list", {p_token:exTok(), p_pkg:id}), exLoad()]); }
+  catch(ex){ box.innerHTML = '<div class="err">' + esc(ex.message) + '</div>'; return; }
+  const back = stu ? `<button class="btn sm ghost" style="margin-bottom:10px" onclick="stuTab('exam')">← সব পরীক্ষা</button>` : "";
+  const p = (r.packages || [])[0];
+  if(!p){ box.innerHTML = back + `<div class="card empty-ex"><div>📦</div><b>প্যাকেজটা পাওয়া যায়নি</b><br>হয়তো এখন আর বিক্রি হচ্ছে না।</div>`; return; }
+  PKG_CUR = p;
+  const exs = (EXL.exams || []).filter(e => (e.pkgs || []).some(x => x.id == id)).sort((a,b) => new Date(a.starts_at) - new Date(b.starts_at));
+  const n = (+p.n_mcq || 0) + (+p.n_cq || 0), tot = Math.max(+p.n_planned || 0, n);
+  const hot = exs.filter(e => e.status === "live" || (e.status === "upcoming" && new Date(e.starts_at).getTime() - nowSrv() < 3*86400e3));
+  const feats = String(p.features || "").split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  let h = back + `<div class="pk-hero"><span class="bd">📦 ${p.subject ? esc(p.subject) + " • " : ""}পরীক্ষার প্যাকেজ</span>
+    <h2>${esc(p.title)}</h2>${p.descr ? `<p>${esc(p.descr)}</p>` : ""}
+    <div class="ex-feat">${[tot ? `📝 ${BN_DIGITS(tot)}টা পরীক্ষা` : "", +p.n_mcq ? `🖥️ MCQ ${BN_DIGITS(p.n_mcq)}টা` : "", +p.n_cq ? `✍️ লিখিত ${BN_DIGITS(p.n_cq)}টা` : "",
+      +p.n_sample ? `🎁 ${BN_DIGITS(p.n_sample)}টা নমুনা ফ্রি` : "", `⏳ ${pkgValidTxt(p)}`].filter(Boolean).map(x => `<span>${x}</span>`).join("")}</div></div>`;
+  h += pkgStatusHtml(p);
+  if(feats.length) h += `<div class="card"><h3>✨ যা যা পাবে</h3><ul class="pk-feat">${feats.map(f => `<li>${esc(f)}</li>`).join("")}</ul></div>`;
+  if(hot.length) h += `<div class="ex-sec">🔴 এখন ও সামনে</div>` + hot.map(e => exCard(e)).join("");
+  h += `<div class="ex-sec">📝 পরীক্ষাগুলো <small>${BN_DIGITS(exs.length)}টা প্রকাশিত</small></div>` + (exs.length
+    ? `<div class="card" style="padding:4px 14px">${exs.map((e,i) => pkgRowHtml(e, i)).join("")}</div>`
+    : `<div class="card muted">পরীক্ষাগুলো শীঘ্রই এখানে আসবে।</div>`);
+  if(p.routine){
+    const rows = String(p.routine).split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    h += `<div class="ex-sec">📅 পুরো রুটিন</div><div class="card" style="padding:6px 12px;overflow-x:auto"><table class="tbl">${rows.map(l => `<tr>${l.split("|").map(c => `<td>${esc(c.trim())}</td>`).join("")}</tr>`).join("")}</table></div>`;
+  }
+  h += `<div class="ex-acts" style="margin-bottom:14px"><button class="btn sec" onclick="pkgShare(${p.id})">🔗 বন্ধুকে পাঠাও</button>${stu ? "" : `<button class="btn ghost" onclick="openExams()">সব পরীক্ষা</button>`}</div>`;
+  if(!stu && (!r.me || r.me.kind === "guest")) h += admCtaHtml();
+  box.innerHTML = h;
+}
+function pkgStatusHtml(p){
+  const me = p.me || {}, id = p.id;
+  if(me.state === "admin") return `<div class="card pk-buy"><b>👀 অ্যাডমিন প্রিভিউ</b><div class="row between" style="margin-top:6px">${pkgPriceHtml(p, true)}<span class="muted">${pkgValidTxt(p)}</span></div>
+    <div class="muted" style="margin-top:6px">স্টুডেন্টরা এখানে দাম আর “📦 প্যাকেজ কিনো” বাটন দেখবে।${p.visible ? "" : " (প্যাকেজটা এখন লুকানো — স্টুডেন্টরা দেখছে না।)"}</div></div>`;
+  if(me.state === "free") return `<div class="card pk-buy ok2"><b>🎁 তোমার ব্যাচের জন্য এই প্যাকেজ ফ্রি</b><div class="muted">সব পরীক্ষা তোমার জন্য খোলা${me.expires_at ? ` • ${expTxt(me.expires_at)} পর্যন্ত` : ""}।</div></div>`;
+  if(me.state === "active"){
+    const left = me.expires_at ? Math.max(0, Math.ceil((new Date(me.expires_at).getTime() - nowSrv()) / 86400e3)) : null;
+    return `<div class="card pk-buy ok2"><b>✅ তোমার প্যাকেজ চালু আছে</b><div class="muted">${me.expires_at ? `মেয়াদ ${expTxt(me.expires_at)} পর্যন্ত (আর ${BN_DIGITS(left)} দিন)` : "মেয়াদ শেষ হবে না"}</div>
+      ${me.pending ? `<div class="hint">⏳ নবায়নের জমা (TrxID ${esc(me.pending.trx)}) যাচাই চলছে</div>`
+        : (p.valid_type === "days" && left !== null && left <= 15 && p.open ? `<button class="btn orange" onclick="pkgBuy(${id})">🔄 মেয়াদ বাড়াও — ${tk(p.my_price)}</button>` : "")}</div>`;
+  }
+  if(me.state === "pending") return `<div class="card pk-buy wait"><b>⏳ টাকা যাচাই চলছে</b>
+    <div class="muted">${PKG_METHOD[me.method] || ""} ${tk(me.amount)} • TrxID ${esc(me.trx)}<br>কোচিং থেকে নিশ্চিত করলেই সব পরীক্ষা খুলে যাবে। ততক্ষণ ফ্রি নমুনা পরীক্ষা দিতে পারো।</div>
+    <button class="btn ghost" onclick="pkgBuy(${id})">✏️ TrxID ভুল দিয়েছি — আবার জমা দাও</button></div>`;
+  if(!p.open) return `<div class="card pk-buy"><b>⌛ এই প্যাকেজের মেয়াদ শেষ</b>${me.state === "expired" ? '<div class="muted">তোমার দেওয়া পরীক্ষাগুলোর রেজাল্ট আর সমাধান দেখতে পারবে।</div>' : ""}</div>`;
+  const rej = me.state === "rejected" ? `<div class="err" style="margin:0 0 10px">❌ আগের জমা (TrxID ${esc(me.trx || "")}) বাতিল হয়েছে${me.note ? ": " + esc(me.note) : ""}। ঠিক TrxID দিয়ে আবার জমা দাও, বা WhatsApp-এ জানাও।</div>` : "";
+  const exp = me.state === "expired" ? `<div class="hint" style="margin:0 0 8px">⌛ তোমার আগের মেয়াদ শেষ হয়েছে — আবার কিনলে নতুন পরীক্ষাগুলো খুলবে।</div>` : "";
+  const special = +p.my_price < +p.price ? `<span class="chip" style="margin-top:4px">🎓 তোমার ব্যাচের জন্য বিশেষ দাম</span>` : "";
+  const login = !exTok() ? `<div class="hint">BIO NERDS-এর ভর্তি হওয়া স্টুডেন্ট? আগে রোল দিয়ে লগইন করো — তোমার ব্যাচের দাম দেখাবে।</div>` : "";
+  return `<div class="card pk-buy">${rej}${exp}<div class="row between"><div><div class="muted" style="font-size:13px">প্যাকেজের দাম</div>${pkgPriceHtml(p, true)}<div>${special}</div></div>
+    <div class="muted" style="text-align:right;font-size:13.5px">⏳ ${pkgValidTxt(p)}</div></div>
+    <button class="btn orange big" onclick="pkgBuy(${id})">📦 প্যাকেজ কিনো</button>${login}</div>`;
+}
+function pkgRowHtml(e, i){
+  const done = e.my && (e.my.score != null || ["submitted","checked","approved"].includes(e.my.state));
+  const ic = e.locked ? "🔒" : e.status === "live" ? "🔴" : e.status === "upcoming" ? "⏳" : done ? "✅" : "📖";
+  return `<div class="pk-row" onclick="pkgRow('${e.cq ? "cq" : "mcq"}',${e.id})"><span class="ic">${ic}</span>
+    <div class="m"><b>${BN_DIGITS(i+1)}. ${esc(e.title)}</b><span>${bnDay(e.starts_at)} • ${e.cq ? "✍️ লিখিত" : "🖥️ MCQ"}${e.sample ? " • 🎁 ফ্রি নমুনা" : ""}${e.my && e.my.score != null ? " • " + BN_DIGITS(num(e.my.score)) + "/" + BN_DIGITS(num(e.total)) : ""}</span></div><span class="go">›</span></div>`;
+}
+function pkgRow(k, id){
+  const e = (EXL.exams || []).find(x => x.id == id && !!x.cq === (k === "cq")); if(!e) return;
+  if(e.locked) return PKG_CUR ? pkgBuy(PKG_CUR.id) : null;
+  if(e.status !== "ended"){
+    const el = $(k === "cq" ? "#excq" + id : "#exc" + id);
+    if(el){ el.scrollIntoView({behavior:"smooth", block:"center"}); el.classList.add("focus"); setTimeout(() => el.classList.remove("focus"), 3000); }
+    else toast((e.status === "live" ? "চলছে — " : "শুরু হবে ") + bnWhen(e.status === "live" ? e.ends_at : e.starts_at) + (e.status === "live" ? " পর্যন্ত" : ""), 3500);
+    return;
+  }
+  if(k === "cq") return (e.my && e.my.state === "approved") ? cqResult(id) : cqPaperView(id);
+  return (e.my && e.my.score != null) ? exResult(id) : exPractice(id);
+}
+async function pkgShare(id){
+  const p = PKG_CUR && PKG_CUR.id == id ? PKG_CUR : PKGS.find(x => x.id == id); if(!p) return;
+  const text = `📦 ${COACHING.name} — ${p.title}\n${p.descr ? p.descr + "\n" : ""}⏳ ${pkgValidTxt(p)}\n👉 `;
+  if(navigator.share){ try{ await navigator.share({title:p.title, text, url:pkgLink(id)}); return; }catch(err){ if(err.name === "AbortError") return; } }
+  copyText(text + pkgLink(id));
+}
+
+/* কেনা: বিকাশ/নগদে Send Money → TrxID */
+function pkgBuy(id){
+  const p = PKG_CUR && PKG_CUR.id == id ? PKG_CUR : PKGS.find(x => x.id == id);
+  if(!p){ pkgOpen(id); return; }
+  if(!exTok()){ exAuth(() => pkgOpen(id).then(() => pkgBuy(id))); return; }
+  const me = p.me || {};
+  if(me.state === "admin"){ toast("অ্যাডমিন অ্যাকাউন্ট দিয়ে কেনা যায় না। কাউকে দিতে চাইলে: অ্যাডমিন → 📝 পরীক্ষা → 📦 প্যাকেজ → ক্রেতা → “হাতে যোগ করো”", 5000); return; }
+  if(me.state === "free"){ toast("তোমার ব্যাচের জন্য ফ্রি — কিনতে হবে না 🎁"); return; }
+  const methods = PAY_METHODS(); let method = methods[0];
+  if(!method){ toast("এখন অনলাইনে কেনা যাচ্ছে না — WhatsApp-এ যোগাযোগ করো: " + COACHING.whatsapp, 4000); return; }
+  sheet(`<h3>📦 ${esc(p.title)}</h3><div class="muted">⏳ ${pkgValidTxt(p)}</div>
+    <div class="pk-pay"><span>পাঠাতে হবে</span><b>${tk(p.my_price)}</b></div>
+    <label>কোনটা দিয়ে পাঠাবে</label>
+    <div class="mbtn" id="pbM">${methods.map(m => `<button type="button" class="${m} ${m === method ? "on" : ""}" data-m="${m}">${METHOD[m]}</button>`).join("")}</div>
+    <div id="pbNum"></div>
+    <label>কোন নম্বর থেকে পাঠিয়েছ</label><input id="pbS" inputmode="tel" placeholder="01XXXXXXXXX" value="${esc((ROLE !== "admin" && ME && ME.phone) || "")}">
+    <label>TrxID</label><input id="pbT" autocapitalize="characters" autocomplete="off" placeholder="যেমন 8N7A6XK2QP">
+    <div id="pbE" class="err hidden"></div>
+    <button class="btn orange" id="pbGo">✅ জমা দাও</button>
+    <button class="btn ghost" onclick="closeSheet()">এখন না</button>
+    <p class="hint">ঠিক ${tk(p.my_price)} পাঠাও। কোচিং থেকে TrxID মিলিয়ে নিশ্চিত করলেই প্যাকেজ চালু হবে। কোনো সমস্যা হলে WhatsApp: ${esc(COACHING.whatsapp)}</p>`);
+  const paint = () => { $("#pbNum").innerHTML = payNumHtml(method); };
+  document.querySelectorAll("#pbM button").forEach(b => b.onclick = () => { method = b.dataset.m; document.querySelectorAll("#pbM button").forEach(x => x.classList.toggle("on", x === b)); paint(); });
+  paint();
+  const err = $("#pbE"), clr = () => err.classList.add("hidden");
+  $("#pbS").oninput = clr; $("#pbT").oninput = clr;
+  $("#pbGo").onclick = async () => {
+    const s = $("#pbS").value.replace(/\D/g, ""), t = $("#pbT").value.trim().replace(/\s/g, "");
+    const fail = m => { err.textContent = m; err.classList.remove("hidden"); };
+    if(!/^(?:88)?01[3-9]\d{8}$/.test(s)) return fail("যে নম্বর থেকে টাকা পাঠিয়েছ সেটা লেখো (01XXXXXXXXX)");
+    if(!/^[A-Za-z0-9]{6,20}$/.test(t)) return fail("TrxID ঠিকভাবে লেখো (বিকাশ/নগদের মেসেজে যেটা আসে)");
+    const b = $("#pbGo"); b.disabled = true; b.textContent = "জমা হচ্ছে...";
+    try{
+      await rpc("pkg_buy", {p_token:exTok(), p_pkg:id, p_method:method, p_sender:s, p_trx:t});
+      closeSheet(); toast("জমা হয়েছে ✅ যাচাইয়ের পর প্যাকেজ চালু হবে", 4000); pkgOpen(id);
+    }catch(ex){ fail(ex.message); b.disabled = false; b.textContent = "✅ জমা দাও"; }
+  };
+}
+
+/* ================================================================
+   ⚙️ অ্যাডমিন: প্যাকেজ
+   ================================================================ */
+let PKG_ADM = null, PKG_LINKS = [], PKG_OM = {}, PKO = {pkg:null, f:"pending", q:"", list:[]}, PKE = null, PKI = null, PKG_PRESET = null;
+async function pkgCfg(force){
+  if(!PKG_CFG || force){ try{ PKG_CFG = await rpc("pkg_config_get", {}); }catch(e){ PKG_CFG = PKG_CFG || {}; } }
+  return PKG_CFG;
+}
+const pkgSubjects = () => ((PKG_CFG && PKG_CFG.subjects) || []).map(s => s.n);
+async function pkgAdmLoad(){ PKG_ADM = await rpc("pkg_admin_list", {p_token:TOKEN}); return PKG_ADM; }
+async function pkgLinksLoad(){ try{ PKG_LINKS = await rpc("pkg_admin_links", {p_token:TOKEN}); }catch(e){ PKG_LINKS = []; } return PKG_LINKS; }
+function admAudChip(e, k){
+  if(e.audience === "free") return '<span class="chip">🆓 ফ্রি</span>';
+  if(e.audience === "package"){
+    const L = (PKG_LINKS || []).filter(l => l.k === k && l.id == e.id);
+    return L.length ? L.map(l => `<span class="chip pk">📦 ${esc(l.title)}${l.sample ? " • 🎁 নমুনা" : ""}</span>`).join("")
+      : '<span class="chip" style="background:#fdeaea;color:var(--red)">📦 কোনো প্যাকেজে নেই</span>';
+  }
+  return `<span class="chip navy">🔒 ${esc((e.batches || []).join(", ") || "সব স্টুডেন্ট")}</span>`;
+}
+
+async function pkgAdm(){
+  window.scrollTo(0,0);
+  $("#aexBody").innerHTML = `<div id="pkReq"></div><div id="pkSum"></div>
+    <button class="btn orange" style="margin-top:0" onclick="pkgEdit()">➕ নতুন প্যাকেজ বানাও</button>
+    <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btn sm sec" onclick="pkgOrders()">🧾 কেনা ও মেয়াদ</button>
+      <button class="btn sm sec" onclick="pkgSubjEdit()">📚 বিষয় ও অধ্যায়</button><button class="btn sm sec" onclick="openExams()">👀 স্টুডেন্টরা যেভাবে দেখবে</button></div>
+    <div id="pkList" style="margin-top:14px"><div class="spin"></div></div>`;
+  try{ await pkgAdmLoad(); }catch(ex){ if($("#pkList")) $("#pkList").innerHTML = '<div class="err">' + esc(ex.message) + '<br>প্যাকেজের SQL (package.sql) চালানো হয়েছে তো?</div>'; return; }
+  if(!$("#pkList")) return;
+  const A = PKG_ADM;
+  setBadge("#admNav", "exams", A.pending);
+  $("#pkSum").innerHTML = `<div class="stats"><div class="stat"><b style="font-size:18px">${tk(A.revenue)}</b><span>প্যাকেজে মোট আয়</span></div>
+    <div class="stat"><b style="font-size:18px">${tk(A.revenue_month)}</b><span>এই মাসে</span></div><div class="stat"><b style="font-size:18px">${bnNum(A.active)}</b><span>চালু ক্রেতা</span></div></div>`;
+  pkgReqs();
+  $("#pkList").innerHTML = A.packages.length ? A.packages.map(p => `<div class="card">
+    <div class="row" style="gap:6px;flex-wrap:wrap">${p.visible ? '<span class="chip">👁️ স্টুডেন্টরা দেখছে</span>' : '<span class="chip" style="background:#eef1f4;color:var(--mute)">🙈 লুকানো</span>'}${p.open ? "" : '<span class="chip warn">⌛ মেয়াদ শেষ</span>'}${+p.pending ? `<span class="chip org">🆕 ${bnNum(p.pending)}টা যাচাই বাকি</span>` : ""}</div>
+    <b style="display:block;font-size:17px;margin-top:6px">${esc(p.title)}</b>
+    <div class="muted">${+p.price > 0 ? tk(p.price) : "ফ্রি"}${p.old_price ? ` (কেটে দেখানো ${tk(p.old_price)})` : ""} • ${pkgValidTxt(p)}</div>
+    ${Object.keys(p.batch_prices || {}).length ? `<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px">${Object.entries(p.batch_prices).map(([b,v]) => `<span class="chip navy">${esc(b)}: ${+v <= 0 ? "ফ্রি" : tk(v)}</span>`).join("")}</div>` : ""}
+    <div class="grid4"><div><b>${bnNum(p.items)}</b><span>পরীক্ষা</span></div><div><b>${bnNum(p.active)}</b><span>চালু ক্রেতা</span></div><div><b>${tk(p.revenue)}</b><span>আয়</span></div><div><b>${bnNum(p.expiring)}</b><span>মেয়াদ শেষ হচ্ছে</span></div></div>
+    <div class="row" style="gap:6px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn sm" onclick="pkgEdit(${p.id})">✏️ এডিট</button>
+      <button class="btn sm sec" onclick="pkgItems(${p.id})">📝 পরীক্ষা</button>
+      <button class="btn sm sec" onclick="pkgOrders(${p.id})">👥 ক্রেতা</button>
+      <button class="btn sm sec" onclick="pkgPromo(${p.id})">📢 প্রচার</button>
+      <button class="btn sm danger" onclick="pkgDel(${p.id})">🗑</button></div></div>`).join("")
+    : '<div class="card muted">এখনো কোনো প্যাকেজ নেই। উপরের বাটন চেপে প্রথম প্যাকেজটা বানাও — নাম, দাম, মেয়াদ সব পরে বদলানো যাবে।</div>';
+}
+
+/* --- টাকা নিশ্চিত করা --- */
+async function pkgReqs(){
+  let list; try{ list = await rpc("pkg_admin_orders", {p_token:TOKEN}); }catch(e){ return; }
+  list.forEach(o => PKG_OM[o.id] = o);
+  list = list.filter(o => o.status === "pending");
+  setBadge("#admNav", "exams", list.length);
+  const box = $("#pkReq"); if(!box) return;
+  box.innerHTML = !list.length ? "" : `<div class="card" style="border-left:5px solid #e2136e"><h3>📲 প্যাকেজের টাকা — নিশ্চিত করো (${bnNum(list.length)})</h3>
+    <div class="muted" style="font-size:13px">বিকাশ/নগদ অ্যাপে TrxID আর টাকার পরিমাণ মিলিয়ে দেখো, তারপর নিশ্চিত করো। নিশ্চিত করলেই প্যাকেজ চালু হবে।</div>
+    ${list.map(o => `<div style="border-top:1px solid var(--line);padding:10px 0 4px;margin-top:10px">
+      <div class="row between"><b>${esc(o.name || o.uid)}</b><span class="paynum" style="border:0;padding:0;margin:0"><span class="tag ${esc(o.method)}">${PKG_METHOD[o.method] || esc(o.method)}</span></span></div>
+      <div class="muted" style="font-size:13px">${pkgWho(o)}<br>📦 ${esc(o.pkg)}<br>প্রেরক: ${esc(o.sender || "-")} • ${fmtTime(o.created_at)}</div>
+      <div class="row" style="margin-top:6px;flex-wrap:wrap"><b style="font-size:21px;font-family:Poppins">${tk(o.amount)}</b>
+        <span class="chip" style="cursor:pointer" onclick="copyText('${esc(o.trx)}')">TrxID ${esc(o.trx)} 📋</span></div>
+      <div class="row" style="margin-top:8px"><button class="btn sm" onclick="pkgConfirm(${o.id})">✅ টাকা পেয়েছি</button><button class="btn sm danger" onclick="pkgReject(${o.id})">বাতিল</button></div></div>`).join("")}</div>`;
+}
+function pkgWho(o){
+  return o.kind === "stu" ? `রোল ${esc(o.uid)}${o.batch ? " • " + esc(o.batch) : ""}`
+    : `বাইরের স্টুডেন্ট • ${esc(o.uid)}${o.phone ? " • " + esc(o.phone) : ""}${o.inst ? "<br>" + esc(o.inst) : ""}`;
+}
+function pkgWa(o, text, key){
+  if(o.kind === "stu") return waBtns(o, text, key);
+  if(!o.phone) return '<span class="muted" style="font-size:12px">নম্বর নেই</span>';
+  const k = key + "|" + o.phone, done = WA_SENT[k];
+  return `<a class="wa" style="display:inline-block;margin:2px 0;${done ? "background:#9aa5b1" : ""}" target="_blank" rel="noopener" data-k="${esc(k)}" onclick="markSent(this)" href="${waLink(o.phone, text)}">${done ? "✓" : "📲"} WhatsApp</a>`;
+}
+function pkgDoneText(o){
+  return `${o.name || ""}, তোমার “${o.pkg}” প্যাকেজ চালু হয়েছে ✅\n${o.expires_at ? "মেয়াদ: " + expTxt(o.expires_at) + " পর্যন্ত\n" : ""}পরীক্ষা দিতে: ${pkgLink(o.pkg_id)}\n— ${COACHING.name}`;
+}
+async function pkgAfterChange(){
+  refreshBadge();
+  if($("#pkoL")) return pkgOrders(PKO.pkg, true);
+  if($("#pkList")) return pkgAdm();
+}
+async function pkgConfirm(id){
+  const o = PKG_OM[id]; if(!o) return;
+  if(!confirm(`${o.name || o.uid} — ${PKG_METHOD[o.method] || o.method} ${tk(o.amount)}\nTrxID ${o.trx}\n📦 ${o.pkg}\n\nটাকা পেয়েছ? নিশ্চিত করলে প্যাকেজ চালু হবে।`)) return;
+  try{
+    const r = await rpc("pkg_admin_confirm", {p_token:TOKEN, p_order:id});
+    await pkgAfterChange(); if(r) pkgNotify(r);
+  }catch(ex){ toast(ex.message, 4000); }
+}
+async function pkgReject(id){
+  const note = prompt("কেন বাতিল করছ? (স্টুডেন্ট এই লেখা দেখবে)", "TrxID বা টাকার পরিমাণ মেলেনি");
+  if(note === null) return;
+  try{ await rpc("pkg_admin_reject", {p_token:TOKEN, p_order:id, p_note:note}); toast("বাতিল করা হয়েছে"); pkgAfterChange(); }catch(ex){ toast(ex.message); }
+}
+function pkgNotify(o){
+  if(typeof o !== "object") o = PKG_OM[o]; if(!o) return;
+  PKG_OM[o.id] = o;
+  const t = pkgDoneText(o);
+  sheet(`<h3>✅ ${esc(o.name || o.uid)} — প্যাকেজ চালু</h3><div class="muted">📦 ${esc(o.pkg)}${o.expires_at ? " • মেয়াদ " + expTxt(o.expires_at) + " পর্যন্ত" : ""}</div>
+    <div class="pwlist" style="font-family:inherit;font-size:14.5px">${esc(t)}</div>
+    <div style="margin-top:10px">WhatsApp-এ জানাও: ${pkgWa(o, t, "pkd" + o.id)}</div>
+    <button class="btn ghost" onclick="closeSheet()">ঠিক আছে</button>`);
+}
+
+/* --- কেনা ও মেয়াদ --- */
+const PKO_TABS = [["pending","⏳ যাচাই বাকি"],["active","✅ চালু"],["expiring","⚠️ মেয়াদ শেষ হচ্ছে"],["expired","⌛ মেয়াদ শেষ"],["rejected","❌ বাতিল"],["all","সব"]];
+const pkoIn = (o, f) => f === "all" || o.state === f || (f === "active" && o.state === "expiring");
+async function pkgOrders(pkg, keep){
+  if(!keep){ PKO.pkg = pkg || null; PKO.q = ""; window.scrollTo(0,0); }
+  if(!PKG_ADM) try{ await pkgAdmLoad(); }catch(e){}
+  await pkgCfg();
+  const p = PKO.pkg && PKG_ADM ? PKG_ADM.packages.find(x => x.id == PKO.pkg) : null;
+  $("#aexBody").innerHTML = `<div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="pkgAdm()">← প্যাকেজ</button><b style="margin-left:4px">${p ? "👥 " + esc(p.title) : "🧾 সব কেনা ও মেয়াদ"}</b></div>
+    <div class="tabs" id="pkoT"></div>
+    <input id="pkoQ" placeholder="🔍 নাম, রোল, আইডি, নম্বর বা TrxID" value="${esc(PKO.q)}">
+    <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap"><button class="btn sm sec" onclick="pkgGrant(${PKO.pkg || "null"})">➕ হাতে যোগ করো (ক্যাশ/উপহার)</button>
+      <button class="btn sm sec" onclick="pkgTplEdit()">✏️ রিমাইন্ডারের লেখা</button></div>
+    <div id="pkoL" style="margin-top:10px"><div class="spin"></div></div>`;
+  $("#pkoQ").oninput = () => { PKO.q = $("#pkoQ").value.trim().toLowerCase(); pkgOrdPaint(); };
+  try{ PKO.list = await rpc("pkg_admin_orders", {p_token:TOKEN, p_pkg:PKO.pkg}); }
+  catch(ex){ if($("#pkoL")) $("#pkoL").innerHTML = '<div class="err">' + esc(ex.message) + '</div>'; return; }
+  PKO.list.forEach(o => PKG_OM[o.id] = o);
+  if(!keep && !PKO.list.some(o => pkoIn(o, PKO.f))) PKO.f = PKO.list.some(o => o.state === "pending") ? "pending" : PKO.list.some(o => pkoIn(o, "active")) ? "active" : "all";
+  pkgOrdPaint();
+}
+function pkgOrdPaint(){
+  const L = PKO.list; if(!$("#pkoT")) return;
+  $("#pkoT").innerHTML = PKO_TABS.map(([k,l]) => `<button class="${PKO.f === k ? "on" : ""}" data-f="${k}">${l} ${bnNum(L.filter(o => pkoIn(o, k)).length)}</button>`).join("");
+  document.querySelectorAll("#pkoT button").forEach(b => b.onclick = () => { PKO.f = b.dataset.f; pkgOrdPaint(); });
+  let rows = L.filter(o => pkoIn(o, PKO.f));
+  if(PKO.q) rows = rows.filter(o => [o.name, o.uid, o.phone, o.trx, o.sender, o.pkg, o.batch].some(v => String(v || "").toLowerCase().includes(PKO.q)));
+  if(["active","expiring","expired"].includes(PKO.f)) rows.sort((a,b) => (new Date(a.expires_at || "2999-01-01") - new Date(b.expires_at || "2999-01-01")) * (PKO.f === "expired" ? -1 : 1));
+  const sum = rows.filter(o => o.status === "confirmed").reduce((a,o) => a + (+o.amount || 0), 0);
+  const tip = PKO.f === "expiring" ? `<div class="hint" style="margin:0 2px 8px">যাদের মেয়াদ ৭ দিনের মধ্যে শেষ হবে — 📲 বাটনে চাপলে WhatsApp-এ রিমাইন্ডার যাবে (নবায়নের লিংকসহ)।</div>` : "";
+  $("#pkoL").innerHTML = rows.length ? `<div class="muted" style="margin:0 2px 8px">${bnNum(rows.length)}টা${sum ? " • মোট " + tk(sum) : ""}</div>` + tip + rows.map(pkgOrdRow).join("")
+    : '<div class="card muted">এখানে কেউ নেই।</div>';
+}
+function pkgTplFill(o){
+  const tpl = (PKG_CFG && PKG_CFG.remind_tpl) || PKG_TPL_DEF;
+  return String(tpl).replace(/\{নাম\}/g, o.name || "").replace(/\{প্যাকেজ\}/g, o.pkg || "").replace(/\{তারিখ\}/g, expTxt(o.expires_at))
+    .replace(/\{লিংক\}/g, pkgLink(o.pkg_id)).replace(/\{দাম\}/g, tk(o.price || o.amount));
+}
+const PKG_TPL_DEF = "প্রিয় {নাম},\nBIO NERDS-এর “{প্যাকেজ}” প্যাকেজের মেয়াদ {তারিখ} পর্যন্ত। পরীক্ষা চালিয়ে যেতে সময়মতো নবায়ন করো 👉 {লিংক}\n— BIO NERDS";
+function pkgOrdRow(o){
+  const stc = {pending:'<span class="chip warn">⏳ যাচাই বাকি</span>', active:'<span class="chip">✅ চালু</span>', expiring:'<span class="chip org">⚠️ মেয়াদ শেষ হচ্ছে</span>',
+    expired:'<span class="chip" style="background:#eef1f4;color:var(--mute)">⌛ মেয়াদ শেষ</span>', rejected:'<span class="chip" style="background:#fdeaea;color:var(--red)">❌ বাতিল</span>'}[o.state] || "";
+  const remind = ["expiring","expired"].includes(o.state) ? `<div style="margin-top:8px"><span class="muted" style="font-size:12.5px">রিমাইন্ডার: </span>${pkgWa(o, pkgTplFill(o), "pkr" + o.id + o.expires_at)}</div>` : "";
+  const acts = o.status === "pending" ? `<button class="btn sm" onclick="pkgConfirm(${o.id})">✅ টাকা পেয়েছি</button><button class="btn sm danger" onclick="pkgReject(${o.id})">বাতিল</button>`
+    : o.status === "confirmed" ? `<button class="btn sm sec" onclick="pkgExtend(${o.id})">⏰ মেয়াদ বাড়াও</button><button class="btn sm sec" onclick="pkgNotify(${o.id})">📲 চালুর খবর</button><button class="btn sm danger" onclick="pkgODel(${o.id})">🗑</button>`
+    : `<button class="btn sm danger" onclick="pkgODel(${o.id})">🗑 মুছো</button>`;
+  return `<div class="card" style="padding:12px 14px;margin-bottom:10px"><div class="row between" style="align-items:flex-start"><b>${esc(o.name || o.uid)}</b>${stc}</div>
+    <div class="muted" style="font-size:13px">${pkgWho(o)}${!PKO.pkg ? "<br>📦 " + esc(o.pkg) : ""}<br>${PKG_METHOD[o.method] || esc(o.method)} ${tk(o.amount)}${o.trx ? " • TrxID " + esc(o.trx) : ""}${o.sender ? " • " + esc(o.sender) : ""} • ${fmtTime(o.created_at)}
+    ${o.status === "confirmed" ? (o.expires_at ? `<br>মেয়াদ: <b>${expTxt(o.expires_at)}</b> পর্যন্ত` : "<br>মেয়াদ: শেষ হবে না") : ""}${o.note ? `<br>📝 ${esc(o.note)}` : ""}</div>${remind}
+    <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">${acts}</div></div>`;
+}
+async function pkgExtend(id){
+  const d = prompt("কত দিন মেয়াদ বাড়াবে?", "7"); if(d === null) return;
+  const n = parseInt(BN2EN(d), 10); if(!(n > 0)){ toast("দিনের সংখ্যা লেখো"); return; }
+  try{ await rpc("pkg_admin_extend", {p_token:TOKEN, p_order:id, p_days:n}); toast(`⏰ ${bnNum(n)} দিন বাড়ানো হয়েছে`); pkgAfterChange(); }catch(ex){ toast(ex.message); }
+}
+async function pkgODel(id){
+  const o = PKG_OM[id];
+  if(!confirm(`${o ? (o.name || o.uid) + " — " + o.pkg : ""}\nএই কেনাটা মুছে ফেলবে? (ভুল এন্ট্রি বা টাকা ফেরত দিলে) — মুছলে তার প্যাকেজ বন্ধ হয়ে যাবে।`)) return;
+  try{ await rpc("pkg_admin_order_delete", {p_token:TOKEN, p_order:id}); toast("মুছে ফেলা হয়েছে"); pkgAfterChange(); }catch(ex){ toast(ex.message); }
+}
+function pkgGrant(pkg){
+  const L = (PKG_ADM && PKG_ADM.packages) || [];
+  if(!L.length){ toast("আগে একটা প্যাকেজ বানাও"); return; }
+  sheet(`<h3>➕ হাতে প্যাকেজ যোগ করো</h3><div class="muted">ক্যাশে টাকা দিলে বা কাউকে ফ্রিতে দিতে চাইলে।</div>
+    <label>প্যাকেজ</label><select id="pgP">${L.map(p => `<option value="${p.id}" ${p.id == pkg ? "selected" : ""}>${esc(p.title)}</option>`).join("")}</select>
+    <label>কাকে — রোল, পরীক্ষার আইডি (G1001) বা মোবাইল নম্বর</label><input id="pgW" placeholder="যেমন 27001 / G1005 / 017XXXXXXXX">
+    <label>কীভাবে</label><select id="pgM"><option value="cash">ক্যাশ</option><option value="gift">উপহার (ফ্রি)</option><option value="bkash">বিকাশ</option><option value="nagad">নগদ</option></select>
+    <label>কত টাকা পেয়েছ</label><input id="pgA" type="number" inputmode="numeric" min="0">
+    <div id="pgE" class="err hidden"></div>
+    <button class="btn" id="pgGo">✅ যোগ করো</button><button class="btn ghost" onclick="closeSheet()">বাতিল</button>
+    <p class="hint">বাইরের স্টুডেন্ট হলে আগে সাইটে রেজিস্টার করতে হবে (নাম + নম্বর)।</p>`);
+  const setA = () => { const p = L.find(x => x.id == $("#pgP").value); $("#pgA").value = $("#pgM").value === "gift" ? 0 : (p ? +p.price : ""); };
+  $("#pgP").onchange = setA; $("#pgM").onchange = setA; setA();
+  $("#pgGo").onclick = async () => {
+    const err = $("#pgE"); err.classList.add("hidden");
+    const w = BN2EN($("#pgW").value.trim()); if(!w){ err.textContent = "রোল, আইডি বা নম্বর লেখো"; err.classList.remove("hidden"); return; }
+    const b = $("#pgGo"); b.disabled = true;
+    try{
+      const r = await rpc("pkg_admin_grant", {p_token:TOKEN, p_pkg:+$("#pgP").value, p_who:w, p_amount:+$("#pgA").value || 0, p_method:$("#pgM").value});
+      closeSheet(); toast("✅ যোগ হয়েছে"); await pkgAfterChange(); if(r) pkgNotify(r);
+    }catch(ex){ err.textContent = ex.message; err.classList.remove("hidden"); b.disabled = false; }
+  };
+}
+async function pkgTplEdit(){
+  await pkgCfg();
+  sheet(`<h3>✏️ মেয়াদের রিমাইন্ডারের লেখা</h3><div class="muted">এগুলো নিজে থেকে বসবে: {নাম} {প্যাকেজ} {তারিখ} {লিংক} {দাম}</div>
+    <textarea id="ptT" style="min-height:150px;font-family:inherit">${esc((PKG_CFG && PKG_CFG.remind_tpl) || PKG_TPL_DEF)}</textarea>
+    <button class="btn" id="ptGo">💾 সেভ করো</button><button class="btn ghost" onclick="$('#ptT').value=PKG_TPL_DEF">আগের লেখায় ফেরাও</button>`);
+  $("#ptGo").onclick = async () => {
+    try{ await rpc("pkg_admin_config_save", {p_token:TOKEN, p_key:"remind_tpl", p_value:$("#ptT").value}); PKG_CFG.remind_tpl = $("#ptT").value; closeSheet(); toast("সেভ হয়েছে ✅"); pkgOrdPaint(); }
+    catch(ex){ toast(ex.message); }
+  };
+}
+
+/* --- প্যাকেজ বানানো / এডিট --- */
+async function pkgEdit(id){
+  $("#aexBody").innerHTML = '<div class="spin"></div>';
+  await pkgCfg();
+  let p = {title:"", descr:"", features:"", subject:"", price:200, old_price:null, valid_type:"date", valid_until:"", valid_days:180, n_planned:null, routine:"", batch_prices:{}, visible:false, sort:0};
+  if(id){ try{ p = await rpc("pkg_admin_get", {p_token:TOKEN, p_pkg:id}); }catch(ex){ toast(ex.message); pkgAdm(); return; } }
+  const subs = pkgSubjects();
+  PKE = {id:id || null, vt:p.valid_type || "date", bp:{...(p.batch_prices || {})}};
+  const batches = [...new Set([...COACHING.batches, ...Object.keys(PKE.bp)])];
+  window.scrollTo(0,0);
+  $("#aexBody").innerHTML = `
+    <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="pkgAdm()">← প্যাকেজ</button><b style="margin-left:4px">${id ? "✏️ প্যাকেজ এডিট" : "➕ নতুন প্যাকেজ"}</b></div>
+    <div class="muted" style="margin:0 2px 6px">স্টুডেন্টরা যেমন দেখবে:</div><div id="pkPrev" style="pointer-events:none"></div>
+    <div class="card"><h3>১. নাম ও বিবরণ</h3>
+      <label>প্যাকেজের নাম</label><input id="pkT" value="${esc(p.title)}" placeholder="যেমন: HSC মডেল টেস্ট ২০২৭ — জীববিজ্ঞান">
+      ${subs.length > 1 ? `<label>বিষয়</label><select id="pkS"><option value="">— একাধিক বিষয় / লিখতে চাই না —</option>${subs.map(s => `<option ${s === p.subject ? "selected" : ""}>${esc(s)}</option>`).join("")}</select>` : ""}
+      <label>ছোট বিবরণ (ঐচ্ছিক)</label><input id="pkD" value="${esc(p.descr || "")}" placeholder="যেমন: পুরো সিলেবাসের মডেল টেস্ট, বোর্ড স্ট্যান্ডার্ড প্রশ্ন">
+      <label>যা যা পাবে — প্রতি লাইনে একটা (ঐচ্ছিক)</label><textarea id="pkF" style="min-height:100px;font-family:inherit" placeholder="প্রতিটা পরীক্ষার ব্যাখ্যাসহ সমাধান&#10;সারা দেশের মেরিট লিস্ট&#10;লিখিত খাতা ২৪ ঘণ্টার মধ্যে দেখে দেওয়া">${esc(p.features || "")}</textarea>
+      <label>মোট কয়টা পরীক্ষা হবে (ঐচ্ছিক)</label><input id="pkN" type="number" inputmode="numeric" min="0" value="${p.n_planned || ""}" placeholder="যেমন ৫০"></div>
+    <div class="card"><h3>২. দাম</h3>
+      <label style="margin-top:0">দাম (৳)</label><input id="pkP" type="number" inputmode="numeric" min="0" value="${p.price ?? ""}">
+      <label>আগের দাম — কেটে দেখাবে (ঐচ্ছিক, যেমন আর্লি-বার্ডে)</label><input id="pkO" type="number" inputmode="numeric" min="0" value="${p.old_price || ""}" placeholder="দরকার না হলে খালি রাখো">
+      <label>আমার স্টুডেন্টদের দাম (ব্যাচ ধরে)</label>
+      <div id="pkB">${batches.map((b,i) => { const v = PKE.bp[b], mode = v === undefined ? "" : +v <= 0 ? "free" : "custom";
+        return `<div class="pk-bp"><b>${esc(b)}</b><select data-b="${esc(b)}" data-i="${i}"><option value="" ${mode === "" ? "selected" : ""}>সাধারণ দাম</option><option value="free" ${mode === "free" ? "selected" : ""}>🎁 পুরো ব্যাচ ফ্রি</option><option value="custom" ${mode === "custom" ? "selected" : ""}>আলাদা দাম</option></select>
+          <input type="number" inputmode="numeric" min="1" id="pkBv${i}" class="${mode === "custom" ? "" : "hidden"}" value="${mode === "custom" ? +v : ""}" placeholder="৳"></div>`; }).join("")}</div>
+      <div class="hint">“পুরো ব্যাচ ফ্রি” দিলে ওই ব্যাচের সবাই কিছু না কিনেই সব পরীক্ষা পাবে। “আলাদা দাম” দিলে তারা সেই দামে কিনবে।</div></div>
+    <div class="card"><h3>৩. মেয়াদ</h3>
+      <div class="seg" id="pkV"><button type="button" data-v="date">📅 নির্দিষ্ট তারিখ পর্যন্ত</button><button type="button" data-v="days">⏳ কেনার দিন থেকে</button></div>
+      <div id="pkVd"><label>কোন তারিখ পর্যন্ত</label><input id="pkU" type="date" value="${p.valid_until || ""}"><div class="hint">এই তারিখের পর প্যাকেজ বিক্রি ও পরীক্ষা বন্ধ; আগের রেজাল্ট দেখা যাবে।</div></div>
+      <div id="pkVn"><label>কেনার দিন থেকে কত দিন</label><input id="pkDays" type="number" inputmode="numeric" min="1" value="${p.valid_days || 180}">
+        <div class="pre-chips" id="pkDC">${[30,60,90,120,180,365].map(d => `<button type="button" data-d="${d}">${BN_DIGITS(d)} দিন</button>`).join("")}</div></div></div>
+    <div class="card"><h3>৪. পুরো রুটিন (ঐচ্ছিক)</h3>
+      <div class="muted">যে পরীক্ষাগুলো এখনো বানানো হয়নি সেগুলোও লিখে রাখো — স্টুডেন্টরা প্যাকেজের পাতায় পুরো রুটিন দেখবে। প্রতি লাইনে: তারিখ | অধ্যায় | ধরন</div>
+      <textarea id="pkR" style="min-height:140px;font-family:inherit" placeholder="২০ নভেম্বর | কোষ ও এর গঠন | MCQ&#10;২৭ নভেম্বর | কোষ বিভাজন | লিখিত">${esc(p.routine || "")}</textarea></div>
+    <div class="card"><label style="display:flex;align-items:center;gap:10px;margin:0"><input type="checkbox" id="pkVis" style="width:22px;height:22px" ${p.visible ? "checked" : ""}> 👁️ স্টুডেন্টদের দেখাও (বন্ধ থাকলে লুকানো/খসড়া)</label>
+      <label>তালিকায় ক্রম (ছোট সংখ্যা আগে)</label><input id="pkSo" type="number" inputmode="numeric" value="${p.sort || 0}"></div>
+    <button class="btn orange big" onclick="pkgSave()">💾 সেভ করো</button>
+    ${id ? `<button class="btn sec" onclick="pkgItems(${id})">📝 এই প্যাকেজের পরীক্ষাগুলো</button>` : ""}
+    <div id="pkMsg"></div>`;
+  const paintV = () => { document.querySelectorAll("#pkV button").forEach(b => b.classList.toggle("on", b.dataset.v === PKE.vt));
+    $("#pkVd").classList.toggle("hidden", PKE.vt !== "date"); $("#pkVn").classList.toggle("hidden", PKE.vt !== "days");
+    document.querySelectorAll("#pkDC button").forEach(b => b.classList.toggle("on", +b.dataset.d === +$("#pkDays").value)); pkgPrev(); };
+  document.querySelectorAll("#pkV button").forEach(b => b.onclick = () => { PKE.vt = b.dataset.v; paintV(); });
+  document.querySelectorAll("#pkDC button").forEach(b => b.onclick = () => { $("#pkDays").value = b.dataset.d; paintV(); });
+  document.querySelectorAll("#pkB select").forEach(s => s.onchange = () => { $("#pkBv" + s.dataset.i).classList.toggle("hidden", s.value !== "custom"); if(s.value === "custom") $("#pkBv" + s.dataset.i).focus(); pkgPrev(); });
+  ["#pkT","#pkD","#pkF","#pkN","#pkP","#pkO","#pkU","#pkDays","#pkS","#pkVis"].forEach(s => { const el = $(s); if(el) el.addEventListener("input", () => { if(s === "#pkDays") paintV(); else pkgPrev(); }); });
+  document.querySelectorAll("#pkB input").forEach(el => el.oninput = pkgPrev);
+  paintV();
+}
+function pkgForm(){
+  const bp = {};
+  document.querySelectorAll("#pkB select").forEach(s => { if(s.value === "free") bp[s.dataset.b] = 0; else if(s.value === "custom"){ const v = +$("#pkBv" + s.dataset.i).value; if(v > 0) bp[s.dataset.b] = v; } });
+  const num0 = s => { const v = $(s) ? $(s).value.trim() : ""; return v === "" ? null : +BN2EN(v); };
+  return {id:PKE.id, title:$("#pkT").value.trim(), descr:$("#pkD").value.trim(), features:$("#pkF").value.trim(), subject:$("#pkS") ? $("#pkS").value : null,
+    price:num0("#pkP"), old_price:num0("#pkO"), valid_type:PKE.vt, valid_until:$("#pkU").value || null, valid_days:num0("#pkDays"),
+    n_planned:num0("#pkN"), routine:$("#pkR").value.trim(), batch_prices:bp, visible:$("#pkVis").checked, sort:num0("#pkSo") || 0};
+}
+function pkgPrev(){
+  const f = pkgForm(); if(!$("#pkPrev")) return;
+  $("#pkPrev").innerHTML = pkgCardHtml({...f, id:0, title:f.title || "প্যাকেজের নাম", price:f.price || 0, my_price:f.price || 0, n_mcq:0, n_cq:0, n_sample:0, me:null, visible:true})
+    + (Object.keys(f.batch_prices).length ? `<div class="hint" style="margin:-4px 2px 10px">${Object.entries(f.batch_prices).map(([b,v]) => `${esc(b)}: ${v <= 0 ? "ফ্রি" : tk(v)}`).join(" • ")}</div>` : "");
+}
+async function pkgSave(){
+  const f = pkgForm(), msg = $("#pkMsg"); msg.innerHTML = "";
+  const fail = t => { msg.innerHTML = '<div class="err">' + t + '</div>'; msg.scrollIntoView({behavior:"smooth"}); };
+  if(!f.title) return fail("প্যাকেজের নাম দাও");
+  if(f.price === null || !(f.price >= 0)) return fail("দাম লেখো (ফ্রি হলে ০)");
+  if(f.old_price !== null && f.old_price <= f.price) f.old_price = null;
+  if(f.valid_type === "date" && !f.valid_until) return fail("কোন তারিখ পর্যন্ত মেয়াদ, দাও");
+  if(f.valid_type === "days" && !(f.valid_days >= 1)) return fail("কত দিনের মেয়াদ, লেখো");
+  try{
+    const r = await rpc("pkg_admin_save", {p_token:TOKEN, p_pkg:f});
+    toast("💾 প্যাকেজ সেভ হয়েছে", 2500);
+    if(!f.id){ await pkgAdmLoad().catch(() => {}); pkgItems(r.id); } else pkgAdm();
+  }catch(ex){ fail(esc(ex.message)); }
+}
+async function pkgDel(id){
+  const p = PKG_ADM && PKG_ADM.packages.find(x => x.id == id);
+  if(!confirm(`“${p ? p.title : ""}” প্যাকেজ মুছে ফেলবে? (পরীক্ষাগুলো মুছবে না)`)) return;
+  try{ await rpc("pkg_admin_delete", {p_token:TOKEN, p_pkg:id}); toast("মুছে ফেলা হয়েছে"); pkgAdm(); }catch(ex){ toast(ex.message, 5000); }
+}
+function pkgPromo(id){
+  const p = PKG_ADM && PKG_ADM.packages.find(x => x.id == id); if(!p) return;
+  const n = Math.max(+p.n_planned || 0, (+p.n_mcq || 0) + (+p.n_cq || 0));
+  const feats = String(p.features || "").split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  const t = `📦 ${COACHING.name} — ${p.title}\n${p.descr ? "\n" + p.descr + "\n" : ""}\n${n ? "📝 " + BN_DIGITS(n) + "টা পরীক্ষা\n" : ""}${feats.map(f => "✅ " + f).join("\n")}${feats.length ? "\n" : ""}⏳ মেয়াদ: ${pkgValidTxt(p)}\n💰 দাম: ${p.old_price ? "~" + tk(p.old_price) + "~ " : ""}${+p.price > 0 ? tk(p.price) : "ফ্রি"}${+p.n_sample ? "\n🎁 " + BN_DIGITS(p.n_sample) + "টা নমুনা পরীক্ষা ফ্রি — আগে দিয়ে দেখো!" : ""}\n\n👉 রুটিন দেখো ও কেনো: ${pkgLink(id)}\n\n📞 ${COACHING.phones}`;
+  sheet(`<h3>📢 Facebook / WhatsApp পোস্ট</h3><div class="muted">কপি করে পেজ বা গ্রুপে পোস্ট করো।</div>
+    <div class="pwlist" style="max-height:50vh;font-family:inherit;font-size:14.5px">${esc(t)}</div>
+    <button class="btn" onclick="copyText(this.dataset.t)" data-t="${esc(t)}">📋 লেখা কপি করো</button>
+    <a class="btn sec" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(t)}">📲 WhatsApp-এ পাঠাও</a>
+    <button class="btn ghost" onclick="copyText('${pkgLink(id)}')">🔗 শুধু লিংক কপি</button>`);
+}
+
+/* --- প্যাকেজের পরীক্ষাগুলো --- */
+async function pkgItems(id){
+  window.scrollTo(0,0); $("#aexBody").innerHTML = '<div class="spin"></div>';
+  let p, oe, cq;
+  try{ [p, oe, cq] = await Promise.all([rpc("pkg_admin_get", {p_token:TOKEN, p_pkg:id}), rpc("oe_admin_list", {p_token:TOKEN}), rpc("cq_admin_list", {p_token:TOKEN}).catch(() => [])]); }
+  catch(ex){ $("#aexBody").innerHTML = `<button class="btn sm ghost" style="margin-bottom:10px" onclick="pkgAdm()">← প্যাকেজ</button><div class="err">${esc(ex.message)}</div>`; return; }
+  PKI = {id, title:p.title, items:(p.items || []).map(i => ({k:i.k, id:i.id, sample:!!i.sample})),
+    all:[...oe.map(e => ({...e, k:"mcq"})), ...cq.map(e => ({...e, k:"cq"}))]};
+  pkgItemsPaint();
+}
+function pkgItemsPaint(){
+  const info = x => PKI.all.find(e => e.k === x.k && e.id == x.id) || {};
+  const items = PKI.items.slice().sort((a,b) => new Date(info(a).starts_at || 0) - new Date(info(b).starts_at || 0));
+  $("#aexBody").innerHTML = `
+    <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="pkgAdm()">← প্যাকেজ</button><b style="margin-left:4px">📝 ${esc(PKI.title)}</b></div>
+    <div class="hl-note" style="margin-bottom:12px"><span>💡</span><span>নতুন পরীক্ষা বানানোর সময় “কার জন্য” → 📦 প্যাকেজ বাছলে সেটা নিজে থেকেই এখানে চলে আসবে। আগে বানানো পরীক্ষা যোগ করতে নিচের বাটন চাপো।</span></div>
+    <div class="card"><h3>এই প্যাকেজের পরীক্ষা (${bnNum(items.length)})</h3>
+      ${items.length ? items.map(x => { const e = info(x); return `<div class="pk-it">
+        <div class="m"><b>${esc(e.title || "(মুছে ফেলা পরীক্ষা)")}</b><span>${x.k === "cq" ? "✍️ লিখিত" : "🖥️ MCQ"}${e.starts_at ? " • " + bnDay(e.starts_at) : ""}${e.published === false ? " • 📝 খসড়া" : ""}</span></div>
+        <label class="pk-smp"><input type="checkbox" ${x.sample ? "checked" : ""} onchange="pkgItemSet('${x.k}',${x.id},this.checked)">🎁 নমুনা</label>
+        <button class="btn sm danger" onclick="pkgItemDel('${x.k}',${x.id})">✕</button></div>`; }).join("") : '<div class="muted">এখনো কোনো পরীক্ষা নেই।</div>'}
+      <button class="btn sec" onclick="pkgItemAdd()">➕ আগে বানানো পরীক্ষা যোগ করো</button>
+      <div class="hint">🎁 নমুনা = প্যাকেজ না কিনেও সবাই দিতে পারবে (১–২টা রাখো)। বাকিগুলো যারা কেনেনি তারা তালা দেওয়া দেখবে।</div></div>
+    <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm" onclick="pkgNewExam('online')">➕ নতুন MCQ পরীক্ষা</button><button class="btn sm" onclick="pkgNewExam('cq')">➕ নতুন লিখিত পরীক্ষা</button>
+      <button class="btn sm sec" onclick="pkgOpen(${PKI.id})">👀 প্যাকেজের পাতা দেখো</button></div>`;
+}
+function pkgNewExam(t){ PKG_PRESET = PKI.id; aexGo(t, t === "cq" ? () => cqEdit() : () => oeEdit()); }
+async function pkgItemsCommit(){
+  try{ await rpc("pkg_admin_items", {p_token:TOKEN, p_pkg:PKI.id, p_items:PKI.items}); toast("সেভ হয়েছে ✅", 1500); }
+  catch(ex){ toast(ex.message, 4000); return pkgItems(PKI.id); }
+  pkgItemsPaint();
+}
+function pkgItemSet(k, id, smp){ const x = PKI.items.find(i => i.k === k && i.id == id); if(x){ x.sample = smp; pkgItemsCommit(); } }
+function pkgItemDel(k, id){
+  if(!confirm("পরীক্ষাটা এই প্যাকেজ থেকে সরাবে? অন্য কোনো প্যাকেজে না থাকলে স্টুডেন্টরা আর দেখবে না — চাইলে পরীক্ষা এডিট করে ফ্রি/ব্যাচের করে দিও।")) return;
+  PKI.items = PKI.items.filter(i => !(i.k === k && i.id == id)); pkgItemsCommit();
+}
+function pkgItemAdd(){
+  const have = new Set(PKI.items.map(i => i.k + ":" + i.id));
+  const L = PKI.all.filter(e => !have.has(e.k + ":" + e.id)).sort((a,b) => new Date(b.starts_at) - new Date(a.starts_at));
+  if(!L.length){ toast("যোগ করার মতো আর কোনো পরীক্ষা নেই — নতুন পরীক্ষা বানাও"); return; }
+  sheet(`<h3>➕ পরীক্ষা যোগ করো</h3><div class="muted">যেগুলো যোগ করবে সেগুলো “প্যাকেজ” ধরনের হয়ে যাবে (ফ্রি/ব্যাচ থাকলে বদলে যাবে)।</div>
+    <div style="max-height:55vh;overflow:auto;margin-top:10px">${L.map((e,i) => `<label class="pk-it" style="margin:0;font-weight:500"><input type="checkbox" data-i="${i}" style="width:22px;height:22px;flex:none">
+      <div class="m"><b>${esc(e.title)}</b><span>${e.k === "cq" ? "✍️ লিখিত" : "🖥️ MCQ"} • ${bnDay(e.starts_at)} • ${e.audience === "free" ? "🆓 ফ্রি" : e.audience === "batch" ? "🔒 ব্যাচ" : "📦 প্যাকেজ"}${e.published ? "" : " • খসড়া"}</span></div></label>`).join("")}</div>
+    <button class="btn" id="piGo">✅ যোগ করো</button><button class="btn ghost" onclick="closeSheet()">বাতিল</button>`);
+  $("#piGo").onclick = () => {
+    const sel = [...document.querySelectorAll(".asheet input[data-i]:checked")].map(x => L[+x.dataset.i]);
+    if(!sel.length){ toast("কোন পরীক্ষা যোগ করবে, টিক দাও"); return; }
+    sel.forEach(e => PKI.items.push({k:e.k, id:e.id, sample:false})); closeSheet(); pkgItemsCommit();
+  };
+}
+
+/* --- বিষয় ও অধ্যায় --- */
+function subjToText(subs){
+  return (subs || []).map(s => { let g = null, out = "# " + s.n;
+    (s.ch || []).forEach(c => { if(c.g && c.g !== g){ g = c.g; out += "\n## " + g; } out += "\n" + c.n; }); return out; }).join("\n\n");
+}
+function subjParse(t){
+  const subs = []; let cur = null, g = null;
+  String(t || "").split(/\r?\n/).forEach(raw => { const l = raw.trim(); if(!l) return;
+    if(/^##/.test(l)){ g = l.replace(/^#+\s*/, "").trim() || null; return; }
+    if(/^#/.test(l)){ cur = {n:l.replace(/^#+\s*/, "").trim(), ch:[]}; g = null; if(cur.n) subs.push(cur); return; }
+    if(!cur){ cur = {n:"জীববিজ্ঞান", ch:[]}; subs.push(cur); }
+    cur.ch.push(g ? {g, n:l} : {n:l}); });
+  return subs;
+}
+async function pkgSubjEdit(){
+  await pkgCfg(true);
+  sheet(`<h3>📚 বিষয় ও অধ্যায়</h3>
+    <div class="muted"><b>#</b> দিয়ে বিষয়, <b>##</b> দিয়ে ভাগ (যেমন ১ম পত্র), তারপর প্রতি লাইনে একটা অধ্যায়। নতুন বিষয় (পদার্থ, রসায়ন…) যোগ করতে নিচে আরেকটা <b># বিষয়ের নাম</b> লেখো।</div>
+    <textarea id="sjT" style="min-height:300px;font-family:inherit">${esc(subjToText(PKG_CFG.subjects))}</textarea>
+    <div id="sjI" class="hint"></div>
+    <button class="btn" id="sjGo">💾 সেভ করো</button><button class="btn ghost" onclick="closeSheet()">বাতিল</button>
+    <p class="hint">প্রশ্ন পেস্ট করার সময় অধ্যায়ের আগে <b># অধ্যায়ের নাম</b> লিখলে নিচের প্রশ্নগুলো সেই অধ্যায়ের হবে — পরে দুর্বল অধ্যায় দেখাতে কাজে লাগবে।</p>`);
+  const info = () => { const s = subjParse($("#sjT").value); $("#sjI").textContent = s.map(x => `${x.n}: ${BN_DIGITS(x.ch.length)}টা অধ্যায়`).join(" • "); };
+  $("#sjT").oninput = info; info();
+  $("#sjGo").onclick = async () => {
+    const s = subjParse($("#sjT").value);
+    if(!s.length){ toast("অন্তত একটা বিষয় রাখো"); return; }
+    try{ await rpc("pkg_admin_config_save", {p_token:TOKEN, p_key:"subjects", p_value:s}); PKG_CFG.subjects = s; closeSheet(); toast("সেভ হয়েছে ✅"); }
+    catch(ex){ toast(ex.message); }
+  };
+}
+
+/* --- পরীক্ষার এডিটরে: কোন প্যাকেজের পরীক্ষা --- */
+async function pkgEditorPrep(ED, k, e){
+  try{ if(!PKG_ADM) await pkgAdmLoad(); }catch(x){}
+  await pkgCfg();
+  ED.pk = new Set((e.pkgs || []).map(x => x.id)); ED.smp = (e.pkgs || []).some(x => x.sample); ED.hadPk = ED.pk.size > 0;
+  if(!ED.id && PKG_PRESET){ ED.aud = "package"; ED.pk = new Set([PKG_PRESET]); PKG_PRESET = null; }
+}
+function pkgPickHtml(ED){
+  const L = (PKG_ADM && PKG_ADM.packages) || [];
+  if(!L.length) return `<div class="hint" style="width:100%">এখনো কোনো প্যাকেজ নেই — আগে 📝 পরীক্ষা → 📦 প্যাকেজ থেকে একটা প্যাকেজ বানাও।</div>`;
+  return `<span class="muted" style="width:100%">কোন প্যাকেজের পরীক্ষা? (একাধিক বাছাই করা যায়)</span>` +
+    L.map(p => `<button type="button" class="${ED.pk.has(p.id) ? "on" : ""}" data-p="${p.id}">📦 ${esc(p.title)}</button>`).join("") +
+    `<label style="display:flex;align-items:center;gap:10px;width:100%;margin-top:8px"><input type="checkbox" class="pkSmp" style="width:22px;height:22px" ${ED.smp ? "checked" : ""}> 🎁 ফ্রি নমুনা — প্যাকেজ না কিনেও সবাই দিতে পারবে</label>`;
+}
+function pkgPickBind(box, ED, repaint){
+  box.querySelectorAll("[data-p]").forEach(x => x.onclick = () => { const id = +x.dataset.p; ED.pk.has(id) ? ED.pk.delete(id) : ED.pk.add(id); repaint(); });
+  const c = box.querySelector(".pkSmp"); if(c) c.onchange = () => { ED.smp = c.checked; };
+}
+async function pkgEditorSave(ED, k, id){
+  if(ED.aud !== "package" && !ED.hadPk) return;
+  try{ await rpc("pkg_admin_link", {p_token:TOKEN, p_k:k, p_exam:id, p_pkgs:ED.aud === "package" ? [...ED.pk] : [], p_sample:ED.aud === "package" && !!ED.smp}); }
+  catch(ex){ toast("প্যাকেজে যোগ হয়নি: " + ex.message, 5000); }
+  PKG_ADM = null; pkgLinksLoad();
+}
+function subjDatalist(){ return `<datalist id="subjDL">${pkgSubjects().map(s => `<option value="${esc(s)}">`).join("")}</datalist>`; }
+function chapterNote(qs){
+  const m = new Map(); qs.forEach(q => { const c = q.ch || ""; m.set(c, (m.get(c) || 0) + 1); });
+  if(!qs.some(q => q.ch)) return "";
+  const known = new Set(((PKG_CFG && PKG_CFG.subjects) || []).flatMap(s => (s.ch || []).map(c => c.n)));
+  const unk = [...m.keys()].filter(c => c && known.size && !known.has(c));
+  return `<div class="hint">🏷️ অধ্যায়: ${[...m.entries()].map(([c,n]) => `${c ? esc(c) : "অধ্যায় ছাড়া"} (${BN_DIGITS(n)})`).join(" • ")}</div>`
+    + (unk.length ? `<div class="hint c-bad">⚠️ তালিকায় নেই: ${unk.map(esc).join(", ")} — নামটা ঠিক আছে তো? (📦 প্যাকেজ → 📚 বিষয় ও অধ্যায়)</div>` : "");
+}
+
 /* ---------------- শুরু ---------------- */
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
-const EX_HASH = location.hash.match(/exam=(\d+)/) || (location.hash === "#exams" ? [0, ""] : null), CQ_HASH = location.hash.match(/cq=(\d+)/);
-if (CQ_HASH && configured()) openExams("q" + CQ_HASH[1]);
+const EX_HASH = location.hash.match(/exam=(\d+)/) || (location.hash === "#exams" ? [0, ""] : null), CQ_HASH = location.hash.match(/cq=(\d+)/), PK_HASH = location.hash.match(/pkg=(\d+)/);
+if (PK_HASH && configured()) pkgOpen(+PK_HASH[1]);
+else if (CQ_HASH && configured()) openExams("q" + CQ_HASH[1]);
 else if (EX_HASH && configured()) openExams(EX_HASH[1] ? +EX_HASH[1] : null);
 else if (TOKEN && configured()) start(); else show("homeView");
-window.addEventListener("hashchange", () => { const m = location.hash.match(/exam=(\d+)/), q = location.hash.match(/cq=(\d+)/); if(m) openExams(+m[1]); else if(q) openExams("q" + q[1]); });
+window.addEventListener("hashchange", () => { const m = location.hash.match(/exam=(\d+)/), q = location.hash.match(/cq=(\d+)/), k = location.hash.match(/pkg=(\d+)/); if(k) pkgOpen(+k[1]); else if(m) openExams(+m[1]); else if(q) openExams("q" + q[1]); });
 </script>
 <div id="printArea"></div>
 </body>
