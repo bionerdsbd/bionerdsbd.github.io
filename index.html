@@ -1944,6 +1944,9 @@ function stuPayForm(){
    📝 অনলাইন পরীক্ষা (ফ্রি + স্টুডেন্টদের) — MCQ
    ================================================================ */
 const LET = ["ক","খ","গ","ঘ","ঙ","চ"];
+const CLS_BN = {"Class 6":"৬ষ্ঠ শ্রেণি","Class 7":"৭ম শ্রেণি","Class 8":"৮ম শ্রেণি","Class 9":"৯ম শ্রেণি","Class 10":"১০ম শ্রেণি","SSC Candidate":"এসএসসি পরীক্ষার্থী",
+  "HSC 1st Year":"এইচএসসি ১ম বর্ষ","HSC 2nd Year":"এইচএসসি ২য় বর্ষ","HSC Candidate":"এইচএসসি পরীক্ষার্থী","Admission":"মেডিকেল/ভর্তি প্রস্তুতি"};
+const clsBn = c => CLS_BN[c] || c || "";
 let GTOKEN = store.get("bn_gtoken"), EXL = null, EX_SKEW = 0, EX_FROM = "home", RUN = null, EX_FOCUS = null;
 const exTok = () => TOKEN || GTOKEN || null;
 const nowSrv = () => Date.now() + EX_SKEW;
@@ -2051,7 +2054,7 @@ async function exPaintHub(box, pub){
   const ex = r.exams, me = r.me;
   const live = ex.filter(e=>e.status==="live"), up = ex.filter(e=>e.status==="upcoming"), done = ex.filter(e=>e.status==="ended");
   let h = "";
-  if(pub) h += `<div class="ex-hero"><span class="bd">🔥 BIO NERDS LIVE EXAM</span>
+  if(pub) h += `<div class="ex-hero"><span class="bd">🔥 BIO NERDS লাইভ পরীক্ষা</span>
     <h2>ঘরে বসেই দাও মেডিকেল স্ট্যান্ডার্ড পরীক্ষা</h2>
     <p>প্রতি সপ্তাহে অধ্যায়ভিত্তিক ফ্রি লাইভ এক্সাম — সারা দেশের স্টুডেন্টদের সাথে নিজের অবস্থান যাচাই করো।</p>
     <div class="ex-feat"><span>⏱️ টাইমার</span><span>➖ নেগেটিভ মার্কিং</span><span>🏆 মেরিট লিস্ট</span><span>📖 ব্যাখ্যাসহ সমাধান</span><span>🔁 প্র্যাকটিস</span></div></div>`;
@@ -2096,7 +2099,7 @@ function exAuth(after, mode="reg"){
       <label>তোমার নাম</label><input id="gN" required placeholder="পুরো নাম" autocomplete="name">
       <label>মোবাইল নম্বর</label><input id="gP" required inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel">
       <label>তুমি কোথায় পড়ো?</label>
-      <div class="aud" id="gLv"><button type="button" data-l="school">🏫 স্কুল<small>Class 6 – SSC</small></button><button type="button" data-l="college">🎓 কলেজ<small>HSC / Admission</small></button></div>
+      <div class="aud" id="gLv"><button type="button" data-l="school">🏫 স্কুল<small>৬ষ্ঠ শ্রেণি – এসএসসি</small></button><button type="button" data-l="college">🎓 কলেজ<small>এইচএসসি / ভর্তি প্রস্তুতি</small></button></div>
       <div id="gLvBox" class="hidden"><label id="gIL">স্কুলের নাম</label><input id="gI" placeholder="">
       <label>কোন ক্লাসে পড়ো</label><select id="gC"></select></div>
       <label>একটা পাসওয়ার্ড দাও (মনে রাখবে)</label><input id="gW" type="password" required minlength="4" autocomplete="new-password" placeholder="কমপক্ষে ৪ অক্ষর">
@@ -2115,7 +2118,7 @@ function exAuth(after, mode="reg"){
   document.querySelectorAll("#gLv button").forEach(x => x.onclick = () => { lv = x.dataset.l;
     document.querySelectorAll("#gLv button").forEach(y => y.classList.toggle("on", y===x));
     $("#gLvBox").classList.remove("hidden"); $("#gIL").textContent = LV[lv].l; $("#gI").placeholder = LV[lv].p;
-    $("#gC").innerHTML = '<option value="">— বেছে নাও —</option>' + LV[lv].c.map(c=>`<option>${c}</option>`).join(""); });
+    $("#gC").innerHTML = '<option value="">— বেছে নাও —</option>' + LV[lv].c.map(c=>`<option value="${c}">${clsBn(c)}</option>`).join(""); });
   $("#gF").onsubmit = async ev => {
     ev.preventDefault(); const err = $("#gE"); err.classList.add("hidden");
     if(mode === "reg" && (!lv || !$("#gI").value.trim() || !$("#gC").value)){ err.textContent = "স্কুল/কলেজ, তার নাম আর ক্লাস বেছে নাও"; err.classList.remove("hidden"); return; }
@@ -2365,7 +2368,7 @@ async function exMerit(id){
   const L = m.list, top = L.filter(x=>x.rank<=3), rest = L.filter(x=>x.rank>3), mine = L.find(x=>x.me);
   const av = x => x.photo ? `<img src="${x.photo}" alt="">` : initials(x.name);
   $("#exMain").innerHTML = `
-    <div class="ex-hero" style="text-align:center"><span class="bd">🏆 MERIT LIST</span><h2 style="margin-bottom:2px">${esc(m.title)}</h2>
+    <div class="ex-hero" style="text-align:center"><span class="bd">🏆 মেধাতালিকা</span><h2 style="margin-bottom:2px">${esc(m.title)}</h2>
       <p>${esc(m.subject||"")}${m.subject?" • ":""}${BN_DIGITS(m.participants)} জন অংশ নিয়েছে</p></div>
     ${mine?`<div class="card ok" style="margin:0 0 14px">তোমার মেরিট পজিশন <b>#${BN_DIGITS(mine.rank)}</b> • নম্বর ${BN_DIGITS(num(mine.score))}</div>`:""}
     ${L.length ? `<div class="stars" style="margin-bottom:14px">${top.map(x=>`<div class="star s${x.rank}"><span class="md">${["🥇","🥈","🥉"][x.rank-1]}</span>
@@ -2467,7 +2470,7 @@ async function oeAdm(){
       <div class="row" style="gap:6px;flex-wrap:wrap">${OE_ST[e.status]}${e.audience==="free"?'<span class="chip">🆓 ফ্রি</span>':`<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ")||"সব স্টুডেন্ট")}</span>`}</div>
       <b style="display:block;font-size:17px;margin-top:6px">${esc(e.title)}</b><div class="muted">${esc(e.subject||"")}</div>
       <div class="muted" style="margin-top:4px">🗓️ ${bnWindow(e)}</div>
-      <div class="grid4"><div><b>${e.n}</b><span>প্রশ্ন</span></div><div><b>${e.duration_min}</b><span>মিনিট</span></div><div><b>${e.participants}</b><span>জন দিয়েছে</span></div><div><b>${e.guests}</b><span>বাইরের</span></div></div>
+      <div class="grid4"><div><b>${BN_DIGITS(e.n)}</b><span>প্রশ্ন</span></div><div><b>${BN_DIGITS(e.duration_min)}</b><span>মিনিট</span></div><div><b>${BN_DIGITS(e.participants)}</b><span>জন দিয়েছে</span></div><div><b>${BN_DIGITS(e.guests)}</b><span>বাইরের</span></div></div>
       <div class="row" style="gap:6px;margin-top:12px;flex-wrap:wrap">
         <button class="btn sm" onclick="oeResults(${e.id})">📊 ফলাফল</button>
         <button class="btn sm sec" onclick="oeEdit(${e.id})">✏️ এডিট</button>
@@ -2544,7 +2547,6 @@ function nextFri(h){ const d = new Date(Date.now()+6*3600e3); let add = (5 - d.g
 
 /* --- এডিটর --- */
 let OE_ED = null;
-const MARK_PRESETS = [["২৫ প্রশ্ন • +৪ / −১",4,1],["২০ প্রশ্ন • +৫ / −১.২৫",5,1.25],["১০০ প্রশ্ন • +১ / −০.২৫",1,.25],["SSC • +১ / নেগেটিভ নেই",1,0]];
 async function oeEdit(id, copy){
   let e = {title:"", subject:"", audience:"free", batches:[], starts_at:fromLocalInput(nextFri(19)), ends_at:fromLocalInput(nextFri(22)),
     duration_min:20, mark_per_q:1, neg_mark:.25, pass_pct:40, shuffle:true, published:false, instructions:"", questions:[], participants:0};
@@ -2556,7 +2558,7 @@ async function oeEdit(id, copy){
   window.scrollTo(0,0);
   $("#aexBody").innerHTML = `
     <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="oeAdm()">← সব পরীক্ষা</button><b style="margin-left:4px">${OE_ED.id?"✏️ পরীক্ষা এডিট":"➕ নতুন অনলাইন পরীক্ষা"}</b></div>
-    ${OE_ED.live?`<div class="hl-note" style="margin-bottom:12px"><span>⚠️</span><span>${e.participants} জন এই পরীক্ষা দিয়ে ফেলেছে। উত্তর বদলালে সবার নম্বর আবার হিসাব হবে। প্রশ্নের ক্রম বদলিও না।</span></div>`:""}
+    ${OE_ED.live?`<div class="hl-note" style="margin-bottom:12px"><span>⚠️</span><span>${BN_DIGITS(e.participants)} জন এই পরীক্ষা দিয়ে ফেলেছে। উত্তর বদলালে সবার নম্বর আবার হিসাব হবে। প্রশ্নের ক্রম বদলিও না।</span></div>`:""}
     <div class="card"><h3>১. পরীক্ষার তথ্য</h3>
       <label>পরীক্ষার নাম</label><input id="oT" value="${esc(e.title)}" placeholder="যেমন: Weekly Free Exam 01">
       <label>বিষয় / অধ্যায়</label><input id="oS" value="${esc(e.subject||"")}" placeholder="যেমন: জীববিজ্ঞান ১ম পত্র — কোষ ও এর গঠন">
@@ -2571,10 +2573,12 @@ async function oeEdit(id, copy){
       <div class="pre-chips" id="oDuC">${[10,15,20,25,30,40,50,60,90,120].map(m=>`<button type="button" data-m="${m}">${BN_DIGITS(m)} মি.</button>`).join("")}</div>
       <div class="hint" id="oWin"></div></div>
     <div class="card"><h3>৩. নম্বর</h3>
-      <div class="pre-chips" id="oMk">${MARK_PRESETS.map((p,i)=>`<button type="button" data-i="${i}">${p[0]}</button>`).join("")}</div>
-      <div class="row"><div style="flex:1"><label>প্রতি সঠিক উত্তরে</label><input id="oMp" type="number" step="any" inputmode="decimal" value="${e.mark_per_q}"></div>
-        <div style="flex:1"><label>প্রতি ভুলে কাটা</label><input id="oNg" type="number" step="any" inputmode="decimal" value="${e.neg_mark}"></div>
-        <div style="flex:1"><label>পাস (%)</label><input id="oPs" type="number" inputmode="numeric" value="${e.pass_pct}"></div></div>
+      <label style="margin-top:0">পরীক্ষার মোট নম্বর</label><input id="oTot" type="number" step="any" inputmode="decimal" value="${(e.questions||[]).length ? Math.round(e.questions.length*e.mark_per_q*100)/100 : 100}">
+      <div class="pre-chips" id="oTotC">${[100,50,25,20].map(m=>`<button type="button" data-t="${m}">${BN_DIGITS(m)}</button>`).join("")}</div>
+      <label style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="oNegOn" style="width:22px;height:22px" ${(e.questions||[]).length ? (+e.neg_mark>0?"checked":"") : "checked"}> নেগেটিভ মার্কিং (এইচএসসি) — প্রতি ভুলে প্রশ্নের মানের ২৫% কাটা</label>
+      <div id="oMkInfo"></div>
+      <input type="hidden" id="oMp" value="${e.mark_per_q}"><input type="hidden" id="oNg" value="${e.neg_mark}">
+      <label>পাস (%)</label><input id="oPs" type="number" inputmode="numeric" value="${e.pass_pct}">
       <label style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="oSh" style="width:22px;height:22px" ${e.shuffle?"checked":""}> প্রত্যেকের জন্য প্রশ্নের ক্রম আলাদা (দেখাদেখি কমাতে)</label>
       <label>বিশেষ নির্দেশনা (ঐচ্ছিক)</label><input id="oIn" value="${esc(e.instructions||"")}" placeholder="যেমন: ক্যালকুলেটর লাগবে না"></div>
     <div class="card"><h3>৪. প্রশ্ন</h3>
@@ -2591,19 +2595,29 @@ async function oeEdit(id, copy){
     document.querySelectorAll(".aud button").forEach(b => b.classList.toggle("on", b.dataset.a===OE_ED.aud));
     $("#oBat").innerHTML = OE_ED.aud === "batch" ? `<span class="muted" style="width:100%">কোন ব্যাচ? (কিছু না বাছলে সব স্টুডেন্ট)</span>` +
       COACHING.batches.map(b=>`<button type="button" class="${OE_ED.batches.has(b)?"on":""}" data-b="${esc(b)}">${esc(b)}</button>`).join("") : "";
-    document.querySelectorAll("#oBat button").forEach(x => x.onclick = () => { OE_ED.batches.has(x.dataset.b) ? OE_ED.batches.delete(x.dataset.b) : OE_ED.batches.add(x.dataset.b); paintAud(); });
+    document.querySelectorAll("#oBat button").forEach(x => x.onclick = () => { OE_ED.batches.has(x.dataset.b) ? OE_ED.batches.delete(x.dataset.b) : OE_ED.batches.add(x.dataset.b);
+      const bs = [...OE_ED.batches]; if(bs.length){ $("#oNegOn").checked = bs.some(b => /^HSC/i.test(b)); oeMarks(); } paintAud(); });
   };
   document.querySelectorAll(".aud button").forEach(b => b.onclick = () => { OE_ED.aud = b.dataset.a; paintAud(); });
   paintAud();
   const paintDu = () => { document.querySelectorAll("#oDuC button").forEach(b => b.classList.toggle("on", +b.dataset.m === +$("#oDu").value)); oeWin(); };
   document.querySelectorAll("#oDuC button").forEach(b => b.onclick = () => { $("#oDu").value = b.dataset.m; paintDu(); });
   $("#oDu").oninput = paintDu; $("#oSt").onchange = oeWin; $("#oEn").onchange = oeWin; paintDu();
-  const paintMk = () => document.querySelectorAll("#oMk button").forEach(b => { const p = MARK_PRESETS[b.dataset.i]; b.classList.toggle("on", +$("#oMp").value===p[1] && +$("#oNg").value===p[2]); });
-  document.querySelectorAll("#oMk button").forEach(b => b.onclick = () => { const p = MARK_PRESETS[b.dataset.i]; $("#oMp").value = p[1]; $("#oNg").value = p[2]; paintMk(); oePrev(); });
-  $("#oMp").oninput = () => { paintMk(); oePrev(); }; $("#oNg").oninput = paintMk; paintMk();
+  document.querySelectorAll("#oTotC button").forEach(b => b.onclick = () => { $("#oTot").value = b.dataset.t; oeMarks(); });
+  $("#oTot").oninput = oeMarks; $("#oNegOn").onchange = oeMarks;
   let t; $("#oQ").oninput = () => { clearTimeout(t); t = setTimeout(oePrev, 500); };
   $("#oImgIn").onchange = oeImgPicked;
   oePrev();
+}
+function oeMarks(){
+  const n = (OE_ED && OE_ED.qs || []).length, tot = +$("#oTot").value || 100, neg = $("#oNegOn").checked;
+  document.querySelectorAll("#oTotC button").forEach(b => b.classList.toggle("on", +b.dataset.t === tot));
+  const mp = n ? Math.round(tot / n * 10000) / 10000 : 1, ng = neg ? Math.round(mp * 0.25 * 10000) / 10000 : 0;
+  $("#oMp").value = mp; $("#oNg").value = ng;
+  const f = v => BN_DIGITS(num(Math.round(v * 100) / 100));
+  $("#oMkInfo").innerHTML = n ? `<div class="ok">${BN_DIGITS(n)}টি প্রশ্ন → প্রতি প্রশ্নে <b>${f(mp)}</b> নম্বর • প্রতি ভুলে <b>${ng ? "−" + f(ng) : "কাটা নেই"}</b> • মোট ${f(tot)}</div>`
+    + (Math.abs(mp*100 - Math.round(mp*100)) > 1e-6 ? '<div class="hint">⚠️ প্রশ্নের মান ভগ্নাংশে আসছে — মোট নম্বর প্রশ্ন সংখ্যা দিয়ে ভাগ যায় এমন রাখলে ভালো।</div>' : "")
+    : '<div class="hint">প্রশ্ন দিলে প্রতি প্রশ্নের মান নিজে থেকে হিসাব হবে।</div>';
 }
 function oeWin(){
   const s = fromLocalInput($("#oSt").value), e = fromLocalInput($("#oEn").value), d = +$("#oDu").value;
@@ -2614,7 +2628,7 @@ function oeWin(){
 }
 function oePrev(){
   const {qs, errs} = parseQs($("#oQ").value); OE_ED.qs = qs; OE_ED.errs = errs;
-  const mp = +$("#oMp").value || 1;
+  oeMarks(); const mp = +$("#oMp").value || 1;
   $("#oPrevSum").innerHTML = !qs.length ? "" : errs.length
     ? `<div class="err">⚠️ ${BN_DIGITS(qs.length)}টি প্রশ্ন পাওয়া গেছে, কিন্তু কিছু সমস্যা আছে:<br>${errs.slice(0,8).map(esc).join("<br>")}${errs.length>8?"<br>...":""}</div>`
     : `<div class="ok">✅ ${BN_DIGITS(qs.length)}টি প্রশ্ন ঠিকঠাক পাওয়া গেছে • মোট নম্বর ${BN_DIGITS(num(qs.length*mp))}</div>`;
@@ -2676,16 +2690,16 @@ async function oeResults(id){
   $("#aexBody").innerHTML = `
     <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="oeAdm()">← সব পরীক্ষা</button></div>
     <div class="card"><b style="font-size:17px">${esc(e.title)}</b><div class="muted">${esc(e.subject||"")}</div><div class="muted">🗓️ ${bnWindow(e)}</div>
-      <div class="grid4"><div><b>${done.length}</b><span>জমা দিয়েছে</span></div><div><b>${A.filter(a=>a.kind==="guest").length}</b><span>বাইরের</span></div><div><b>${num(hi)}</b><span>সর্বোচ্চ</span></div><div><b>${num(Math.round(avg*100)/100)}</b><span>গড়</span></div></div>
+      <div class="grid4"><div><b>${BN_DIGITS(done.length)}</b><span>জমা দিয়েছে</span></div><div><b>${BN_DIGITS(A.filter(a=>a.kind==="guest").length)}</b><span>বাইরের</span></div><div><b>${BN_DIGITS(num(hi))}</b><span>সর্বোচ্চ</span></div><div><b>${BN_DIGITS(num(Math.round(avg*100)/100))}</b><span>গড়</span></div></div>
       ${!ended?'<div class="hint">পরীক্ষা এখনো চলছে — শেষ হলে স্টুডেন্টরা নিজেদের রেজাল্ট দেখবে।</div>':(e.audience==="batch"?'<div class="hint">✅ স্টুডেন্টদের রেজাল্ট পোর্টালের রেজাল্ট/মেরিট/Star of the Week-এ চলে গেছে।</div>':"")}
       <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btn sm sec" onclick="copyText('${examLink(id)}')">🔗 লিংক কপি</button>
         <button class="btn sm sec" onclick="copyText(this.dataset.t)" data-t="${esc(done.map(a=>a.rank+". "+a.name+" ("+(a.inst||"")+") — "+num(a.score)).join("\n"))}">📋 মেধাক্রম কপি</button></div></div>
     <div class="card" style="padding:10px"><table class="tbl"><tr><th>#</th><th>নাম</th><th>নম্বর</th><th></th></tr>
-    ${A.map(a=>`<tr><td>${a.done?a.rank:"⏳"}</td>
+    ${A.map(a=>`<tr><td>${a.done?BN_DIGITS(a.rank):"⏳"}</td>
       <td>${esc(a.name||"")} ${a.kind==="guest"?'<span class="chip org" style="font-size:11px">বাইরের</span>':a.kind==="admin"?'<span class="chip" style="font-size:11px">অ্যাডমিন</span>':""}
-        <div class="muted" style="font-size:12px">${esc(a.uid)} • ${esc(a.inst||a.batch||"")}${a.class_name?" • "+esc(a.class_name):""}<br>
-        ✓${a.correct??"-"} ✗${a.wrong??"-"} • ⏱ ${secTxt(a.secs)}${a.tabs?` • <span class="${a.tabs>=3?"c-bad":""}">📵 ${a.tabs} বার অন্য অ্যাপে</span>`:""}${a.done?"":` • চলছে (${a.answered}টা উত্তর)`}</div></td>
-      <td><b>${a.done?num(a.score):"-"}</b></td>
+        <div class="muted" style="font-size:12px">${esc(a.uid)} • ${esc(a.inst||a.batch||"")}${a.class_name?" • "+esc(clsBn(a.class_name)):""}<br>
+        ✓${BN_DIGITS(a.correct??"-")} ✗${BN_DIGITS(a.wrong??"-")} • ⏱ ${secTxt(a.secs)}${a.tabs?` • <span class="${a.tabs>=3?"c-bad":""}">📵 ${BN_DIGITS(a.tabs)} বার অন্য অ্যাপে</span>`:""}${a.done?"":` • চলছে (${BN_DIGITS(a.answered)}টা উত্তর)`}</div></td>
+      <td><b>${a.done?BN_DIGITS(num(a.score)):"-"}</b></td>
       <td style="text-align:right">${a.done&&ended?waBtns(a, msgFor(a), "oe"+id+"|"+a.uid):""}
         <button class="btn sm ghost" style="margin-top:4px" title="আবার দেওয়ার সুযোগ" onclick="oeReset(${id},'${esc(a.uid)}')">♻️</button></td></tr>`).join("")}
     </table>${A.length?"":'<p class="muted">এখনো কেউ পরীক্ষা দেয়নি।</p>'}</div>
@@ -2717,9 +2731,9 @@ function leadFilter(){ const q = ($("#lSearch").value||"").toLowerCase();
   return LEADS.filter(g => !q || [g.name,g.phone,g.inst,g.class_name,g.gid].some(v => String(v||"").toLowerCase().includes(q))); }
 function paintLeads(){
   const L = leadFilter(), tpl = $("#lMsg").value;
-  $("#lList").innerHTML = `<div class="muted" style="margin:0 4px 8px">${L.length} জন${L.length!==LEADS.length?" (মোট "+LEADS.length+")":""}</div>` + (L.length ? `<div class="card" style="padding:10px"><table class="tbl">${L.map(g=>`<tr>
+  $("#lList").innerHTML = `<div class="muted" style="margin:0 4px 8px">${BN_DIGITS(L.length)} জন${L.length!==LEADS.length?" (মোট "+BN_DIGITS(LEADS.length)+")":""}</div>` + (L.length ? `<div class="card" style="padding:10px"><table class="tbl">${L.map(g=>`<tr>
     <td><b>${esc(g.name)}</b> <span class="muted" style="font-size:12px">${esc(g.gid)}</span>
-      <div class="muted" style="font-size:12px">${esc(g.class_name||"")}${g.class_name&&g.inst?" • ":""}${esc(g.inst||"")}<br>📞 ${esc(g.phone)} • ${g.exams}টা পরীক্ষা${g.avg_pct!=null?" • গড় "+g.avg_pct+"%":""}<br>যোগ: ${fmtDate(g.created_at)}</div></td>
+      <div class="muted" style="font-size:12px">${esc(clsBn(g.class_name))}${g.class_name&&g.inst?" • ":""}${esc(g.inst||"")}<br>📞 ${esc(g.phone)} • ${BN_DIGITS(g.exams)}টা পরীক্ষা${g.avg_pct!=null?" • গড় "+BN_DIGITS(g.avg_pct)+"%":""}<br>যোগ: ${fmtDate(g.created_at)}</div></td>
     <td style="text-align:right;white-space:nowrap">${waBtns({phone:g.phone}, tpl.replace(/\{নাম\}/g, g.name), "lead|"+g.gid)}<br>
       <button class="btn sm ghost" style="margin-top:4px" onclick="oeLeadReset('${esc(g.gid)}')">🔑</button> <button class="btn sm danger" style="margin-top:4px" onclick="oeLeadDel('${esc(g.gid)}')">🗑</button></td></tr>`).join("")}</table></div>`
     : '<div class="card muted">এখনো কেউ রেজিস্টার করেনি।</div>');
