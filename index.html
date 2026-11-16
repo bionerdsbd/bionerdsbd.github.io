@@ -248,6 +248,149 @@ details summary{cursor:pointer}
 .dots{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.dots span{width:14px;height:14px;border-radius:50%;background:var(--g3)}.dots span.x{background:var(--red)}
 .idgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.idgrid canvas{width:100%;height:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer}
 #printArea{display:none}
+/* ---------- অনলাইন পরীক্ষা ---------- */
+.gold-cta{background:linear-gradient(135deg,#ffd76a,#f2b632);color:#3b2a00;flex-direction:column;gap:0;box-shadow:0 8px 22px #f2b63255;margin-top:12px}
+.gold-cta span{font-size:12.5px;font-weight:600;opacity:.8}
+.ex-hero{background:radial-gradient(circle at 90% 0%,#f05a2240 0,transparent 40%),linear-gradient(150deg,#13294b 0%,#13684c 100%);color:#fff;border-radius:22px;padding:20px 18px;margin-bottom:14px;position:relative;overflow:hidden}
+.ex-hero::after{content:"🧬";position:absolute;right:-6px;bottom:-14px;font-size:92px;opacity:.12;transform:rotate(-18deg)}
+.ex-hero .bd{display:inline-block;background:#ffffff22;border:1px solid #ffffff44;border-radius:20px;padding:3px 12px;font-size:12.5px;font-weight:700;letter-spacing:.3px}
+.ex-hero h2{font-size:22px;line-height:1.3;margin:10px 0 6px}
+.ex-hero p{opacity:.88;font-size:14.5px}
+.ex-feat{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.ex-feat span{background:#ffffff1c;border-radius:10px;padding:4px 9px;font-size:12.5px;font-weight:600}
+.acct{display:flex;align-items:center;gap:10px;background:#fff;border-radius:16px;padding:10px 12px;margin-bottom:14px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.acct .av{width:38px;height:38px;border-radius:50%;background:var(--mint);color:var(--g);display:grid;place-items:center;font-weight:800;flex:none}
+.acct .nm{flex:1;min-width:0}.acct .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reg-card{background:linear-gradient(135deg,#fff7e0,#fff);border:1.5px solid #f6dd9a;border-radius:18px;padding:16px;margin-bottom:14px}
+.reg-card b{font-size:16.5px}
+.ex-sec{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;margin:18px 2px 10px}
+.ex-sec small{margin-left:auto;font-size:12.5px;color:var(--mute);font-weight:500}
+.exc{background:#fff;border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(16,24,40,.07);position:relative;overflow:hidden;border:1.5px solid transparent;transition:border-color .3s}
+.exc.live{border-color:#f05a2255;box-shadow:0 6px 22px #f05a2222}
+.exc.focus{border-color:var(--gold)!important;box-shadow:0 0 0 4px #f2b63240}
+.exc .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.exc h4{font-size:18px;line-height:1.3;margin:8px 0 2px}
+.exc .sub{color:var(--mute);font-size:14px}
+.exc .when{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;margin-top:10px;color:var(--ink)}
+.chip.navy{background:#e7ecf6;color:var(--navy)}
+.chip.org{background:#ffeadf;color:#c4410c}
+.live-pill{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;border-radius:20px;padding:2px 10px;font-size:12.5px;font-weight:800;letter-spacing:.3px}
+.live-pill i{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+.ex-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px;text-align:center}
+.ex-meta div{background:var(--bg);border-radius:12px;padding:7px 2px}
+.ex-meta b{display:block;font-family:Poppins;font-size:15px;color:var(--g)}
+.ex-meta span{font-size:11.5px;color:var(--mute)}
+.cdbox{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff6f1;border:1px dashed #f5b799;border-radius:12px;padding:8px 12px;margin-top:10px;font-size:14px}
+.cdbox b{font-family:Poppins;font-weight:800;color:var(--orange);font-size:16px;white-space:nowrap}
+.cdbox.g{background:var(--mint);border-color:#a9dcc4}.cdbox.g b{color:var(--g2)}
+.ex-acts{display:flex;gap:8px;margin-top:12px}
+.ex-acts .btn{margin:0}
+.btn.orange.big{font-size:17px;padding:15px}
+.mine{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--mint),#fff);border-radius:14px;padding:10px 12px;margin-top:12px}
+.mine .sc{font-family:Poppins;font-weight:800;font-size:24px;color:var(--g)}
+.lnkbtn{background:none;border:0;color:var(--g2);font-weight:700;font-size:14px;cursor:pointer;padding:4px 0}
+.empty-ex{text-align:center;padding:26px 16px;color:var(--mute)}
+.empty-ex div{font-size:42px;margin-bottom:6px}
+
+/* রুলস শিট */
+.rules{list-style:none;margin:12px 0 4px}
+.rules li{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.rules li:last-child{border:0}
+.rules li span:first-child{flex:none;width:24px;text-align:center}
+.seg{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin:10px 0 4px}
+.seg button{flex:1;border:0;background:none;border-radius:9px;padding:9px;font-weight:700;color:var(--mute);cursor:pointer}
+.seg button.on{background:#fff;color:var(--g);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.asheet{max-height:92vh;overflow:auto}
+
+/* পরীক্ষা দেওয়ার স্ক্রিন */
+#runView{background:#f2f5f4;min-height:100vh;-webkit-user-select:none;user-select:none}
+.run-top{position:sticky;top:0;z-index:8;background:var(--g);color:#fff;padding:10px 14px 0}
+.run-top .r1{display:flex;align-items:center;gap:10px}
+.run-top .tt{flex:1;min-width:0}
+.run-top .tt b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15.5px}
+.run-top .tt small{opacity:.8;font-size:12.5px}
+.timer{font-family:Poppins;font-weight:800;font-size:20px;background:#fff;color:var(--g);border-radius:12px;padding:4px 12px;min-width:92px;text-align:center;letter-spacing:.5px}
+.timer.warn{background:var(--gold);color:#3b2a00}
+.timer.danger{background:var(--red);color:#fff;animation:blink 1s infinite}
+.tbar{height:4px;background:#ffffff33;margin:10px -14px 0}
+.tbar i{display:block;height:100%;background:var(--gold);transition:width 1s linear}
+.run-main{max-width:680px;margin:0 auto;padding:14px 12px 120px}
+.qc{background:#fff;border-radius:18px;padding:16px 14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(16,24,40,.06);scroll-margin-top:90px}
+.qc .qn{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--mute);margin-bottom:6px}
+.qc .qn .dn{margin-left:auto;color:var(--g3)}
+.qc .qt{font-size:16.5px;font-weight:600;white-space:pre-wrap;line-height:1.55}
+.qc img.qi{max-width:100%;border-radius:12px;margin-top:10px;display:block}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.op{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:11px 12px;font-size:15.5px;cursor:pointer;color:var(--ink);line-height:1.4;transition:all .12s}
+.op .ob{width:32px;height:32px;border-radius:50%;border:2px solid #c9d2dc;display:grid;place-items:center;font-weight:700;flex:none;font-size:15px;color:var(--mute);transition:all .12s}
+.op.sel{border-color:var(--g2);background:#eefaf4}
+.op.sel .ob{background:var(--g2);border-color:var(--g2);color:#fff}
+.op.ok{border-color:#1f9d6f;background:#e8f8ef}.op.ok .ob{background:#1f9d6f;border-color:#1f9d6f;color:#fff}
+.op.bad{border-color:#e07a7a;background:#fdeeee}.op.bad .ob{background:var(--red);border-color:var(--red);color:#fff}
+.op:disabled{cursor:default}
+.run-bot{position:fixed;left:0;right:0;bottom:0;z-index:8;background:#fff;border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;align-items:center}
+.run-bot .cnt{flex:1;font-size:13.5px;color:var(--mute);line-height:1.3}
+.run-bot .cnt b{font-family:Poppins;font-size:18px;color:var(--g)}
+.run-bot .btn{width:auto;margin:0;padding:12px 16px}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:8px;margin:14px 0}
+.pal button{aspect-ratio:1;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:700;cursor:pointer;font-family:Poppins}
+.pal button.a{background:var(--g2);border-color:var(--g2);color:#fff}
+.netbar{background:#fff4dc;color:#7a5600;text-align:center;font-size:13px;font-weight:600;padding:5px 10px}
+.done-wrap{text-align:center;padding:30px 10px}
+.done-ic{width:96px;height:96px;border-radius:50%;background:var(--mint);display:grid;place-items:center;margin:0 auto 14px;font-size:48px;animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.overlay{position:fixed;inset:0;background:#fffd;z-index:70;display:grid;place-items:center;text-align:center;font-weight:700}
+
+/* রেজাল্ট */
+.rs-hero{background:linear-gradient(150deg,var(--g) 0%,var(--g2) 60%,var(--navy) 100%);color:#fff;border-radius:22px;padding:20px 16px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden}
+.ring{position:relative;width:150px;height:150px;margin:6px auto 8px}
+.ring svg{transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;align-content:center}
+.ring .v b{font-family:Poppins;font-size:34px;font-weight:800;line-height:1}
+.ring .v small{opacity:.8;font-size:13px;margin-top:2px}
+.pf{display:inline-block;border-radius:20px;padding:3px 12px;font-weight:800;font-size:13px}
+.pf.p{background:#4ade80;color:#053b1f}.pf.f{background:#fecaca;color:#7f1d1d}
+.rs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.rs-grid div{background:#fff;border-radius:16px;padding:12px 6px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.rs-grid b{display:block;font-family:Poppins;font-size:21px}
+.rs-grid span{font-size:12px;color:var(--mute)}
+.c-ok{color:#1f9d6f}.c-bad{color:var(--red)}.c-sk{color:#94650a}
+.expl{background:#f3f8ff;border-left:4px solid #5b8def;border-radius:10px;padding:10px 12px;margin-top:10px;font-size:14.5px;white-space:pre-wrap}
+.qc .tag{font-size:12px;border-radius:8px;padding:1px 8px;font-weight:700}
+.tag.ok{background:#e8f8ef;color:#1f9d6f}.tag.bad{background:#fdeeee;color:var(--red)}.tag.sk{background:#fff4dc;color:#94650a}
+.cta-adm{background:linear-gradient(135deg,#fff1e9,#fff);border:1.5px solid #f8c6ad;border-radius:18px;padding:16px;margin:14px 0}
+
+/* মেরিট */
+.podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end;margin-bottom:12px}
+.mrow{display:flex;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid var(--line)}
+.mrow:last-child{border:0}
+.mrow .rk{width:34px;text-align:center;font-family:Poppins;font-weight:800;color:var(--mute);flex:none}
+.mrow .av{width:38px;height:38px;border-radius:50%;background:var(--mint);color:var(--g);display:grid;place-items:center;font-weight:700;overflow:hidden;flex:none}
+.mrow .av img{width:100%;height:100%;object-fit:cover}
+.mrow .nm{flex:1;min-width:0}.mrow .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
+.mrow .nm span{font-size:12.5px;color:var(--mute);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .sc{text-align:right;flex:none}.mrow .sc b{font-family:Poppins;font-weight:800;color:var(--g);display:block}.mrow .sc span{font-size:11.5px;color:var(--mute)}
+.mrow.me{background:var(--mint);border-radius:12px;border:0}
+.bnb{display:inline-block;background:var(--g2);color:#fff;border-radius:6px;font-size:10.5px;padding:0 5px;margin-left:4px;vertical-align:middle;font-weight:700}
+
+/* অ্যাডমিন: পরীক্ষা এডিটর */
+.pre-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pre-chips button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink)}
+.pre-chips button.on{background:var(--g2);border-color:var(--g2);color:#fff}
+.aud{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.aud button{border:2px solid var(--line);background:#fff;border-radius:14px;padding:12px 8px;cursor:pointer;font-weight:700;text-align:center;line-height:1.3}
+.aud button small{display:block;font-weight:500;color:var(--mute);font-size:12px}
+.aud button.on{border-color:var(--g2);background:#eefaf4;color:var(--g)}
+.pq{border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px;font-size:14px}
+.pq .pqt{font-weight:600;white-space:pre-wrap}
+.pq ol{list-style:none;margin-top:4px}
+.pq li{padding:2px 6px;border-radius:6px}
+.pq li.c{background:#e8f8ef;color:#126b49;font-weight:700}
+.pq .ex{color:#3b5ea8;font-size:13px;margin-top:4px;white-space:pre-wrap}
+.pq img{max-width:160px;border-radius:8px;margin-top:6px;display:block}
+.pq.bad{border-color:#f3b4b4;background:#fff6f6}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:13px}
 @media print{
   @page{size:A4;margin:10mm}
   body{background:#fff!important}
@@ -273,6 +416,7 @@ details summary{cursor:pointer}
     <div class="tg" id="hTag"></div>
     <div class="addr" id="hAddr"></div>
     <div class="h-cta" id="hCta"></div>
+    <div id="hExamCta"></div>
   </div>
   <div class="h-main" id="homeMain"><div class="card"><div class="spin"></div></div></div>
 </section>
@@ -283,6 +427,14 @@ details summary{cursor:pointer}
     <div class="t"><b>📝 ভর্তির আবেদন</b><small>BIO NERDS — অনলাইন ভর্তি</small></div></header>
   <main id="admitMain"></main>
 </section>
+
+<!-- ============ অনলাইন পরীক্ষা ============ -->
+<section id="examView" class="hidden">
+  <header class="top"><button class="btn sm" id="exBackBtn" style="background:#fff2;color:#fff">←</button>
+    <div class="t"><b id="exHead">📝 অনলাইন পরীক্ষা</b><small>BIO NERDS — Seek For Knowledge</small></div></header>
+  <main id="exMain"></main>
+</section>
+<section id="runView" class="hidden"></section>
 
 <!-- ============ লগইন ============ -->
 <section id="loginView" class="hidden">
@@ -337,6 +489,7 @@ details summary{cursor:pointer}
   <nav class="bottom" id="stuNav">
     <button data-tab="home" class="on"><i>🏠</i>হোম</button>
     <button data-tab="results"><i>📊</i>রেজাল্ট</button>
+    <button data-tab="exam"><i>📝</i>পরীক্ষা</button>
     <button data-tab="merit"><i>🏆</i>মেরিট</button>
     <button data-tab="id"><i>🪪</i>আইডি</button>
     <button data-tab="notices"><i>📢</i>নোটিশ</button>
@@ -381,11 +534,12 @@ let ME = null, RESULTS = [], PW_FORCED = false, CHAT_TIMER = null;
 
 function toast(msg, ms=2600){
   const t = document.createElement("div"); t.className="toast"; t.textContent=msg;
+  if(document.querySelector(".asheet-bg,.sheet")){ t.style.bottom="auto"; t.style.top="calc(16px + env(safe-area-inset-top))"; t.style.zIndex=90; }
   document.body.appendChild(t); setTimeout(()=>t.remove(), ms);
 }
 function show(id){
   if(id==="homeView") loadHome();
-  ["homeView","admitView","loginView","pwView","stuView","admView"].forEach(v => $("#"+v).classList.toggle("hidden", v!==id));
+  ["homeView","admitView","examView","runView","loginView","pwView","stuView","admView"].forEach(v => $("#"+v).classList.toggle("hidden", v!==id));
   window.scrollTo(0,0);
 }
 const configured = () => !SUPABASE_URL.includes("PASTE_") && !SUPABASE_KEY.includes("PASTE_");
@@ -438,7 +592,11 @@ $("#pwForm").onsubmit = async e => {
 };
 $("#pwCancel").onclick = () => PW_FORCED ? logout() : start();
 
-function start(){ if(ROLE==="admin"){ show("admView"); admTab("students"); refreshBadge(); attFlush(); } else { show("stuView"); loadStudent(); } }
+function start(){
+  if(ROLE==="admin"){ show("admView"); admTab("students"); refreshBadge(); attFlush(); return; }
+  let pend = null; try{ pend = sessionStorage.getItem("bn_pend_exam"); sessionStorage.removeItem("bn_pend_exam"); }catch(e){}
+  show("stuView"); loadStudent().then(() => { if(pend && ME && ME.profile_done && !ME.must_change) stuTab("exam"); });
+}
 
 /* ---------------- স্টুডেন্ট ---------------- */
 document.querySelectorAll("#stuNav button").forEach(b => b.onclick = () => stuTab(b.dataset.tab));
@@ -460,7 +618,7 @@ function stuTab(t){
   document.querySelectorAll("#stuNav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
   window.scrollTo(0,0);
   clearInterval(CHAT_TIMER);
-  ({home:stuHome, results:stuResults, merit:stuMerit, id:stuId, notices:stuNotices, msg:stuMsg})[t]();
+  ({home:stuHome, results:stuResults, exam:stuExam, merit:stuMerit, id:stuId, notices:stuNotices, msg:stuMsg})[t]();
 }
 function resultCard(r, withShare=true){
   const pct = r.total_marks ? Math.max(0, Math.min(100, r.marks / r.total_marks * 100)) : 0;
@@ -494,6 +652,7 @@ async function stuHome(){
       <div class="stat"><b>${n?avg+"%":"-"}</b><span>গড় নম্বর</span></div>
       <div class="stat"><b>${n?"#"+best:"-"}</b><span>সেরা র‍্যাংক</span></div>
     </div>
+    <div id="exLiveCard"></div>
     <div id="attCard"></div>
     <div id="feeMini"></div>
     <div class="sec-title">সর্বশেষ রেজাল্ট</div>
@@ -528,7 +687,7 @@ async function stuHome(){
     try{ await rpc("submit_feedback",{p_token:TOKEN,p_body:v,p_rating:rating}); $("#fbBody").value=""; toast("ধন্যবাদ! মতামত পাঠানো হয়েছে ✅"); }
     catch(ex){ toast(ex.message); }
   };
-  stuAttCard(); stuFeeMini();
+  stuAttCard(); stuFeeMini(); stuExamBanner();
   try{
     const ns = await rpc("get_notices",{p_token:TOKEN});
     if(ns.length) $("#homeNotice").innerHTML = '<div class="sec-title">নতুন নোটিশ</div>' + noticeCard(ns[0]);
@@ -840,9 +999,9 @@ async function delStu(roll){
 }
 function copyText(t){ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("কপি হয়েছে ✅")).catch(()=>{ const a=document.createElement("textarea"); a.value=t; document.body.appendChild(a); a.select(); document.execCommand("copy"); a.remove(); toast("কপি হয়েছে ✅"); }); }
 
-async function admExams(){
+async function admOffline(){
   const today = new Date().toISOString().slice(0,10);
-  $("#admMain").innerHTML = `
+  $("#aexBody").innerHTML = `
     <div class="card"><h3>📝 নতুন পরীক্ষার রেজাল্ট দাও</h3>
       <label>পরীক্ষার নাম</label><input id="eT" placeholder="যেমন: Daily Quiz 05">
       <label>বিষয় / অধ্যায়</label><input id="eS" placeholder="যেমন: প্রাণিবিজ্ঞান — হাইড্রা">
@@ -981,6 +1140,7 @@ function paintHomeMain(h, loading){
   const vids = String(s.videos||"").split(/\s+/).map(ytId).filter(Boolean).slice(0,6);
   let html = "";
   if(s.highlight) html += `<div class="hl-note"><span>📌</span><span>${esc(s.highlight)}</span></div>`;
+  html += '<div id="homeExams"></div>';
   if(open && s.admission_text) html += `<div class="card" style="margin-top:12px;border-left:5px solid var(--orange)"><b>🎓 ${esc(s.admission_text)}</b>
     <div class="muted" style="margin-top:4px">WhatsApp-এ মেসেজ দাও বা সরাসরি কোচিংয়ে চলে আসো।</div>
     <button class="btn orange" onclick="admitOnline()">📝 অনলাইনে ভর্তির আবেদন করো</button>
@@ -1027,6 +1187,8 @@ function paintHomeMain(h, loading){
   html += `<div id="instBox"></div>
     <div class="h-foot"><b class="brand" style="color:var(--g)">BIO NERDS</b> — Seek For Knowledge<br>📍 ${esc(COACHING.address)}<br>📞 ${esc(COACHING.phones)}</div>`;
   $("#homeMain").innerHTML = html;
+  $("#hExamCta").innerHTML = `<button class="btn gold-cta" onclick="openExams()">🔥 ফ্রি অনলাইন পরীক্ষা দাও<span>সারা দেশের মেরিট লিস্ট • ব্যাখ্যাসহ সমাধান</span></button>`;
+  if(!loading) homeExams();
   paintInstall();
 }
 function fmtShort(d){ const x=new Date(d); return isNaN(x)?d:x.toLocaleDateString("en-GB",{day:"numeric",month:"short"}).replace(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/,m=>({Jan:"জানু",Feb:"ফেব্রু",Mar:"মার্চ",Apr:"এপ্রিল",May:"মে",Jun:"জুন",Jul:"জুলাই",Aug:"আগস্ট",Sep:"সেপ্টে",Oct:"অক্টো",Nov:"নভে",Dec:"ডিসে"}[m])); }
@@ -1778,9 +1940,806 @@ function stuPayForm(){
   $("#feeBox").scrollIntoView({behavior:"smooth"});
 }
 
+/* ================================================================
+   📝 অনলাইন পরীক্ষা (ফ্রি + স্টুডেন্টদের) — MCQ
+   ================================================================ */
+const LET = ["ক","খ","গ","ঘ","ঙ","চ"];
+let GTOKEN = store.get("bn_gtoken"), EXL = null, EX_SKEW = 0, EX_FROM = "home", RUN = null, EX_FOCUS = null;
+const exTok = () => TOKEN || GTOKEN || null;
+const nowSrv = () => Date.now() + EX_SKEW;
+const pad2 = n => String(n).padStart(2,"0");
+function bdParts(iso){ const d = new Date(new Date(iso).getTime() + 6*3600e3); return {y:d.getUTCFullYear(), m:d.getUTCMonth(), d:d.getUTCDate(), wd:d.getUTCDay(), h:d.getUTCHours(), mi:d.getUTCMinutes()}; }
+function bnTime(iso){ const p = bdParts(iso), h = p.h;
+  const per = h<4?"রাত":h<6?"ভোর":h<12?"সকাল":h<15?"দুপুর":h<18?"বিকাল":h<20?"সন্ধ্যা":"রাত";
+  return per + " " + BN_DIGITS((h%12||12) + ":" + pad2(p.mi)); }
+function bnDay(iso){ const p = bdParts(iso); return DAYS[p.wd] + ", " + BN_DIGITS(p.d) + " " + BN_MON[p.m]; }
+function bnWhen(iso){ return bnDay(iso) + " • " + bnTime(iso); }
+function bnWindow(e){ const a = bdParts(e.starts_at), b = bdParts(e.ends_at);
+  return (a.y===b.y && a.m===b.m && a.d===b.d) ? bnDay(e.starts_at) + " • " + bnTime(e.starts_at) + " – " + bnTime(e.ends_at)
+    : bnWhen(e.starts_at) + " – " + bnWhen(e.ends_at); }
+function cdText(ms){
+  if(ms <= 0) return "০০:০০";
+  const s = Math.floor(ms/1000), d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60), ss = s%60;
+  if(d) return BN_DIGITS(d) + " দিন " + BN_DIGITS(h) + " ঘণ্টা";
+  if(h) return BN_DIGITS(h) + " ঘণ্টা " + BN_DIGITS(m) + " মিনিট";
+  return BN_DIGITS(pad2(m) + ":" + pad2(ss));
+}
+const secTxt = s => s==null ? "-" : BN_DIGITS(Math.floor(s/60) + ":" + pad2(s%60));
+const cd = (iso, on) => `<b data-cd="${new Date(iso).getTime()}" ${on?`data-on="${on}"`:""}>${cdText(new Date(iso).getTime() - nowSrv())}</b>`;
+setInterval(() => {
+  document.querySelectorAll("[data-cd]").forEach(el => {
+    const left = +el.dataset.cd - nowSrv(); el.textContent = cdText(left);
+    if(left <= 0 && el.dataset.on && !el.dataset.fired){ el.dataset.fired = 1; const f = window[el.dataset.on]; if(f) setTimeout(f, 1500); }
+  });
+}, 1000);
+const examLink = id => SITE_URL + "/#exam=" + id;
+function sheet(html){
+  document.querySelectorAll(".asheet-bg").forEach(x => x.remove());
+  const bg = document.createElement("div"); bg.className = "asheet-bg";
+  bg.innerHTML = `<div class="asheet">${html}</div>`;
+  bg.onclick = e => { if(e.target === bg) bg.remove(); };
+  document.body.appendChild(bg); return bg;
+}
+const closeSheet = () => document.querySelectorAll(".asheet-bg").forEach(x => x.remove());
+
+async function exLoad(){
+  const r = await rpc("oe_list", {p_token: exTok()});
+  EX_SKEW = new Date(r.now).getTime() - Date.now();
+  if(GTOKEN && !TOKEN && (!r.me || r.me.kind !== "guest")){ GTOKEN = null; store.del("bn_gtoken"); }
+  EXL = r; return r;
+}
+
+/* ---------- পরীক্ষার কার্ড ---------- */
+function exCard(e, compact){
+  const my = e.my, st = e.status;
+  const aud = e.audience === "free" ? '<span class="chip">🆓 ফ্রি পরীক্ষা</span>'
+    : `<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ") || "BIO NERDS স্টুডেন্ট")}</span>`;
+  const pill = st === "live" ? '<span class="live-pill"><i></i>লাইভ চলছে</span>'
+    : st === "upcoming" ? '<span class="chip warn">⏳ আসছে</span>' : '<span class="chip" style="background:#eef1f4;color:var(--mute)">শেষ হয়েছে</span>';
+  let body = "";
+  if(st === "live"){
+    if(my && my.state === "running") body = `<div class="cdbox"><span>⏱️ তোমার সময় বাকি</span>${cd(my.deadline,"exRefresh")}</div>
+      <button class="btn orange big" onclick="exRun(${e.id})">▶️ পরীক্ষা চালিয়ে যাও</button>`;
+    else if(my) body = `<div class="cdbox g"><span>✅ জমা দিয়েছ • রেজাল্ট প্রকাশ</span>${cd(e.ends_at,"exRefresh")}</div>`;
+    else {
+      const lastIn = new Date(e.ends_at).getTime() - e.duration_min*60000;
+      body = `<div class="cdbox"><span>🔴 পরীক্ষা শেষ হবে</span>${cd(e.ends_at,"exRefresh")}</div>
+        ${lastIn > nowSrv() ? `<div class="hint" style="margin-top:6px">পুরো ${BN_DIGITS(e.duration_min)} মিনিট পেতে ${bnTime(new Date(lastIn).toISOString())}-এর মধ্যে শুরু করো</div>`:""}
+        <button class="btn orange big" onclick="exIntro(${e.id})">🚀 পরীক্ষা শুরু করো</button>`;
+    }
+  } else if(st === "upcoming"){
+    body = `<div class="cdbox g"><span>⏳ শুরু হতে বাকি</span>${cd(e.starts_at,"exRefresh")}</div>`;
+  } else {
+    if(my && my.score != null) body = `<div class="mine"><div><div class="muted" style="font-size:12.5px">তোমার নম্বর</div><div class="sc">${num(my.score)}<small style="font-size:14px;color:var(--mute)"> / ${num(e.total)}</small></div></div>
+      <div style="margin-left:auto;text-align:right"><div class="muted" style="font-size:12.5px">মেরিট পজিশন</div><div class="sc">#${BN_DIGITS(my.rank)}</div></div></div>
+      <div class="ex-acts"><button class="btn" onclick="exResult(${e.id})">📊 রেজাল্ট ও সমাধান</button><button class="btn sec" onclick="exMerit(${e.id})">🏆 মেরিট</button></div>`;
+    else body = `<div class="ex-acts"><button class="btn sec" onclick="exMerit(${e.id})">🏆 মেরিট লিস্ট</button><button class="btn" onclick="exPractice(${e.id})">🔁 প্র্যাকটিস করো</button></div>`;
+  }
+  return `<div class="exc ${st}" id="exc${e.id}">
+    <div class="top">${aud}${pill}<button class="lnkbtn" style="margin-left:auto" onclick="exShareLink(${e.id})">🔗 শেয়ার</button></div>
+    <h4>${esc(e.title)}</h4>${e.subject?`<div class="sub">📚 ${esc(e.subject)}</div>`:""}
+    <div class="when">🗓️ ${bnWindow(e)}</div>
+    ${compact?"":`<div class="ex-meta"><div><b>${BN_DIGITS(e.n)}</b><span>প্রশ্ন</span></div><div><b>${BN_DIGITS(e.duration_min)}</b><span>মিনিট</span></div>
+      <div><b>${BN_DIGITS(num(e.total))}</b><span>নম্বর</span></div><div><b>${+e.neg_mark?"−"+BN_DIGITS(num(e.neg_mark)):"নেই"}</b><span>নেগেটিভ</span></div></div>`}
+    ${e.participants >= 10 ? `<div class="muted" style="margin-top:8px;font-size:13px">👥 ${BN_DIGITS(e.participants)} জন অংশ নিয়েছে</div>` : ""}
+    ${body}${st==="ended" && my && my.score!=null ? `<button class="lnkbtn" style="margin-top:8px" onclick="exPractice(${e.id})">🔁 আবার প্র্যাকটিস করো</button>`:""}</div>`;
+}
+
+/* ---------- পরীক্ষার পাতা (হাব) ---------- */
+async function openExams(focus){
+  EX_FROM = "pub"; if(focus) EX_FOCUS = focus;
+  show("examView");
+  $("#exHead").textContent = "📝 অনলাইন পরীক্ষা";
+  $("#exBackBtn").onclick = () => show("homeView");
+  $("#exMain").innerHTML = '<div class="spin"></div>';
+  await exPaintHub($("#exMain"), true);
+}
+async function stuExam(){
+  EX_FROM = "stu";
+  $("#stuMain").innerHTML = '<div class="spin"></div>';
+  await exPaintHub($("#stuMain"), false);
+}
+function exHome(){ RUN = null; if(EX_FROM === "stu"){ show("stuView"); stuTab("exam"); } else openExams(); }
+function exRefresh(){
+  if(!$("#examView").classList.contains("hidden") && $("#exMain .exc")) return exPaintHub($("#exMain"), true);
+  if(!$("#stuView").classList.contains("hidden") && $("#stuMain .exc")) return exPaintHub($("#stuMain"), false);
+  if(!$("#homeView").classList.contains("hidden")) return homeExams(true);
+}
+async function exPaintHub(box, pub){
+  let r;
+  try{ r = await exLoad(); }catch(ex){ box.innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; return; }
+  const ex = r.exams, me = r.me;
+  const live = ex.filter(e=>e.status==="live"), up = ex.filter(e=>e.status==="upcoming"), done = ex.filter(e=>e.status==="ended");
+  let h = "";
+  if(pub) h += `<div class="ex-hero"><span class="bd">🔥 BIO NERDS LIVE EXAM</span>
+    <h2>ঘরে বসেই দাও মেডিকেল স্ট্যান্ডার্ড পরীক্ষা</h2>
+    <p>প্রতি সপ্তাহে অধ্যায়ভিত্তিক ফ্রি লাইভ এক্সাম — সারা দেশের স্টুডেন্টদের সাথে নিজের অবস্থান যাচাই করো।</p>
+    <div class="ex-feat"><span>⏱️ টাইমার</span><span>➖ নেগেটিভ মার্কিং</span><span>🏆 মেরিট লিস্ট</span><span>📖 ব্যাখ্যাসহ সমাধান</span><span>🔁 প্র্যাকটিস</span></div></div>`;
+  else h += `<div class="sec-title">📝 অনলাইন পরীক্ষা</div>`;
+  if(me){
+    h += `<div class="acct"><div class="av">${initials(me.name)}</div><div class="nm"><b>${esc(me.name)}</b>
+      <span class="muted" style="font-size:12.5px">${me.kind==="guest"?"পরীক্ষার আইডি "+esc(me.uid):me.kind==="admin"?"অ্যাডমিন (প্রিভিউ — মেরিটে গুনবে না)":"রোল "+esc(me.uid)+(me.batch?" • "+esc(me.batch):"")}</span></div>
+      ${me.kind==="guest"?'<button class="btn sm ghost" onclick="exGuestLogout()">লগআউট</button>':""}</div>`;
+  } else {
+    h += `<div class="reg-card"><b>🎯 ফ্রিতে পরীক্ষা দিতে একবার রেজিস্টার করো</b>
+      <div class="muted" style="margin-top:4px">নাম আর মোবাইল নম্বর দিলেই হবে — ৩০ সেকেন্ড লাগবে। সব পরীক্ষার রেজাল্ট এক জায়গায় জমা থাকবে।</div>
+      <div class="ex-acts"><button class="btn orange" onclick="exAuth(exRefresh,'reg')">📝 রেজিস্টার</button><button class="btn sec" onclick="exAuth(exRefresh,'login')">🔐 লগইন</button></div></div>`;
+  }
+  if(live.length) h += `<div class="ex-sec">🔴 এখন লাইভ</div>` + live.map(e=>exCard(e)).join("");
+  if(up.length) h += `<div class="ex-sec">⏳ আসছে</div>` + up.map(e=>exCard(e)).join("");
+  if(!live.length && !up.length) h += `<div class="card empty-ex"><div>📅</div><b>এই মুহূর্তে কোনো লাইভ পরীক্ষা নেই</b><br>নতুন পরীক্ষার ঘোষণা পেতে আমাদের Facebook পেজে চোখ রাখো।</div>`;
+  if(done.length) h += `<div class="ex-sec">✅ আগের পরীক্ষা <small>মেরিট • সমাধান • প্র্যাকটিস</small></div>` + done.map(e=>exCard(e)).join("");
+  if(pub && (!me || me.kind==="guest")) h += admCtaHtml();
+  box.innerHTML = h;
+  if(EX_FOCUS){ const el = $("#exc"+EX_FOCUS); EX_FOCUS = null;
+    if(el){ el.classList.add("focus"); setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"center"}),150); setTimeout(()=>el.classList.remove("focus"),4000); } }
+}
+function admCtaHtml(){
+  return `<div class="cta-adm"><b style="font-size:16.5px">🎓 BIO NERDS-এ নিয়মিত পড়তে চাও?</b>
+    <div class="muted" style="margin-top:4px">কুমিল্লার কান্দিরপাড়ে HSC ও SSC বায়োলজির ব্যাচ — নিয়মিত পরীক্ষা, মেরিট লিস্ট আর অভিভাবককে রেজাল্ট।</div>
+    <button class="btn orange" onclick="openAdmission()">📝 ভর্তি হতে চাই</button></div>`;
+}
+async function exShareLink(id){
+  const e = (EXL && EXL.exams.find(x=>x.id==id)) || HOME_EX.find(x=>x.id==id); if(!e) return;
+  const text = `🔥 ${COACHING.name} ${e.audience==="free"?"ফ্রি ":""}লাইভ এক্সাম\n📚 ${e.title}${e.subject?" — "+e.subject:""}\n🗓️ ${bnWindow(e)}\n⏱️ ${BN_DIGITS(e.duration_min)} মিনিট • ${BN_DIGITS(e.n)}টি প্রশ্ন\n🏆 মেরিট লিস্ট + ব্যাখ্যাসহ সমাধান\n👉 `;
+  const url = examLink(id);
+  if(navigator.share){ try{ await navigator.share({title:e.title, text, url}); return; }catch(err){ if(err.name==="AbortError") return; } }
+  copyText(text + url);
+}
+
+/* ---------- রেজিস্টার / লগইন (বাইরের স্টুডেন্ট) ---------- */
+function exAuth(after, mode="reg"){
+  window.__exAfter = after;
+  sheet(`<h3>${mode==="reg"?"📝 ফ্রি রেজিস্ট্রেশন":"🔐 লগইন"}</h3>
+    <div class="seg"><button class="${mode==="reg"?"on":""}" onclick="exAuth(window.__exAfter,'reg')">নতুন রেজিস্টার</button><button class="${mode==="login"?"on":""}" onclick="exAuth(window.__exAfter,'login')">আগে করেছি — লগইন</button></div>
+    ${mode==="reg" ? `<form id="gF">
+      <label>তোমার নাম</label><input id="gN" required placeholder="পুরো নাম" autocomplete="name">
+      <label>মোবাইল নম্বর</label><input id="gP" required inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel">
+      <label>তুমি কোথায় পড়ো?</label>
+      <div class="aud" id="gLv"><button type="button" data-l="school">🏫 স্কুল<small>Class 6 – SSC</small></button><button type="button" data-l="college">🎓 কলেজ<small>HSC / Admission</small></button></div>
+      <div id="gLvBox" class="hidden"><label id="gIL">স্কুলের নাম</label><input id="gI" placeholder="">
+      <label>কোন ক্লাসে পড়ো</label><select id="gC"></select></div>
+      <label>একটা পাসওয়ার্ড দাও (মনে রাখবে)</label><input id="gW" type="password" required minlength="4" autocomplete="new-password" placeholder="কমপক্ষে ৪ অক্ষর">
+      <button class="btn orange" type="submit">✅ রেজিস্টার করো</button><div id="gE" class="err hidden"></div></form>`
+    : `<form id="gF">
+      <label>মোবাইল নম্বর</label><input id="gP" required inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="username">
+      <label>পাসওয়ার্ড</label><input id="gW" type="password" required autocomplete="current-password">
+      <button class="btn" type="submit">লগইন</button><div id="gE" class="err hidden"></div>
+      <p class="hint">পাসওয়ার্ড ভুলে গেলে WhatsApp-এ (${esc(COACHING.whatsapp)}) মোবাইল নম্বর লিখে জানাও।</p></form>`}
+    <div class="card" style="background:var(--mint);margin:14px 0 0;box-shadow:none"><b>BIO NERDS-এর ভর্তি হওয়া স্টুডেন্ট?</b>
+      <div class="muted">তোমার রোল আর পাসওয়ার্ড দিয়ে পোর্টালে লগইন করো — তোমার রেজাল্ট পোর্টালেই জমা হবে।</div>
+      <button class="btn sec" onclick="exStuLogin()">🔐 রোল দিয়ে লগইন</button></div>`);
+  const LV = {school:{l:"স্কুলের নাম", p:"যেমন: Cumilla Zilla School", c:["Class 6","Class 7","Class 8","Class 9","Class 10","SSC Candidate"]},
+              college:{l:"কলেজের নাম", p:"যেমন: Cumilla Victoria Govt. College", c:["HSC 1st Year","HSC 2nd Year","HSC Candidate","Admission"]}};
+  let lv = null;
+  document.querySelectorAll("#gLv button").forEach(x => x.onclick = () => { lv = x.dataset.l;
+    document.querySelectorAll("#gLv button").forEach(y => y.classList.toggle("on", y===x));
+    $("#gLvBox").classList.remove("hidden"); $("#gIL").textContent = LV[lv].l; $("#gI").placeholder = LV[lv].p;
+    $("#gC").innerHTML = '<option value="">— বেছে নাও —</option>' + LV[lv].c.map(c=>`<option>${c}</option>`).join(""); });
+  $("#gF").onsubmit = async ev => {
+    ev.preventDefault(); const err = $("#gE"); err.classList.add("hidden");
+    if(mode === "reg" && (!lv || !$("#gI").value.trim() || !$("#gC").value)){ err.textContent = "স্কুল/কলেজ, তার নাম আর ক্লাস বেছে নাও"; err.classList.remove("hidden"); return; }
+    const b = ev.target.querySelector("button[type=submit]"); b.disabled = true;
+    try{
+      const r = mode === "reg"
+        ? await rpc("oe_guest_register", {p_name:$("#gN").value, p_phone:$("#gP").value, p_inst:$("#gI").value, p_class:$("#gC").value, p_pass:$("#gW").value})
+        : await rpc("oe_guest_login", {p_phone:$("#gP").value, p_pass:$("#gW").value});
+      GTOKEN = r.token; store.set("bn_gtoken", GTOKEN); closeSheet();
+      toast(mode==="reg" ? `স্বাগতম ${r.name}! তোমার পরীক্ষার আইডি ${r.gid} 🎉` : `স্বাগতম ${r.name} 👋`, 3500);
+      if(window.__exAfter) window.__exAfter();
+    }catch(ex){ err.textContent = ex.message; err.classList.remove("hidden"); b.disabled = false; }
+  };
+}
+function exStuLogin(){
+  closeSheet();
+  if(EX_FOCUS || (EXL && EXL.exams.length)) try{ sessionStorage.setItem("bn_pend_exam", "1"); }catch(e){}
+  show("loginView");
+}
+async function exGuestLogout(){
+  if(!confirm("লগআউট করবে?")) return;
+  try{ await rpc("oe_guest_logout", {p_token:GTOKEN}); }catch(e){}
+  GTOKEN = null; store.del("bn_gtoken"); exRefresh();
+}
+
+/* ---------- শুরু করার আগে নিয়ম ---------- */
+function exIntro(id){
+  if(!exTok()){ exAuth(() => exIntro(id)); return; }
+  const e = (EXL && EXL.exams.find(x=>x.id==id)) || HOME_EX.find(x=>x.id==id); if(!e){ openExams(id); return; }
+  const left = Math.floor((new Date(e.ends_at).getTime() - nowSrv())/60000);
+  const get = Math.min(e.duration_min, left);
+  sheet(`<h3>🚀 ${esc(e.title)}</h3><div class="muted">${esc(e.subject||"")}</div>
+    <ul class="rules">
+      <li><span>⏱️</span><span>সময় <b>${BN_DIGITS(get)} মিনিট</b>${get<e.duration_min?` <span class="c-bad">(পরীক্ষা ${bnTime(e.ends_at)}-এ শেষ হবে, তাই পুরো ${BN_DIGITS(e.duration_min)} মিনিট পাবে না)</span>`:""}। শুরু করলেই টাইমার চালু — থামানো যাবে না, সময় শেষে খাতা নিজে থেকে জমা হবে।</span></li>
+      <li><span>✅</span><span>${BN_DIGITS(e.n)}টি প্রশ্ন • প্রতি সঠিক উত্তরে <b>+${BN_DIGITS(num(e.mark_per_q))}</b>${+e.neg_mark?`, প্রতি ভুলে <b class="c-bad">−${BN_DIGITS(num(e.neg_mark))}</b> (উত্তর না দিলে ০)`:" • কোনো নেগেটিভ মার্কিং নেই"}</span></li>
+      <li><span>👆</span><span>উত্তরে ট্যাপ করলে দাগ পড়বে; আবার ট্যাপ করলে মুছে যাবে।</span></li>
+      <li><span>📵</span><span>পরীক্ষার সময় অন্য অ্যাপ বা ট্যাবে গেলে সেটা রেকর্ড হবে।</span></li>
+      <li><span>📶</span><span>নেট চলে গেলেও উত্তর ফোনে জমা থাকবে — পেজ বন্ধ করো না।</span></li>
+      <li><span>🏆</span><span>রেজাল্ট, মেরিট লিস্ট ও সমাধান: <b>${bnWhen(e.ends_at)}</b></span></li>
+      ${e.instructions?`<li><span>📌</span><span>${esc(e.instructions)}</span></li>`:""}
+    </ul>
+    <button class="btn orange big" onclick="closeSheet();exRun(${id})">🚀 শুরু করো</button>
+    <button class="btn ghost" onclick="closeSheet()">এখন না</button>`);
+}
+
+/* ---------- পরীক্ষা চলাকালীন ---------- */
+async function exRun(id){
+  const ov = document.createElement("div"); ov.className = "overlay"; ov.innerHTML = '<div><div class="spin"></div>প্রশ্ন আসছে...</div>'; document.body.appendChild(ov);
+  let d;
+  try{ d = await rpc("oe_start", {p_token:exTok(), p_exam:id}); }
+  catch(ex){ ov.remove(); toast(ex.message, 3500); exRefresh(); return; }
+  ov.remove();
+  EX_SKEW = new Date(d.now).getTime() - Date.now();
+  const key = "bn_oe_" + id;
+  let local = {}; try{ local = JSON.parse(store.get(key) || "{}"); }catch(e){}
+  if(local.s !== d.started_at) local = {};
+  RUN = { id, practice:false, exam:d.exam, qs:d.questions, ans:Object.assign({}, d.answers||{}, local.a||{}),
+    tabs: Math.max(d.tab_switch||0, local.t||0), deadline:new Date(d.deadline).getTime(), start:new Date(d.started_at).getTime(),
+    key, started_at:d.started_at, dirty:true, warned:{} };
+  paintRun();
+}
+async function exPractice(id){
+  let p;
+  try{ p = await rpc("oe_paper", {p_exam:id, p_token:exTok()}); }catch(ex){ toast(ex.message, 3500); return; }
+  const qs = p.questions.slice().sort(()=>Math.random()-.5);
+  RUN = { id, practice:true, exam:p, qs, paper:p, ans:{}, tabs:0, start:Date.now(), deadline:Date.now() + p.duration_min*60000, warned:{} };
+  paintRun();
+}
+function paintRun(){
+  show("runView");
+  const R = RUN, n = R.qs.length;
+  $("#runView").innerHTML = `
+    <div class="run-top"><div class="r1"><div class="tt"><b>${R.practice?"🔁 প্র্যাকটিস — ":""}${esc(R.exam.title)}</b><small>${BN_DIGITS(n)}টি প্রশ্ন • +${BN_DIGITS(num(R.exam.mark_per_q))}${+R.exam.neg_mark?" / −"+BN_DIGITS(num(R.exam.neg_mark)):""}</small></div>
+      <div class="timer" id="rT">--:--</div></div><div class="tbar"><i id="rB" style="width:100%"></i></div></div>
+    <div id="rNet"></div>
+    <div class="run-main">${R.qs.map((q,i)=>qHtml(q,i)).join("")}
+      <button class="btn orange big" onclick="exSubmitAsk()">📤 খাতা জমা দাও</button></div>
+    <div class="run-bot"><div class="cnt"><b id="rC">০</b> / ${BN_DIGITS(n)} উত্তর দিয়েছ<br><button class="lnkbtn" onclick="exPalette()">🔢 প্রশ্ন তালিকা</button></div>
+      <button class="btn orange" onclick="exSubmitAsk()">জমা দাও</button></div>`;
+  updCount(); clearInterval(R.timer); R.timer = setInterval(runTick, 500); runTick();
+  if(!R.practice){ R.saver = setInterval(()=>exSave(), 20000); window.onbeforeunload = () => "পরীক্ষা চলছে!"; }
+  window.scrollTo(0,0);
+}
+function qHtml(q, i){
+  const a = RUN.ans[q.k];
+  return `<div class="qc" id="qc${q.k}"><div class="qn">প্রশ্ন ${BN_DIGITS(i+1)}<span class="dn">${a!=null?"✓ উত্তর দিয়েছ":""}</span></div>
+    <div class="qt">${esc(q.q)}</div>${q.img?`<img class="qi" src="${q.img}" alt="">`:""}
+    <div class="opts">${q.opts.map((o,j)=>`<button class="op ${a===j?"sel":""}" onclick="exPick(${q.k},${j})"><span class="ob">${LET[j]}</span><span>${esc(o)}</span></button>`).join("")}</div></div>`;
+}
+function exPick(k, j){
+  if(!RUN || RUN.over) return;
+  if(RUN.ans[k] === j) delete RUN.ans[k]; else RUN.ans[k] = j;
+  const box = $("#qc"+k);
+  box.querySelectorAll(".op").forEach((b,i)=>b.classList.toggle("sel", RUN.ans[k]===i));
+  box.querySelector(".dn").textContent = RUN.ans[k]!=null ? "✓ উত্তর দিয়েছ" : "";
+  updCount(); exLocal(); RUN.dirty = true;
+  clearTimeout(RUN.deb); RUN.deb = setTimeout(()=>exSave(), 4000);
+}
+function updCount(){ const c = $("#rC"); if(c) c.textContent = BN_DIGITS(Object.keys(RUN.ans).length); }
+function exLocal(){ if(RUN && !RUN.practice) store.set(RUN.key, JSON.stringify({s:RUN.started_at, a:RUN.ans, t:RUN.tabs})); }
+async function exSave(){
+  const R = RUN; if(!R || R.practice || R.over || !R.dirty) return;
+  try{ await rpc("oe_save", {p_token:exTok(), p_exam:R.id, p_answers:R.ans, p_tabs:R.tabs}); R.dirty = false; $("#rNet").innerHTML = ""; }
+  catch(ex){ if(isNetErr(ex)) $("#rNet").innerHTML = '<div class="netbar">📶 নেট নেই — উত্তর ফোনে জমা আছে, পরীক্ষা চালিয়ে যাও</div>'; }
+}
+function runTick(){
+  const R = RUN; if(!R || R.over) return;
+  const now = R.practice ? Date.now() : nowSrv(), left = R.deadline - now, tot = R.deadline - R.start;
+  const t = $("#rT"); if(!t) return;
+  t.textContent = cdText(left);
+  t.className = "timer" + (left < 60000 ? " danger" : left < 300000 ? " warn" : "");
+  $("#rB").style.width = Math.max(0, Math.min(100, left/tot*100)) + "%";
+  if(left < 300000 && left > 240000 && !R.warned.f){ R.warned.f = 1; toast("⏰ আর ৫ মিনিট বাকি!"); }
+  if(left < 60000 && !R.warned.o){ R.warned.o = 1; toast("⏰ আর ১ মিনিট বাকি — খাতা নিজে থেকে জমা হবে"); }
+  if(left <= 0) exSubmit(true);
+}
+document.addEventListener("visibilitychange", () => {
+  if(!RUN || RUN.over || RUN.practice || $("#runView").classList.contains("hidden")) return;
+  if(document.visibilityState === "hidden"){ RUN.tabs++; RUN.dirty = true; exLocal(); }
+  else { toast(`⚠️ পরীক্ষার সময় অন্য অ্যাপে যাওয়া রেকর্ড হয়েছে (${BN_DIGITS(RUN.tabs)} বার)`, 3500); runTick(); exSave(); }
+});
+window.addEventListener("online", () => { if(RUN && !RUN.over) exSave(); });
+function exPalette(){
+  sheet(`<h3>🔢 প্রশ্ন তালিকা</h3><div class="muted">সবুজ = উত্তর দিয়েছ। নম্বরে চাপলে সেই প্রশ্নে যাবে।</div>
+    <div class="pal">${RUN.qs.map((q,i)=>`<button class="${RUN.ans[q.k]!=null?"a":""}" onclick="closeSheet();$('#qc${q.k}').scrollIntoView({behavior:'smooth'})">${BN_DIGITS(i+1)}</button>`).join("")}</div>
+    <button class="btn ghost" onclick="closeSheet()">বন্ধ করো</button>`);
+}
+function exSubmitAsk(){
+  const n = RUN.qs.length, a = Object.keys(RUN.ans).length;
+  sheet(`<h3>📤 খাতা জমা দেবে?</h3>
+    <div class="rs-grid" style="margin:14px 0"><div><b class="c-ok">${BN_DIGITS(a)}</b><span>উত্তর দিয়েছ</span></div><div><b class="c-sk">${BN_DIGITS(n-a)}</b><span>বাকি</span></div><div><b>${$("#rT").textContent}</b><span>সময় বাকি</span></div></div>
+    ${n-a?`<div class="muted">${BN_DIGITS(n-a)}টা প্রশ্নের উত্তর দাওনি। চাইলে ফিরে গিয়ে দেখে নাও।</div>`:""}
+    <button class="btn orange big" onclick="closeSheet();exSubmit(false)">✅ হ্যাঁ, জমা দাও</button>
+    <button class="btn ghost" onclick="closeSheet()">ফিরে যাও</button>`);
+}
+async function exSubmit(auto){
+  const R = RUN; if(!R || R.over) return;
+  R.over = true; clearInterval(R.timer); clearInterval(R.saver); clearTimeout(R.deb); closeSheet();
+  window.onbeforeunload = null;
+  if(R.practice) return exPracticeResult();
+  const ov = document.createElement("div"); ov.className = "overlay";
+  ov.innerHTML = `<div><div class="spin"></div>${auto?"⏰ সময় শেষ — ":""}খাতা জমা হচ্ছে...</div>`; document.body.appendChild(ov);
+  let r = null, lastErr = null;
+  for(let i=0; i<5 && !r; i++){
+    try{ r = await rpc("oe_submit", {p_token:exTok(), p_exam:R.id, p_answers:R.ans, p_tabs:R.tabs}); }
+    catch(ex){ lastErr = ex; if(!isNetErr(ex)) break; await new Promise(ok=>setTimeout(ok, 3000)); }
+  }
+  ov.remove();
+  if(!r){
+    $("#runView").innerHTML = `<div class="run-main"><div class="done-wrap"><div class="done-ic" style="background:#fff4dc">📶</div>
+      <h2>খাতা এখনো জমা হয়নি</h2><p class="muted" style="margin-top:6px">${esc(lastErr ? lastErr.message : "")}<br>তোমার উত্তরগুলো ফোনে জমা আছে। নেট চালু করে নিচের বাটনে চাপো (সময় শেষ হওয়ার ২ মিনিটের মধ্যে)।</p>
+      <button class="btn orange big" onclick="RUN.over=false;exSubmit(true)">🔄 আবার জমা দাও</button></div></div>`;
+    return;
+  }
+  store.del(R.key);
+  $("#runView").innerHTML = `<div class="run-main"><div class="done-wrap"><div class="done-ic">✅</div>
+    <h2>খাতা জমা হয়েছে!</h2><p class="muted" style="margin-top:4px">তুমি ${BN_DIGITS(r.answered)}টা প্রশ্নের উত্তর দিয়েছ। শুভকামনা 🤲</p>
+    <div class="card" style="margin-top:16px"><div class="muted">রেজাল্ট, মেরিট লিস্ট ও সমাধান প্রকাশ হবে</div>
+      <div style="font-weight:700;margin-top:2px">${bnWhen(r.ends_at)}</div>
+      <div class="cdbox g" style="margin-top:10px"><span>বাকি</span>${cd(r.ends_at)}</div></div>
+    <button class="btn" onclick="exHome()">🏠 পরীক্ষার পাতায় ফিরে যাও</button>
+    <button class="btn sec" onclick="exShareLink(${R.id})">📲 বন্ধুদেরও পরীক্ষা দিতে বলো</button></div></div>`;
+  RUN = null;
+}
+
+/* ---------- রেজাল্ট ---------- */
+function exOpenPage(title){
+  show("examView"); $("#exHead").textContent = title; $("#exBackBtn").onclick = exHome;
+  $("#exMain").innerHTML = '<div class="spin"></div>';
+}
+function ringHtml(pct, big, small){
+  const C = 2*Math.PI*62, p = Math.max(0, Math.min(100, pct));
+  return `<div class="ring"><svg width="150" height="150"><circle cx="75" cy="75" r="62" stroke="#ffffff30" stroke-width="13" fill="none"/>
+    <circle cx="75" cy="75" r="62" stroke="#f2b632" stroke-width="13" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p/100)}" style="transition:stroke-dashoffset 1s"/></svg>
+    <div class="v"><b>${big}</b><small>${small}</small></div></div>`;
+}
+function solHtml(qs, filter){
+  return qs.map((q,i)=>({q,i})).filter(({q}) => filter==="all" || (filter==="bad" && q.my!=null && q.my!==q.ans) || (filter==="sk" && q.my==null))
+    .map(({q,i}) => {
+      const st = q.my==null ? '<span class="tag sk">উত্তর দাওনি</span>' : q.my===q.ans ? '<span class="tag ok">✓ সঠিক</span>' : '<span class="tag bad">✗ ভুল</span>';
+      return `<div class="qc"><div class="qn">প্রশ্ন ${BN_DIGITS(i+1)} ${st}</div><div class="qt">${esc(q.q)}</div>${q.img?`<img class="qi" src="${q.img}" alt="">`:""}
+        <div class="opts">${q.opts.map((o,j)=>`<button disabled class="op ${j===q.ans?"ok":(j===q.my?"bad":"")}"><span class="ob">${LET[j]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+        ${q.expl?`<div class="expl">💡 ${esc(q.expl)}</div>`:""}</div>`;
+    }).join("") || '<div class="card muted" style="text-align:center">এই ভাগে কোনো প্রশ্ন নেই 🎉</div>';
+}
+function solBlock(qs){
+  window.__sol = qs;
+  const bad = qs.filter(q=>q.my!=null && q.my!==q.ans).length, sk = qs.filter(q=>q.my==null).length;
+  return `<div class="ex-sec">📖 সমাধান</div>
+    <div class="tabs" id="solTabs"><button class="on" data-f="all">সব (${BN_DIGITS(qs.length)})</button><button data-f="bad">ভুলগুলো (${BN_DIGITS(bad)})</button><button data-f="sk">বাদ দেওয়া (${BN_DIGITS(sk)})</button></div>
+    <div id="solList">${solHtml(qs,"all")}</div>`;
+}
+function bindSol(){
+  document.querySelectorAll("#solTabs button").forEach(b => b.onclick = () => {
+    document.querySelectorAll("#solTabs button").forEach(x=>x.classList.toggle("on", x===b));
+    $("#solList").innerHTML = solHtml(window.__sol, b.dataset.f);
+  });
+}
+async function exResult(id){
+  if(!exTok()){ exAuth(() => exResult(id), "login"); return; }
+  exOpenPage("📊 রেজাল্ট");
+  let r; try{ r = await rpc("oe_result", {p_token:exTok(), p_exam:id}); }
+  catch(ex){ $("#exMain").innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; return; }
+  if(r.pending){
+    $("#exMain").innerHTML = `<div class="done-wrap"><div class="done-ic">⏳</div><h2>রেজাল্ট এখনো প্রকাশ হয়নি</h2>
+      <div class="card" style="margin-top:14px"><div class="muted">প্রকাশ হবে ${bnWhen(r.ends_at)}</div><div class="cdbox g" style="margin-top:8px"><span>বাকি</span>${cd(r.ends_at)}</div></div>
+      <button class="btn" onclick="exHome()">← ফিরে যাও</button></div>`; return;
+  }
+  window.__res = r;
+  const e = r.exam, pct = e.total ? r.score/e.total*100 : 0, pass = pct >= (+e.pass_pct||40);
+  $("#exMain").innerHTML = `
+    <div class="rs-hero"><div style="font-weight:700">${esc(e.title)}</div><div style="opacity:.8;font-size:13.5px">${esc(e.subject||"")}</div>
+      ${ringHtml(pct, BN_DIGITS(num(r.score)), "/ "+BN_DIGITS(num(e.total))+" নম্বর")}
+      <span class="pf ${pass?"p":"f"}">${pass?"🎉 পাস":"আরও চেষ্টা লাগবে"} • ${BN_DIGITS(Math.round(pct))}%</span>
+      <div style="margin-top:12px;font-size:15px"><b style="font-size:26px;font-family:Poppins">#${BN_DIGITS(r.rank)}</b><br>${BN_DIGITS(r.participants)} জনের মধ্যে মেরিট পজিশন</div></div>
+    <div class="rs-grid">
+      <div><b class="c-ok">${BN_DIGITS(r.correct)}</b><span>সঠিক</span></div><div><b class="c-bad">${BN_DIGITS(r.wrong)}</b><span>ভুল</span></div><div><b class="c-sk">${BN_DIGITS(r.skipped)}</b><span>উত্তর দাওনি</span></div>
+      <div><b>${BN_DIGITS(num(r.highest))}</b><span>সর্বোচ্চ</span></div><div><b>${BN_DIGITS(num(r.average))}</b><span>গড়</span></div><div><b>${secTxt(r.secs)}</b><span>সময় লেগেছে</span></div></div>
+    ${+e.neg_mark && r.wrong ? `<div class="hl-note" style="margin-bottom:14px"><span>💡</span><span>ভুলের জন্য ${BN_DIGITS(num(r.wrong*e.neg_mark))} নম্বর কাটা গেছে। নিশ্চিত না হলে উত্তর না দেওয়াই ভালো।</span></div>`:""}
+    <button class="btn orange" onclick="exShareCard()">📤 রেজাল্ট কার্ড শেয়ার করো</button>
+    <div class="ex-acts"><button class="btn sec" onclick="exMerit(${id})">🏆 মেরিট লিস্ট</button><button class="btn sec" onclick="exPractice(${id})">🔁 প্র্যাকটিস</button></div>
+    ${r.me.kind==="guest" ? admCtaHtml() : ""}
+    ${solBlock(r.questions)}`;
+  bindSol();
+}
+function exPracticeResult(){
+  const R = RUN, p = R.paper, qs = R.qs.map(q => ({...q, my: R.ans[q.k]}));
+  const c = qs.filter(q=>q.my===q.ans).length, w = qs.filter(q=>q.my!=null && q.my!==q.ans).length;
+  const score = c*p.mark_per_q - w*p.neg_mark, total = qs.length*p.mark_per_q, pct = total ? score/total*100 : 0;
+  const secs = Math.round((Date.now()-R.start)/1000);
+  show("examView"); $("#exHead").textContent = "🔁 প্র্যাকটিস রেজাল্ট"; $("#exBackBtn").onclick = exHome;
+  $("#exMain").innerHTML = `
+    <div class="rs-hero"><div style="font-weight:700">${esc(p.title)}</div><div style="opacity:.8;font-size:13.5px">প্র্যাকটিস — মেরিটে গণনা হয়নি</div>
+      ${ringHtml(pct, BN_DIGITS(num(Math.round(score*100)/100)), "/ "+BN_DIGITS(num(total))+" নম্বর")}
+      <span class="pf ${pct>=(+p.pass_pct||40)?"p":"f"}">${BN_DIGITS(Math.round(pct))}%</span></div>
+    <div class="rs-grid"><div><b class="c-ok">${BN_DIGITS(c)}</b><span>সঠিক</span></div><div><b class="c-bad">${BN_DIGITS(w)}</b><span>ভুল</span></div><div><b>${secTxt(secs)}</b><span>সময়</span></div></div>
+    <div class="ex-acts"><button class="btn" onclick="exPractice(${p.id})">🔁 আবার দাও</button><button class="btn sec" onclick="exMerit(${p.id})">🏆 মেরিট</button></div>
+    ${solBlock(qs)}`;
+  bindSol(); RUN = null; window.scrollTo(0,0);
+}
+
+/* ---------- মেরিট লিস্ট ---------- */
+async function exMerit(id){
+  exOpenPage("🏆 মেরিট লিস্ট");
+  let m; try{ m = await rpc("oe_merit", {p_exam:id, p_token:exTok(), p_limit:100}); }
+  catch(ex){ $("#exMain").innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; return; }
+  const L = m.list, top = L.filter(x=>x.rank<=3), rest = L.filter(x=>x.rank>3), mine = L.find(x=>x.me);
+  const av = x => x.photo ? `<img src="${x.photo}" alt="">` : initials(x.name);
+  $("#exMain").innerHTML = `
+    <div class="ex-hero" style="text-align:center"><span class="bd">🏆 MERIT LIST</span><h2 style="margin-bottom:2px">${esc(m.title)}</h2>
+      <p>${esc(m.subject||"")}${m.subject?" • ":""}${BN_DIGITS(m.participants)} জন অংশ নিয়েছে</p></div>
+    ${mine?`<div class="card ok" style="margin:0 0 14px">তোমার মেরিট পজিশন <b>#${BN_DIGITS(mine.rank)}</b> • নম্বর ${BN_DIGITS(num(mine.score))}</div>`:""}
+    ${L.length ? `<div class="stars" style="margin-bottom:14px">${top.map(x=>`<div class="star s${x.rank}"><span class="md">${["🥇","🥈","🥉"][x.rank-1]}</span>
+      <div class="sp">${av(x)}</div><b>${esc(x.name)}</b><div class="si">${esc(x.inst||"")}</div><span class="pc">${BN_DIGITS(num(x.score))}</span></div>`).join("")}</div>
+    <div class="card" style="padding:6px 10px">${L.map(x=>`<div class="mrow ${x.me?"me":""}"><div class="rk">${x.rank<=3?["🥇","🥈","🥉"][x.rank-1]:BN_DIGITS(x.rank)}</div>
+      <div class="av">${av(x)}</div><div class="nm"><b>${esc(x.name)}${x.bn?'<span class="bnb">BIO NERDS</span>':""}</b><span>${esc(x.inst||"")}</span></div>
+      <div class="sc"><b>${BN_DIGITS(num(x.score))}</b><span>⏱ ${secTxt(x.secs)}</span></div></div>`).join("")}</div>
+    <div class="hint" style="text-align:center">সমান নম্বর হলে যে কম সময়ে শেষ করেছে সে আগে।</div>`
+    : '<div class="card muted">এখনো কেউ অংশ নেয়নি।</div>'}
+    <button class="btn" onclick="exPractice(${id})">🔁 এই পরীক্ষাটা প্র্যাকটিস করো</button>`;
+}
+
+/* ---------- রেজাল্ট কার্ড (শেয়ারের ছবি) ---------- */
+async function exShareCard(){
+  const r = window.__res; if(!r) return;
+  await fontsReady();
+  const e = r.exam, cv = document.createElement("canvas"), W = 1080, H = 1350; cv.width = W; cv.height = H; const c = cv.getContext("2d");
+  const g = c.createLinearGradient(0,0,W,H); g.addColorStop(0,"#13294b"); g.addColorStop(.55,"#13684c"); g.addColorStop(1,"#0b3d2e");
+  c.fillStyle = g; c.fillRect(0,0,W,H);
+  c.globalAlpha = .07; c.fillStyle = "#fff"; c.beginPath(); c.arc(W-60,140,320,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(40,H-80,260,0,Math.PI*2); c.fill(); c.globalAlpha = 1;
+  try{ const lg = await loadImg("icon-192.png"); c.save(); rr(c,W/2-60,48,120,120,30); c.clip(); c.drawImage(lg,W/2-60,48,120,120); c.restore(); }catch(err){}
+  c.textAlign = "center"; c.fillStyle = "#fff"; c.font = '800 66px Poppins'; c.fillText(COACHING.name, W/2, 240);
+  c.fillStyle = "#f2b632"; rr(c, W/2-210, 270, 420, 56, 28); c.fill();
+  c.fillStyle = "#3b2a00"; c.font = '700 30px "Hind Siliguri"'; c.fillText(e.audience==="free" ? "ফ্রি লাইভ এক্সাম" : "অনলাইন পরীক্ষা", W/2, 309);
+  c.fillStyle = "#fff"; fitText(c, e.title, W-140, 46, 700, '"Hind Siliguri"'); c.fillText(e.title, W/2, 400);
+  if(e.subject){ c.fillStyle = "#ffffffcc"; fitText(c, e.subject, W-160, 32, 500, '"Hind Siliguri"'); c.fillText(e.subject, W/2, 450); }
+  const st = r.me.kind === "stu" && ME && ME.roll === r.me.uid ? ME : {name:r.me.name};
+  c.fillStyle = "#fff"; c.beginPath(); c.arc(W/2, 590, 98, 0, Math.PI*2); c.fill();
+  await drawPhoto(c, W/2-90, 500, 180, true, st);
+  c.fillStyle = "#fff"; fitText(c, r.me.name, W-140, 54, 700, '"Hind Siliguri"'); c.fillText(r.me.name, W/2, 750);
+  if(r.me.inst){ c.fillStyle = "#ffffffbb"; fitText(c, r.me.inst, W-160, 30, 500, '"Hind Siliguri"'); c.fillText(r.me.inst, W/2, 798); }
+  c.fillStyle = "#fff"; rr(c, 100, 840, W-200, 270, 40); c.fill();
+  c.fillStyle = "#6b7685"; c.font = '600 30px "Hind Siliguri"'; c.fillText("প্রাপ্ত নম্বর", W/2-220, 905); c.fillText("মেরিট পজিশন", W/2+220, 905);
+  c.fillStyle = "#0b3d2e"; c.font = '800 96px Poppins'; c.fillText(num(r.score), W/2-220, 1010); c.fillText("#"+r.rank, W/2+220, 1010);
+  c.fillStyle = "#6b7685"; c.font = '600 28px "Hind Siliguri"'; c.fillText("মোট "+num(e.total)+" এর মধ্যে", W/2-220, 1060); c.fillText(r.participants+" জনের মধ্যে", W/2+220, 1060);
+  c.fillStyle = "#e3e8ee"; c.fillRect(W/2-2, 870, 4, 210);
+  c.fillStyle = "#fff"; c.font = '600 32px "Hind Siliguri"'; c.fillText(r.rank===1 ? "🏆 প্রথম স্থান! অভিনন্দন 🎉" : r.rank<=10 ? "🌟 টপ ১০-এ জায়গা করে নিয়েছি!" : "✨ নিজেকে যাচাই করলাম", W/2, 1180);
+  c.fillStyle = "#f2b632"; c.font = '700 30px "Hind Siliguri"'; c.fillText("তুমিও ফ্রি পরীক্ষা দাও 👉 bionerdsbd.github.io", W/2, 1260);
+  c.fillStyle = "#ffffffaa"; c.font = '500 24px "Hind Siliguri"'; c.fillText("📞 "+COACHING.phones, W/2, 1305);
+  const blob = await new Promise(ok => cv.toBlob(ok, "image/png"));
+  const file = new File([blob], "BIO-NERDS-Result-"+e.id+".png", {type:"image/png"});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], title:"আমার রেজাল্ট — "+COACHING.name, text:"BIO NERDS ফ্রি লাইভ এক্সাম 👉 "+SITE_URL}); return; }catch(err){ if(err.name==="AbortError") return; }
+  }
+  downloadBlob(blob, file.name);
+}
+
+/* ---------- হোম পেজে ফ্রি পরীক্ষা ---------- */
+let HOME_EX = [], HOME_EX_AT = 0;
+async function homeExams(force){
+  const box = $("#homeExams"); if(!box) return;
+  if(force || Date.now() - HOME_EX_AT > 60000){
+    try{ const r = await rpc("oe_list", {p_token:exTok()}); EX_SKEW = new Date(r.now).getTime() - Date.now(); HOME_EX = r.exams; HOME_EX_AT = Date.now(); }catch(e){ return; }
+  }
+  const box2 = $("#homeExams"); if(!box2) return;
+  const free = HOME_EX.filter(e => e.audience === "free");
+  let list = free.filter(e => e.status !== "ended").slice(0, 2);
+  if(!list.length) list = free.slice(0, 1);
+  if(!list.length){ box2.innerHTML = ""; return; }
+  box2.innerHTML = `<div class="h-sec">📝 ফ্রি লাইভ এক্সাম <small><button class="lnkbtn" onclick="openExams()">সব দেখো ›</button></small></div>` + list.map(e => exCard(e)).join("");
+}
+
+/* ---------- স্টুডেন্ট হোমে লাইভ পরীক্ষার ব্যানার ---------- */
+async function stuExamBanner(){
+  const box = $("#exLiveCard"); if(!box) return;
+  try{
+    const r = await rpc("oe_list", {p_token:TOKEN}); EX_SKEW = new Date(r.now).getTime() - Date.now();
+    const e = r.exams.find(x => x.status==="live" && (!x.my || x.my.state==="running")) ||
+              r.exams.find(x => x.status==="upcoming" && new Date(x.starts_at).getTime() - nowSrv() < 2*86400e3);
+    if(!e || !$("#exLiveCard")) return;
+    $("#exLiveCard").innerHTML = `<div class="exc ${e.status}" style="cursor:pointer" onclick="stuTab('exam')">
+      <div class="top">${e.status==="live"?'<span class="live-pill"><i></i>লাইভ চলছে</span>':'<span class="chip warn">⏳ আসছে</span>'}<span class="lnkbtn" style="margin-left:auto">দেখো ›</span></div>
+      <h4>${esc(e.title)}</h4><div class="cdbox ${e.status==="live"?"":"g"}"><span>${e.status==="live"?"শেষ হবে":"শুরু হতে বাকি"}</span>${cd(e.status==="live"?e.ends_at:e.starts_at)}</div></div>`;
+  }catch(e){}
+}
+
+/* ================================================================
+   ⚙️ অ্যাডমিন: অনলাইন পরীক্ষা
+   ================================================================ */
+let AEX_TAB = "online";
+function admExams(){
+  $("#admMain").innerHTML = `<div class="tabs" id="aexTabs">
+      <button data-t="online">🖥️ অনলাইন পরীক্ষা</button><button data-t="offline">📄 অফলাইন রেজাল্ট</button><button data-t="leads">👥 বাইরের স্টুডেন্ট</button></div>
+    <div id="aexBody"></div>`;
+  document.querySelectorAll("#aexTabs button").forEach(b => { b.classList.toggle("on", b.dataset.t===AEX_TAB); b.onclick = () => { AEX_TAB = b.dataset.t; admExams(); }; });
+  ({online:oeAdm, offline:admOffline, leads:oeLeads})[AEX_TAB]();
+}
+const OE_ST = {draft:'<span class="chip" style="background:#eef1f4;color:var(--mute)">📝 খসড়া</span>', upcoming:'<span class="chip warn">⏳ আসছে</span>',
+  live:'<span class="live-pill"><i></i>লাইভ</span>', ended:'<span class="chip">✅ শেষ</span>'};
+let OE_LIST = [];
+async function oeAdm(){
+  $("#aexBody").innerHTML = `<button class="btn orange" style="margin-top:0" onclick="oeEdit()">➕ নতুন অনলাইন পরীক্ষা বানাও</button>
+    <p class="hint">টিপস: প্রশ্নের PDF বা লেখা Claude-কে দিয়ে “পোর্টালে পরীক্ষা বানাও” বললে সরাসরি এখানে চলে আসবে।</p>
+    <button class="btn sec" onclick="openExams()">👀 স্টুডেন্টরা যেভাবে দেখবে</button>
+    <div id="oeList" style="margin-top:14px"><div class="spin"></div></div>`;
+  try{
+    OE_LIST = await rpc("oe_admin_list", {p_token:TOKEN});
+    $("#oeList").innerHTML = OE_LIST.length ? OE_LIST.map(e => `<div class="card">
+      <div class="row" style="gap:6px;flex-wrap:wrap">${OE_ST[e.status]}${e.audience==="free"?'<span class="chip">🆓 ফ্রি</span>':`<span class="chip navy">🔒 ${esc((e.batches||[]).join(", ")||"সব স্টুডেন্ট")}</span>`}</div>
+      <b style="display:block;font-size:17px;margin-top:6px">${esc(e.title)}</b><div class="muted">${esc(e.subject||"")}</div>
+      <div class="muted" style="margin-top:4px">🗓️ ${bnWindow(e)}</div>
+      <div class="grid4"><div><b>${e.n}</b><span>প্রশ্ন</span></div><div><b>${e.duration_min}</b><span>মিনিট</span></div><div><b>${e.participants}</b><span>জন দিয়েছে</span></div><div><b>${e.guests}</b><span>বাইরের</span></div></div>
+      <div class="row" style="gap:6px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn sm" onclick="oeResults(${e.id})">📊 ফলাফল</button>
+        <button class="btn sm sec" onclick="oeEdit(${e.id})">✏️ এডিট</button>
+        <button class="btn sm sec" onclick="oePromo(${e.id})">📢 প্রচার</button>
+        <button class="btn sm sec" onclick="oeEdit(${e.id},true)">📑 কপি</button>
+        <button class="btn sm danger" onclick="oeDel(${e.id})">🗑</button></div></div>`).join("")
+      : '<div class="card muted">এখনো কোনো অনলাইন পরীক্ষা নেই। উপরের বাটন চেপে প্রথম পরীক্ষাটা বানাও।</div>';
+  }catch(ex){ $("#oeList").innerHTML = '<div class="err">'+esc(ex.message)+'<br>অনলাইন পরীক্ষার SQL (online-exam.sql) চালানো হয়েছে তো?</div>'; }
+}
+function oePromo(id){
+  const e = OE_LIST.find(x=>x.id==id); if(!e) return;
+  const t = `🔥 ${COACHING.name} ${e.audience==="free"?"ফ্রি ":""}লাইভ এক্সাম 🔥\n\n📚 ${e.title}${e.subject?"\n📖 "+e.subject:""}\n🗓️ ${bnWindow(e)}\n⏱️ সময় ${BN_DIGITS(e.duration_min)} মিনিট • ${BN_DIGITS(e.n)}টি MCQ${+e.neg_mark?" • নেগেটিভ মার্কিং":""}\n\n✅ যেকোনো সময় উইন্ডোর মধ্যে ঢুকে পরীক্ষা দাও\n🏆 সারা দেশের মেরিট লিস্ট\n📖 ব্যাখ্যাসহ সমাধান\n🆓 সম্পূর্ণ ফ্রি!\n\n👉 এখনই রেজিস্টার করো: ${examLink(id)}\n\n📞 ${COACHING.phones}`;
+  sheet(`<h3>📢 Facebook / WhatsApp পোস্ট</h3><div class="muted">কপি করে পেজ বা গ্রুপে পোস্ট করো।</div>
+    <div class="pwlist" style="max-height:50vh;font-family:inherit;font-size:14.5px">${esc(t)}</div>
+    <button class="btn" onclick="copyText(this.dataset.t)" data-t="${esc(t)}">📋 লেখা কপি করো</button>
+    <a class="btn sec" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(t)}">📲 WhatsApp-এ পাঠাও</a>
+    <button class="btn ghost" onclick="copyText('${examLink(id)}')">🔗 শুধু লিংক কপি</button>`);
+}
+async function oeDel(id){
+  const e = OE_LIST.find(x=>x.id==id);
+  if(!confirm(`“${e?e.title:""}” পরীক্ষা, এর প্রশ্ন আর সবার খাতা মুছে যাবে। নিশ্চিত?`)) return;
+  try{ await rpc("oe_admin_delete", {p_token:TOKEN, p_exam:id}); toast("মুছে ফেলা হয়েছে"); oeAdm(); }catch(ex){ toast(ex.message); }
+}
+
+/* --- প্রশ্ন পার্স করা --- */
+const BN2EN = s => String(s).replace(/[০-৯]/g, d => "০১২৩৪৫৬৭৮৯".indexOf(d));
+function letterIdx(ch){
+  ch = BN2EN(String(ch).trim()).toLowerCase();
+  const i = ["ক","খ","গ","ঘ","ঙ","চ"].indexOf(ch); if(i>=0) return i;
+  if(/^[a-f]$/.test(ch)) return ch.charCodeAt(0) - 97;
+  if(/^[1-6]$/.test(ch)) return +ch - 1;
+  return -1;
+}
+function parseQs(text){
+  const qs = [], errs = []; let cur = null, mode = null;
+  const push = () => { if(cur){ cur.q = cur.q.trim(); cur.expl = (cur.expl||"").trim(); qs.push(cur); } };
+  const reQ = /^(?:প্রশ্ন\s*|Q\s*)?([০-৯\d]{1,3})\s*[.)।:]\s*(.*)$/i;
+  const reO = /^\(?\s*([কখগঘঙ]|[a-eA-E])\s*[.)।:]\s*(.*)$/;
+  const reA = /^(?:সঠিক\s*উত্তর|উত্তর|উঃ|উ:|Ans(?:wer)?|Correct)\s*[:：ঃ.\-=]?\s*\(?\s*([কখগঘঙ]|[a-eA-E]|[1-5১-৫])(?![a-zA-Z])/i;
+  const reE = /^(?:ব্যাখ্যা|সমাধান|Explanation|Expl|Exp)\s*[:：.\-]\s*(.*)$/i;
+  String(text||"").split(/\r?\n/).forEach(raw => {
+    const l = raw.trim(); if(!l){ if(mode==="e" && cur) cur.expl += "\n"; return; }
+    let m;
+    if((m = l.match(reA)) && cur){ cur.ans = letterIdx(m[1]); mode = "a"; return; }
+    if((m = l.match(reE)) && cur){ cur.expl = m[1]; mode = "e"; return; }
+    if((m = l.match(reO)) && cur && mode !== "e"){
+      let o = m[2].trim(), star = false;
+      if(/^\*|\*$|✓$|✅$/.test(o)){ star = true; o = o.replace(/^\*\s*|\s*(\*|✓|✅)$/g,"").trim(); }
+      if(star) cur.ans = cur.opts.length;
+      cur.opts.push(o); mode = "o"; return;
+    }
+    if((m = l.match(reQ)) && (!cur || mode==="o" || mode==="a" || mode==="e")){
+      push(); cur = {q:m[2], opts:[], ans:-1, expl:""}; mode = "q"; return;
+    }
+    if(!cur){ cur = {q:l, opts:[], ans:-1, expl:""}; mode = "q"; return; }
+    if(mode === "q") cur.q += "\n" + l;
+    else if(mode === "e") cur.expl += (cur.expl ? "\n" : "") + l;
+    else if(mode === "o" && cur.opts.length) cur.opts[cur.opts.length-1] += " " + l;
+  });
+  push();
+  qs.forEach((q,i) => {
+    if(q.opts.length < 2) errs.push(`প্রশ্ন ${i+1}: অপশন পাওয়া যায়নি`);
+    else if(q.ans < 0 || q.ans >= q.opts.length) errs.push(`প্রশ্ন ${i+1}: সঠিক উত্তর দেওয়া নেই`);
+  });
+  return {qs, errs};
+}
+function qsToText(qs){
+  return qs.map((q,i) => `${i+1}. ${q.q}\n` + q.opts.map((o,j)=>`${LET[j]}. ${o}`).join("\n") + `\nউত্তর: ${LET[q.ans]}` + (q.expl ? `\nব্যাখ্যা: ${q.expl}` : "")).join("\n\n");
+}
+const toLocalInput = iso => iso ? new Date(new Date(iso).getTime() + 6*3600e3).toISOString().slice(0,16) : "";
+const fromLocalInput = v => v ? new Date(v + ":00+06:00").toISOString() : null;
+function nextFri(h){ const d = new Date(Date.now()+6*3600e3); let add = (5 - d.getUTCDay() + 7) % 7; if(add===0 && d.getUTCHours()>=h) add = 7;
+  d.setUTCDate(d.getUTCDate()+add); return d.toISOString().slice(0,10) + "T" + pad2(h) + ":00"; }
+
+/* --- এডিটর --- */
+let OE_ED = null;
+const MARK_PRESETS = [["২৫ প্রশ্ন • +৪ / −১",4,1],["২০ প্রশ্ন • +৫ / −১.২৫",5,1.25],["১০০ প্রশ্ন • +১ / −০.২৫",1,.25],["SSC • +১ / নেগেটিভ নেই",1,0]];
+async function oeEdit(id, copy){
+  let e = {title:"", subject:"", audience:"free", batches:[], starts_at:fromLocalInput(nextFri(19)), ends_at:fromLocalInput(nextFri(22)),
+    duration_min:20, mark_per_q:1, neg_mark:.25, pass_pct:40, shuffle:true, published:false, instructions:"", questions:[], participants:0};
+  if(id){ $("#aexBody").innerHTML = '<div class="spin"></div>';
+    try{ e = await rpc("oe_admin_get", {p_token:TOKEN, p_exam:id}); }catch(ex){ toast(ex.message); return; } }
+  if(copy){ e = {...e, id:null, title:e.title + " (কপি)", published:false, participants:0}; }
+  OE_ED = {id: copy ? null : (id||null), imgs: {}, aud: e.audience, batches: new Set(e.batches||[]), live: !copy && id && e.participants>0};
+  (e.questions||[]).forEach((q,i) => { if(q.img) OE_ED.imgs[i] = q.img; });
+  window.scrollTo(0,0);
+  $("#aexBody").innerHTML = `
+    <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="oeAdm()">← সব পরীক্ষা</button><b style="margin-left:4px">${OE_ED.id?"✏️ পরীক্ষা এডিট":"➕ নতুন অনলাইন পরীক্ষা"}</b></div>
+    ${OE_ED.live?`<div class="hl-note" style="margin-bottom:12px"><span>⚠️</span><span>${e.participants} জন এই পরীক্ষা দিয়ে ফেলেছে। উত্তর বদলালে সবার নম্বর আবার হিসাব হবে। প্রশ্নের ক্রম বদলিও না।</span></div>`:""}
+    <div class="card"><h3>১. পরীক্ষার তথ্য</h3>
+      <label>পরীক্ষার নাম</label><input id="oT" value="${esc(e.title)}" placeholder="যেমন: Weekly Free Exam 01">
+      <label>বিষয় / অধ্যায়</label><input id="oS" value="${esc(e.subject||"")}" placeholder="যেমন: জীববিজ্ঞান ১ম পত্র — কোষ ও এর গঠন">
+      <label>কার জন্য</label>
+      <div class="aud"><button type="button" data-a="free">🆓 ফ্রি — সবার জন্য<small>বাইরের স্টুডেন্টরাও দিতে পারবে</small></button>
+        <button type="button" data-a="batch">🔒 শুধু আমার স্টুডেন্ট<small>পোর্টালের আইডিতে</small></button></div>
+      <div id="oBat" class="pre-chips" style="margin-top:10px"></div></div>
+    <div class="card"><h3>২. সময়</h3>
+      <label>পরীক্ষা শুরু (এই সময় থেকে ঢোকা যাবে)</label><input id="oSt" type="datetime-local" value="${toLocalInput(e.starts_at)}">
+      <label>পরীক্ষা শেষ (এরপর আর ঢোকা যাবে না)</label><input id="oEn" type="datetime-local" value="${toLocalInput(e.ends_at)}">
+      <label>প্রত্যেকে কত মিনিট পাবে</label><input id="oDu" type="number" inputmode="numeric" value="${e.duration_min}">
+      <div class="pre-chips" id="oDuC">${[10,15,20,25,30,40,50,60,90,120].map(m=>`<button type="button" data-m="${m}">${BN_DIGITS(m)} মি.</button>`).join("")}</div>
+      <div class="hint" id="oWin"></div></div>
+    <div class="card"><h3>৩. নম্বর</h3>
+      <div class="pre-chips" id="oMk">${MARK_PRESETS.map((p,i)=>`<button type="button" data-i="${i}">${p[0]}</button>`).join("")}</div>
+      <div class="row"><div style="flex:1"><label>প্রতি সঠিক উত্তরে</label><input id="oMp" type="number" step="any" inputmode="decimal" value="${e.mark_per_q}"></div>
+        <div style="flex:1"><label>প্রতি ভুলে কাটা</label><input id="oNg" type="number" step="any" inputmode="decimal" value="${e.neg_mark}"></div>
+        <div style="flex:1"><label>পাস (%)</label><input id="oPs" type="number" inputmode="numeric" value="${e.pass_pct}"></div></div>
+      <label style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="oSh" style="width:22px;height:22px" ${e.shuffle?"checked":""}> প্রত্যেকের জন্য প্রশ্নের ক্রম আলাদা (দেখাদেখি কমাতে)</label>
+      <label>বিশেষ নির্দেশনা (ঐচ্ছিক)</label><input id="oIn" value="${esc(e.instructions||"")}" placeholder="যেমন: ক্যালকুলেটর লাগবে না"></div>
+    <div class="card"><h3>৪. প্রশ্ন</h3>
+      <details><summary class="muted">📋 কোন ফরম্যাটে প্রশ্ন দেবে? (চাপো)</summary>
+        <div class="pwlist" style="font-family:inherit">1. মাইটোকন্ড্রিয়াকে কী বলা হয়?\nক. কোষের মস্তিষ্ক\nখ. কোষের শক্তিঘর\nগ. আত্মঘাতী থলি\nঘ. প্রোটিন কারখানা\nউত্তর: খ\nব্যাখ্যা: এখানে ATP তৈরি হয়।\n\n2. পরের প্রশ্ন...</div>
+        <div class="hint">• অপশন ক/খ/গ/ঘ বা a/b/c/d — দুটোই চলবে\n• “উত্তর: খ” না লিখে সঠিক অপশনের শেষে * দিলেও হবে\n• ব্যাখ্যা ঐচ্ছিক • i, ii, iii লাইনসহ বহুপদী প্রশ্নও চলবে</div></details>
+      <textarea id="oQ" style="min-height:260px" placeholder="এখানে প্রশ্ন পেস্ট করো...">${esc(qsToText(e.questions||[]))}</textarea>
+      <div id="oPrevSum"></div><div id="oPrev"></div></div>
+    <button class="btn orange big" onclick="oeSave(true)">🚀 প্রকাশ করো</button>
+    <button class="btn sec" onclick="oeSave(false)">💾 খসড়া হিসেবে রাখো (স্টুডেন্টরা দেখবে না)</button>
+    <div id="oMsg"></div>
+    <input type="file" id="oImgIn" accept="image/*" class="hidden">`;
+  const paintAud = () => {
+    document.querySelectorAll(".aud button").forEach(b => b.classList.toggle("on", b.dataset.a===OE_ED.aud));
+    $("#oBat").innerHTML = OE_ED.aud === "batch" ? `<span class="muted" style="width:100%">কোন ব্যাচ? (কিছু না বাছলে সব স্টুডেন্ট)</span>` +
+      COACHING.batches.map(b=>`<button type="button" class="${OE_ED.batches.has(b)?"on":""}" data-b="${esc(b)}">${esc(b)}</button>`).join("") : "";
+    document.querySelectorAll("#oBat button").forEach(x => x.onclick = () => { OE_ED.batches.has(x.dataset.b) ? OE_ED.batches.delete(x.dataset.b) : OE_ED.batches.add(x.dataset.b); paintAud(); });
+  };
+  document.querySelectorAll(".aud button").forEach(b => b.onclick = () => { OE_ED.aud = b.dataset.a; paintAud(); });
+  paintAud();
+  const paintDu = () => { document.querySelectorAll("#oDuC button").forEach(b => b.classList.toggle("on", +b.dataset.m === +$("#oDu").value)); oeWin(); };
+  document.querySelectorAll("#oDuC button").forEach(b => b.onclick = () => { $("#oDu").value = b.dataset.m; paintDu(); });
+  $("#oDu").oninput = paintDu; $("#oSt").onchange = oeWin; $("#oEn").onchange = oeWin; paintDu();
+  const paintMk = () => document.querySelectorAll("#oMk button").forEach(b => { const p = MARK_PRESETS[b.dataset.i]; b.classList.toggle("on", +$("#oMp").value===p[1] && +$("#oNg").value===p[2]); });
+  document.querySelectorAll("#oMk button").forEach(b => b.onclick = () => { const p = MARK_PRESETS[b.dataset.i]; $("#oMp").value = p[1]; $("#oNg").value = p[2]; paintMk(); oePrev(); });
+  $("#oMp").oninput = () => { paintMk(); oePrev(); }; $("#oNg").oninput = paintMk; paintMk();
+  let t; $("#oQ").oninput = () => { clearTimeout(t); t = setTimeout(oePrev, 500); };
+  $("#oImgIn").onchange = oeImgPicked;
+  oePrev();
+}
+function oeWin(){
+  const s = fromLocalInput($("#oSt").value), e = fromLocalInput($("#oEn").value), d = +$("#oDu").value;
+  if(!s || !e){ $("#oWin").textContent = ""; return; }
+  const mins = (new Date(e) - new Date(s))/60000;
+  $("#oWin").innerHTML = mins <= 0 ? '<span class="c-bad">⚠️ শেষের সময় শুরুর পরে হতে হবে</span>'
+    : `🗓️ ${bnWindow({starts_at:s, ends_at:e})}<br>পুরো ${BN_DIGITS(d)} মিনিট পেতে শেষ ঢোকার সময় ${bnTime(new Date(new Date(e).getTime()-d*60000).toISOString())}` + (d > mins ? '<br><span class="c-bad">⚠️ পরীক্ষার সময় উইন্ডোর চেয়ে বেশি</span>' : "");
+}
+function oePrev(){
+  const {qs, errs} = parseQs($("#oQ").value); OE_ED.qs = qs; OE_ED.errs = errs;
+  const mp = +$("#oMp").value || 1;
+  $("#oPrevSum").innerHTML = !qs.length ? "" : errs.length
+    ? `<div class="err">⚠️ ${BN_DIGITS(qs.length)}টি প্রশ্ন পাওয়া গেছে, কিন্তু কিছু সমস্যা আছে:<br>${errs.slice(0,8).map(esc).join("<br>")}${errs.length>8?"<br>...":""}</div>`
+    : `<div class="ok">✅ ${BN_DIGITS(qs.length)}টি প্রশ্ন ঠিকঠাক পাওয়া গেছে • মোট নম্বর ${BN_DIGITS(num(qs.length*mp))}</div>`;
+  $("#oPrev").innerHTML = qs.length ? `<details ${qs.length<=5?"open":""} style="margin-top:10px"><summary class="lnkbtn">👀 প্রশ্নগুলো দেখো ও ছবি যোগ করো</summary>${qs.map((q,i)=>`
+    <div class="pq ${q.opts.length<2||q.ans<0?"bad":""}"><div class="pqt">${BN_DIGITS(i+1)}. ${esc(q.q)}</div>
+      ${OE_ED.imgs[i]?`<img src="${OE_ED.imgs[i]}" alt="">`:""}
+      <ol>${q.opts.map((o,j)=>`<li class="${j===q.ans?"c":""}">${LET[j]}. ${esc(o)}${j===q.ans?" ✓":""}</li>`).join("")}</ol>
+      ${q.expl?`<div class="ex">💡 ${esc(q.expl)}</div>`:""}
+      <div class="row" style="gap:6px;margin-top:6px"><button class="btn sm sec" onclick="oeImg(${i})">🖼️ ${OE_ED.imgs[i]?"ছবি বদলাও":"ছবি যোগ করো"}</button>
+      ${OE_ED.imgs[i]?`<button class="btn sm danger" onclick="delete OE_ED.imgs[${i}];oePrev()">ছবি সরাও</button>`:""}</div></div>`).join("")}</details>` : "";
+}
+function oeImg(i){ OE_ED.imgFor = i; $("#oImgIn").click(); }
+async function oeImgPicked(ev){
+  const f = ev.target.files[0]; ev.target.value = ""; if(!f) return;
+  try{
+    const img = await loadImg(URL.createObjectURL(f));
+    const W = Math.min(900, img.width), H = Math.round(img.height * W / img.width), c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0,0,W,H); x.drawImage(img,0,0,W,H);
+    let q = .8, d = c.toDataURL("image/jpeg", q); while(d.length > 140000 && q > .3){ q -= .1; d = c.toDataURL("image/jpeg", q); }
+    OE_ED.imgs[OE_ED.imgFor] = d; oePrev(); toast("ছবি যোগ হয়েছে ✅");
+  }catch(e){ toast("ছবিটা খোলা যায়নি"); }
+}
+async function oeSave(publish){
+  const msg = $("#oMsg"); msg.innerHTML = "";
+  oePrev();
+  const {qs, errs} = OE_ED;
+  const e = { id: OE_ED.id, title: $("#oT").value.trim(), subject: $("#oS").value.trim(), audience: OE_ED.aud,
+    batches: OE_ED.aud==="batch" ? [...OE_ED.batches] : null,
+    starts_at: fromLocalInput($("#oSt").value), ends_at: fromLocalInput($("#oEn").value),
+    duration_min: +$("#oDu").value || 20, mark_per_q: +$("#oMp").value || 1, neg_mark: +$("#oNg").value || 0,
+    pass_pct: +$("#oPs").value || 40, shuffle: $("#oSh").checked, published: publish, instructions: $("#oIn").value.trim() };
+  const fail = t => { msg.innerHTML = '<div class="err">'+t+'</div>'; msg.scrollIntoView({behavior:"smooth"}); };
+  if(!e.title) return fail("পরীক্ষার নাম দাও");
+  if(!e.starts_at || !e.ends_at) return fail("শুরু আর শেষের সময় দাও");
+  if(new Date(e.ends_at) <= new Date(e.starts_at)) return fail("শেষের সময় শুরুর সময়ের পরে হতে হবে");
+  if(!qs.length) return fail("প্রশ্ন দাও");
+  if(errs.length) return fail("প্রশ্নে সমস্যা আছে:<br>" + errs.slice(0,6).map(esc).join("<br>"));
+  if(publish && new Date(e.ends_at) < new Date()) { if(!confirm("শেষের সময় পার হয়ে গেছে — তাহলে শুধু প্র্যাকটিস আর মেরিট দেখা যাবে। তবুও প্রকাশ করবে?")) return; }
+  const payload = qs.map((q,i) => ({q:q.q, opts:q.opts, ans:q.ans, expl:q.expl||null, img:OE_ED.imgs[i]||null}));
+  try{
+    const r = await rpc("oe_admin_save", {p_token:TOKEN, p_exam:e, p_qs:payload});
+    OE_ED.id = r.id; HOME_EX_AT = 0;
+    toast(publish ? "🚀 পরীক্ষা প্রকাশ হয়েছে!" : "💾 খসড়া সেভ হয়েছে", 3000);
+    if(publish){ await oeAdm(); oePromo(r.id); } else oeAdm();
+  }catch(ex){ fail(esc(ex.message)); }
+}
+
+/* --- ফলাফল (অ্যাডমিন) --- */
+async function oeResults(id){
+  window.scrollTo(0,0);
+  $("#aexBody").innerHTML = '<div class="spin"></div>';
+  let e, A;
+  try{ [e, A] = await Promise.all([rpc("oe_admin_get", {p_token:TOKEN, p_exam:id}), rpc("oe_admin_attempts", {p_token:TOKEN, p_exam:id})]); }
+  catch(ex){ $("#aexBody").innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; return; }
+  const total = e.questions.length * e.mark_per_q, done = A.filter(a=>a.done), ended = new Date(e.ends_at) < new Date();
+  done.forEach((a,i) => a.rank = i+1);
+  const hi = done.length ? Math.max(...done.map(a=>+a.score)) : 0, avg = done.length ? done.reduce((s,a)=>s+ +a.score,0)/done.length : 0;
+  const msgFor = a => `${COACHING.name} অনলাইন পরীক্ষা\n${e.title}${e.subject?" ("+e.subject+")":""}\nনাম: ${a.name}\n${a.kind==="stu"?"রোল":"আইডি"}: ${a.uid}\nপ্রাপ্ত নম্বর: ${num(a.score)}/${num(total)}\nমেরিট পজিশন: ${a.rank} (মোট ${done.length} জন)\nসর্বোচ্চ: ${num(hi)}\n\nসমাধান ও মেরিট লিস্ট: ${examLink(id)}`;
+  $("#aexBody").innerHTML = `
+    <div class="row" style="margin-bottom:10px"><button class="btn sm ghost" onclick="oeAdm()">← সব পরীক্ষা</button></div>
+    <div class="card"><b style="font-size:17px">${esc(e.title)}</b><div class="muted">${esc(e.subject||"")}</div><div class="muted">🗓️ ${bnWindow(e)}</div>
+      <div class="grid4"><div><b>${done.length}</b><span>জমা দিয়েছে</span></div><div><b>${A.filter(a=>a.kind==="guest").length}</b><span>বাইরের</span></div><div><b>${num(hi)}</b><span>সর্বোচ্চ</span></div><div><b>${num(Math.round(avg*100)/100)}</b><span>গড়</span></div></div>
+      ${!ended?'<div class="hint">পরীক্ষা এখনো চলছে — শেষ হলে স্টুডেন্টরা নিজেদের রেজাল্ট দেখবে।</div>':(e.audience==="batch"?'<div class="hint">✅ স্টুডেন্টদের রেজাল্ট পোর্টালের রেজাল্ট/মেরিট/Star of the Week-এ চলে গেছে।</div>':"")}
+      <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btn sm sec" onclick="copyText('${examLink(id)}')">🔗 লিংক কপি</button>
+        <button class="btn sm sec" onclick="copyText(this.dataset.t)" data-t="${esc(done.map(a=>a.rank+". "+a.name+" ("+(a.inst||"")+") — "+num(a.score)).join("\n"))}">📋 মেধাক্রম কপি</button></div></div>
+    <div class="card" style="padding:10px"><table class="tbl"><tr><th>#</th><th>নাম</th><th>নম্বর</th><th></th></tr>
+    ${A.map(a=>`<tr><td>${a.done?a.rank:"⏳"}</td>
+      <td>${esc(a.name||"")} ${a.kind==="guest"?'<span class="chip org" style="font-size:11px">বাইরের</span>':a.kind==="admin"?'<span class="chip" style="font-size:11px">অ্যাডমিন</span>':""}
+        <div class="muted" style="font-size:12px">${esc(a.uid)} • ${esc(a.inst||a.batch||"")}${a.class_name?" • "+esc(a.class_name):""}<br>
+        ✓${a.correct??"-"} ✗${a.wrong??"-"} • ⏱ ${secTxt(a.secs)}${a.tabs?` • <span class="${a.tabs>=3?"c-bad":""}">📵 ${a.tabs} বার অন্য অ্যাপে</span>`:""}${a.done?"":` • চলছে (${a.answered}টা উত্তর)`}</div></td>
+      <td><b>${a.done?num(a.score):"-"}</b></td>
+      <td style="text-align:right">${a.done&&ended?waBtns(a, msgFor(a), "oe"+id+"|"+a.uid):""}
+        <button class="btn sm ghost" style="margin-top:4px" title="আবার দেওয়ার সুযোগ" onclick="oeReset(${id},'${esc(a.uid)}')">♻️</button></td></tr>`).join("")}
+    </table>${A.length?"":'<p class="muted">এখনো কেউ পরীক্ষা দেয়নি।</p>'}</div>
+    <p class="hint">♻️ = কারো নেট/ফোনের সমস্যা হলে তার খাতা মুছে আবার দেওয়ার সুযোগ দাও (পরীক্ষার সময়ের মধ্যে)।</p>`;
+}
+async function oeReset(id, uid){
+  if(!confirm(uid+"-এর খাতা মুছে আবার দেওয়ার সুযোগ দেবে?")) return;
+  try{ await rpc("oe_admin_reset_attempt", {p_token:TOKEN, p_exam:id, p_uid:uid}); toast("✅ এখন আবার দিতে পারবে"); oeResults(id); }catch(ex){ toast(ex.message); }
+}
+
+/* --- বাইরের স্টুডেন্ট (লিড) --- */
+let LEADS = [];
+const LEAD_MSG_DEFAULT = "আসসালামু আলাইকুম {নাম}!\nBIO NERDS ফ্রি অনলাইন পরীক্ষায় অংশ নেওয়ার জন্য ধন্যবাদ 🌟\nপ্রতি সপ্তাহে ফ্রি লাইভ এক্সাম হয় — পরেরটা মিস করো না: " + SITE_URL + "\n\nকুমিল্লায় আমাদের ব্যাচে ভর্তি চলছে। বিস্তারিত জানতে এই নম্বরে মেসেজ দাও।\n— BIO NERDS, " + COACHING.whatsapp;
+async function oeLeads(){
+  $("#aexBody").innerHTML = `<div class="card"><h3>👥 বাইরের স্টুডেন্ট (ফ্রি পরীক্ষার রেজিস্ট্রেশন)</h3>
+      <div class="muted">এরা ভবিষ্যতের সম্ভাব্য স্টুডেন্ট। ভর্তি, নতুন পরীক্ষা বা প্যাকেজের খবর WhatsApp-এ পাঠাতে পারবে।</div>
+      <input id="lSearch" placeholder="🔍 নাম, নম্বর, কলেজ বা ক্লাস দিয়ে খোঁজো" style="margin-top:10px">
+      <details style="margin-top:10px"><summary class="muted">✏️ WhatsApp মেসেজ বদলাও ({নাম} লিখলে নাম বসবে)</summary>
+        <textarea id="lMsg" style="font-family:inherit;min-height:120px">${esc(store.get("bn_lead_msg") || LEAD_MSG_DEFAULT)}</textarea></details>
+      <button class="btn sec" id="lCopy">📋 সব নম্বর কপি করো</button></div>
+    <div id="lList"><div class="spin"></div></div>`;
+  $("#lMsg").oninput = () => { store.set("bn_lead_msg", $("#lMsg").value); paintLeads(); };
+  $("#lSearch").oninput = paintLeads;
+  $("#lCopy").onclick = () => copyText(leadFilter().map(g=>g.phone).join("\n"));
+  try{ LEADS = await rpc("oe_admin_guests", {p_token:TOKEN}); paintLeads(); }
+  catch(ex){ $("#lList").innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; }
+}
+function leadFilter(){ const q = ($("#lSearch").value||"").toLowerCase();
+  return LEADS.filter(g => !q || [g.name,g.phone,g.inst,g.class_name,g.gid].some(v => String(v||"").toLowerCase().includes(q))); }
+function paintLeads(){
+  const L = leadFilter(), tpl = $("#lMsg").value;
+  $("#lList").innerHTML = `<div class="muted" style="margin:0 4px 8px">${L.length} জন${L.length!==LEADS.length?" (মোট "+LEADS.length+")":""}</div>` + (L.length ? `<div class="card" style="padding:10px"><table class="tbl">${L.map(g=>`<tr>
+    <td><b>${esc(g.name)}</b> <span class="muted" style="font-size:12px">${esc(g.gid)}</span>
+      <div class="muted" style="font-size:12px">${esc(g.class_name||"")}${g.class_name&&g.inst?" • ":""}${esc(g.inst||"")}<br>📞 ${esc(g.phone)} • ${g.exams}টা পরীক্ষা${g.avg_pct!=null?" • গড় "+g.avg_pct+"%":""}<br>যোগ: ${fmtDate(g.created_at)}</div></td>
+    <td style="text-align:right;white-space:nowrap">${waBtns({phone:g.phone}, tpl.replace(/\{নাম\}/g, g.name), "lead|"+g.gid)}<br>
+      <button class="btn sm ghost" style="margin-top:4px" onclick="oeLeadReset('${esc(g.gid)}')">🔑</button> <button class="btn sm danger" style="margin-top:4px" onclick="oeLeadDel('${esc(g.gid)}')">🗑</button></td></tr>`).join("")}</table></div>`
+    : '<div class="card muted">এখনো কেউ রেজিস্টার করেনি।</div>');
+}
+async function oeLeadReset(gid){
+  if(!confirm(gid+"-এর পাসওয়ার্ড রিসেট করবে?")) return;
+  try{ const r = await rpc("oe_admin_guest_reset", {p_token:TOKEN, p_gid:gid}); const g = LEADS.find(x=>x.gid===gid);
+    alert(`${g?g.name:gid}\nমোবাইল: ${g?g.phone:""}\nনতুন পাসওয়ার্ড: ${r.password}`); }catch(ex){ toast(ex.message); }
+}
+async function oeLeadDel(gid){
+  if(!confirm(gid+"-এর অ্যাকাউন্ট আর সব পরীক্ষার খাতা মুছে যাবে। নিশ্চিত?")) return;
+  try{ await rpc("oe_admin_guest_delete", {p_token:TOKEN, p_gid:gid}); LEADS = LEADS.filter(x=>x.gid!==gid); paintLeads(); }catch(ex){ toast(ex.message); }
+}
+
 /* ---------------- শুরু ---------------- */
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
-if (TOKEN && configured()) start(); else show("homeView");
+const EX_HASH = location.hash.match(/exam=(\d+)/) || (location.hash === "#exams" ? [0, ""] : null);
+if (EX_HASH && configured()) openExams(EX_HASH[1] ? +EX_HASH[1] : null);
+else if (TOKEN && configured()) start(); else show("homeView");
+window.addEventListener("hashchange", () => { const m = location.hash.match(/exam=(\d+)/); if(m) openExams(+m[1]); });
 </script>
 <div id="printArea"></div>
 </body>
