@@ -1157,9 +1157,35 @@ function admSettings(){
   $("#admMain").innerHTML = `
     <div class="card"><h3>🔑 অ্যাডমিন পাসওয়ার্ড বদলাও</h3>
       <button class="btn sec" onclick="openChangePw()">পাসওয়ার্ড বদলাও</button></div>
+    <div class="card"><h3>💾 ডাটাবেস ব্যাকআপ</h3>
+      <p class="muted">সব স্টুডেন্ট, রেজাল্ট, হাজিরা, বেতন, পরীক্ষা, প্যাকেজ — সব তথ্য একটা ফাইলে ফোনে নামিয়ে রাখো। মাসে অন্তত একবার নামাও, ফাইলটা Google Drive-এ রেখে দাও। (খাতার ছবিগুলো এতে থাকে না।)</p>
+      <p id="bkLast" class="muted"></p>
+      <button class="btn" id="bkBtn" onclick="doBackup()">💾 ব্যাকআপ নামাও</button></div>
     <div class="card"><h3>ℹ️ কীভাবে লগইন করবে</h3>
       <p class="muted">অ্যাডমিন হিসেবে ঢুকতে রোলের ঘরে <b>admin</b> লিখে তোমার অ্যাডমিন পাসওয়ার্ড দাও। স্টুডেন্টরা তাদের রোল আর পাসওয়ার্ড দিয়ে ঢুকবে।</p></div>
     <div class="card"><button class="btn danger" style="margin-top:0" onclick="logout()">লগআউট</button></div>`;
+  paintBackupLast();
+}
+function backupAgeDays(){ let t=null; try{ t=localStorage.getItem("bn_last_backup"); }catch(e){} return t? Math.floor((Date.now()-Number(t))/864e5) : null; }
+function paintBackupLast(){
+  const el=$("#bkLast"); if(!el) return; const d=backupAgeDays();
+  el.innerHTML = d===null ? '<span class="chip warn">এই ফোন থেকে এখনো ব্যাকআপ নামানো হয়নি</span>'
+    : d>=30 ? `<span class="chip warn">শেষ ব্যাকআপ ${BN_DIGITS(d)} দিন আগে — নতুন করে নামাও</span>`
+    : `শেষ ব্যাকআপ: ${d===0?"আজ":BN_DIGITS(d)+" দিন আগে"} ✅`;
+}
+async function doBackup(){
+  const b=$("#bkBtn"); b.disabled=true; b.textContent="⏳ তৈরি হচ্ছে…";
+  try{
+    const data = await rpc("admin_backup",{p_token:TOKEN});
+    const n = Object.keys(data).filter(k=>!k.startsWith("_")).length;
+    const blob = new Blob([JSON.stringify(data)],{type:"application/json"});
+    const d = new Date(), pad=x=>String(x).padStart(2,"0");
+    downloadBlob(blob, `bionerds-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`);
+    try{ localStorage.setItem("bn_last_backup", String(Date.now())); }catch(e){}
+    toast(`✅ ব্যাকআপ নামানো হয়েছে (${BN_DIGITS(n)}টা টেবিল, ${BN_DIGITS((blob.size/1048576).toFixed(1))} MB)`);
+    paintBackupLast();
+  }catch(ex){ toast(ex.message); }
+  b.disabled=false; b.textContent="💾 ব্যাকআপ নামাও";
 }
 
 /* ---------------- পাবলিক হোম পেজ ---------------- */
