@@ -2098,10 +2098,20 @@ function exCard(e, compact){
   if(e.cq) return cqCard(e, compact);
   const my = e.my, st = e.status;
   const aud = audChip(e);
-  const pill = st === "live" ? '<span class="live-pill"><i></i>লাইভ চলছে</span>'
+  const inst = e.instant && st === "live";
+  const pill = inst ? '<span class="chip">♾️ যখন খুশি</span>' : st === "live" ? '<span class="live-pill"><i></i>লাইভ চলছে</span>'
     : st === "upcoming" ? '<span class="chip warn">⏳ আসছে</span>' : '<span class="chip" style="background:#eef1f4;color:var(--mute)">শেষ হয়েছে</span>';
   let body = "";
-  if(st === "live"){
+  if(inst){
+    if(my && my.state === "running") body = `<div class="cdbox"><span>⏱️ তোমার সময় বাকি</span>${cd(my.deadline,"exRefresh")}</div>
+      <button class="btn orange big" onclick="exRun(${e.id})">▶️ পরীক্ষা চালিয়ে যাও</button>`;
+    else if(my) body = `<div class="mine"><div><div class="muted" style="font-size:12.5px">তোমার নম্বর</div><div class="sc">${my.score!=null?num(my.score):"—"}<small style="font-size:14px;color:var(--mute)"> / ${num(e.total)}</small></div></div>
+      ${my.rank?`<div style="margin-left:auto;text-align:right"><div class="muted" style="font-size:12.5px">মেরিট পজিশন</div><div class="sc">#${BN_DIGITS(my.rank)}</div></div>`:""}</div>
+      <div class="ex-acts"><button class="btn" onclick="exResult(${e.id})">📊 রেজাল্ট ও সমাধান</button><button class="btn sec" onclick="exMerit(${e.id})">🏆 মেরিট</button></div>
+      <button class="lnkbtn" style="margin-top:8px" onclick="exPractice(${e.id})">🔁 আবার প্র্যাকটিস করো</button>`;
+    else body = `<div class="cdbox g"><span>♾️ যখন খুশি দাও</span><b style="font-size:14px">জমা দিলেই রেজাল্ট</b></div>
+      <button class="btn orange big" onclick="exIntro(${e.id})">🚀 পরীক্ষা শুরু করো</button>`;
+  } else if(st === "live"){
     if(my && my.state === "running") body = `<div class="cdbox"><span>⏱️ তোমার সময় বাকি</span>${cd(my.deadline,"exRefresh")}</div>
       <button class="btn orange big" onclick="exRun(${e.id})">▶️ পরীক্ষা চালিয়ে যাও</button>`;
     else if(my) body = `<div class="cdbox g"><span>✅ জমা দিয়েছ • রেজাল্ট প্রকাশ</span>${cd(e.ends_at,"exRefresh")}</div>`;
@@ -2123,7 +2133,7 @@ function exCard(e, compact){
   return `<div class="exc ${st}" id="exc${e.id}">
     <div class="top">${aud}${pill}<button class="lnkbtn" style="margin-left:auto" onclick="exShareLink(${e.id})">🔗 শেয়ার</button></div>
     <h4>${esc(e.title)}</h4>${e.subject?`<div class="sub">📚 ${esc(e.subject)}</div>`:""}
-    <div class="when">🗓️ ${bnWindow(e)}</div>
+    <div class="when">${inst ? "♾️ যেকোনো সময় একবার দেওয়া যাবে • জমা দিলেই নম্বর, মেরিট ও সমাধান" : "🗓️ " + bnWindow(e)}</div>
     ${compact?"":`<div class="ex-meta"><div><b>${BN_DIGITS(e.n)}</b><span>প্রশ্ন</span></div><div><b>${BN_DIGITS(e.duration_min)}</b><span>মিনিট</span></div>
       <div><b>${BN_DIGITS(num(e.total))}</b><span>নম্বর</span></div><div><b>${+e.neg_mark?"−"+BN_DIGITS(num(e.neg_mark)):"নেই"}</b><span>নেগেটিভ</span></div></div>`}
     ${e.participants >= 10 ? `<div class="muted" style="margin-top:8px;font-size:13px">👥 ${BN_DIGITS(e.participants)} জন অংশ নিয়েছে</div>` : ""}
@@ -2190,7 +2200,7 @@ function admCtaHtml(){
 }
 async function exShareLink(id){
   const e = (EXL && EXL.exams.find(x=>x.id==id)) || HOME_EX.find(x=>x.id==id); if(!e) return;
-  const text = `🔥 ${COACHING.name} ${e.audience==="free"?"ফ্রি ":""}লাইভ এক্সাম\n📚 ${e.title}${e.subject?" — "+e.subject:""}\n🗓️ ${bnWindow(e)}\n⏱️ ${BN_DIGITS(e.duration_min)} মিনিট • ${BN_DIGITS(e.n)}টি প্রশ্ন\n🏆 মেরিট লিস্ট + ব্যাখ্যাসহ সমাধান\n👉 `;
+  const text = `🔥 ${COACHING.name} ${e.audience==="free"?"ফ্রি ":""}লাইভ এক্সাম\n📚 ${e.title}${e.subject?" — "+e.subject:""}\n${e.instant ? "♾️ যখন খুশি দাও — জমা দিলেই রেজাল্ট" : "🗓️ " + bnWindow(e)}\n⏱️ ${BN_DIGITS(e.duration_min)} মিনিট • ${BN_DIGITS(e.n)}টি প্রশ্ন\n🏆 মেরিট লিস্ট + ব্যাখ্যাসহ সমাধান\n👉 `;
   const url = examLink(id);
   if(navigator.share){ try{ await navigator.share({title:e.title, text, url}); return; }catch(err){ if(err.name==="AbortError") return; } }
   copyText(text + url);
@@ -2256,7 +2266,7 @@ function exIntro(id){
   const e = (EXL && EXL.exams.find(x=>x.id==id && !x.cq)) || HOME_EX.find(x=>x.id==id); if(!e){ openExams(id); return; }
   if(e.locked){ const p = (e.pkgs||[])[0]; if(p) pkgOpen(p.id); return; }
   const left = Math.floor((new Date(e.ends_at).getTime() - nowSrv())/60000);
-  const get = Math.min(e.duration_min, left);
+  const get = e.instant ? e.duration_min : Math.min(e.duration_min, left);
   sheet(`<h3>🚀 ${esc(e.title)}</h3><div class="muted">${esc(e.subject||"")}</div>
     <ul class="rules">
       <li><span>⏱️</span><span>সময় <b>${BN_DIGITS(get)} মিনিট</b>${get<e.duration_min?` <span class="c-bad">(পরীক্ষা ${bnTime(e.ends_at)}-এ শেষ হবে, তাই পুরো ${BN_DIGITS(e.duration_min)} মিনিট পাবে না)</span>`:""}। শুরু করলেই টাইমার চালু — থামানো যাবে না, সময় শেষে খাতা নিজে থেকে জমা হবে।</span></li>
@@ -2264,7 +2274,7 @@ function exIntro(id){
       <li><span>👆</span><span>উত্তরে ট্যাপ করলে দাগ পড়বে; আবার ট্যাপ করলে মুছে যাবে।</span></li>
       <li><span>📵</span><span>পরীক্ষার সময় অন্য অ্যাপ বা ট্যাবে গেলে সেটা রেকর্ড হবে।</span></li>
       <li><span>📶</span><span>নেট চলে গেলেও উত্তর ফোনে জমা থাকবে — পেজ বন্ধ করো না।</span></li>
-      <li><span>🏆</span><span>রেজাল্ট, মেরিট লিস্ট ও সমাধান: <b>${bnWhen(e.ends_at)}</b></span></li>
+      <li><span>🏆</span><span>${e.instant ? "একবারই দেওয়া যাবে — প্রথমবারের নম্বর মেরিটে যাবে। জমা দিলেই <b>সাথে সাথে রেজাল্ট, মেরিট ও সমাধান</b>; এরপর যত খুশি প্র্যাকটিস।" : `রেজাল্ট, মেরিট লিস্ট ও সমাধান: <b>${bnWhen(e.ends_at)}</b>`}</span></li>
       ${e.instructions?`<li><span>📌</span><span>${esc(e.instructions)}</span></li>`:""}
     </ul>
     <button class="btn orange big" onclick="closeSheet();exRun(${id})">🚀 শুরু করো</button>
@@ -2381,6 +2391,7 @@ async function exSubmit(auto){
     return;
   }
   store.del(R.key);
+  if(r.instant){ const id = R.id; RUN = null; HOME_EX_AT = 0; toast("✅ খাতা জমা হয়েছে!", 2500); return exResult(id); }
   $("#runView").innerHTML = `<div class="run-main"><div class="done-wrap"><div class="done-ic">✅</div>
     <h2>খাতা জমা হয়েছে!</h2><p class="muted" style="margin-top:4px">তুমি ${BN_DIGITS(r.answered)}টা প্রশ্নের উত্তর দিয়েছ। শুভকামনা 🤲</p>
     <div class="card" style="margin-top:16px"><div class="muted">রেজাল্ট, মেরিট লিস্ট ও সমাধান প্রকাশ হবে</div>
@@ -2548,7 +2559,7 @@ async function stuExamBanner(){
   try{
     const r = await rpc("oe_list", {p_token:TOKEN}); EX_SKEW = new Date(r.now).getTime() - Date.now();
     try{ const c = await rpc("cq_list", {p_token:TOKEN}); r.exams = c.exams.filter(x => !x.locked && x.status === "live" && (!x.my || x.my.state === "writing" || x.my.state === "upload")).map(x => ({...x, my:x.my ? {state:"running"} : null})).concat(r.exams); }catch(e){}
-    const e = r.exams.find(x => !x.locked && x.status==="live" && (!x.my || x.my.state==="running")) ||
+    const e = r.exams.find(x => !x.locked && x.status==="live" && (x.instant ? x.my && x.my.state==="running" : (!x.my || x.my.state==="running"))) ||
               r.exams.find(x => !x.locked && x.status==="upcoming" && new Date(x.starts_at).getTime() - nowSrv() < 2*86400e3);
     if(!e || !$("#exLiveCard")) return;
     $("#exLiveCard").innerHTML = `<div class="exc ${e.status}" style="cursor:pointer" onclick="stuTab('exam')">
@@ -2684,8 +2695,10 @@ async function oeEdit(id, copy){
         <button type="button" data-a="package">📦 প্যাকেজের পরীক্ষা<small>যারা প্যাকেজ কিনেছে (+ ফ্রি নমুনা)</small></button></div>
       <div id="oBat" class="pre-chips" style="margin-top:10px"></div></div>
     <div class="card"><h3>২. সময়</h3>
+      <label style="display:flex;align-items:center;gap:10px;margin-top:0"><input type="checkbox" id="oInst" style="width:22px;height:22px" ${e.instant?"checked":""}> ♾️ সবসময় খোলা — যে কেউ যখন খুশি একবার দেবে, জমা দিলেই রেজাল্ট ও সমাধান</label>
+      <div id="oWinBox" class="${e.instant?"hidden":""}">
       <label>পরীক্ষা শুরু (এই সময় থেকে ঢোকা যাবে)</label><input id="oSt" type="datetime-local" value="${toLocalInput(e.starts_at)}">
-      <label>পরীক্ষা শেষ (এরপর আর ঢোকা যাবে না)</label><input id="oEn" type="datetime-local" value="${toLocalInput(e.ends_at)}">
+      <label>পরীক্ষা শেষ (এরপর আর ঢোকা যাবে না)</label><input id="oEn" type="datetime-local" value="${toLocalInput(e.ends_at)}"></div>
       <label>প্রত্যেকে কত মিনিট পাবে</label><input id="oDu" type="number" inputmode="numeric" value="${e.duration_min}">
       <div class="pre-chips" id="oDuC">${[10,15,20,25,30,40,50,60,90,120].map(m=>`<button type="button" data-m="${m}">${BN_DIGITS(m)} মি.</button>`).join("")}</div>
       <div class="hint" id="oWin"></div></div>
@@ -2720,6 +2733,7 @@ async function oeEdit(id, copy){
   paintAud();
   const paintDu = () => { document.querySelectorAll("#oDuC button").forEach(b => b.classList.toggle("on", +b.dataset.m === +$("#oDu").value)); oeWin(); };
   document.querySelectorAll("#oDuC button").forEach(b => b.onclick = () => { $("#oDu").value = b.dataset.m; paintDu(); });
+  $("#oInst").onchange = () => { $("#oWinBox").classList.toggle("hidden", $("#oInst").checked); oeWin(); };
   $("#oDu").oninput = paintDu; $("#oSt").onchange = oeWin; $("#oEn").onchange = oeWin; paintDu();
   document.querySelectorAll("#oTotC button").forEach(b => b.onclick = () => { $("#oTot").value = b.dataset.t; oeMarks(); });
   $("#oTot").oninput = oeMarks; $("#oNegOn").onchange = oeMarks;
@@ -2738,6 +2752,7 @@ function oeMarks(){
     : '<div class="hint">প্রশ্ন দিলে প্রতি প্রশ্নের মান নিজে থেকে হিসাব হবে।</div>';
 }
 function oeWin(){
+  if($("#oInst") && $("#oInst").checked){ $("#oWin").innerHTML = "♾️ কোনো শেষ সময় নেই — প্রত্যেকে " + BN_DIGITS(+$("#oDu").value || 0) + " মিনিট পাবে"; return; }
   const s = fromLocalInput($("#oSt").value), e = fromLocalInput($("#oEn").value), d = +$("#oDu").value;
   if(!s || !e){ $("#oWin").textContent = ""; return; }
   const mins = (new Date(e) - new Date(s))/60000;
@@ -2777,7 +2792,9 @@ async function oeSave(publish){
     batches: OE_ED.aud==="batch" ? [...OE_ED.batches] : null,
     starts_at: fromLocalInput($("#oSt").value), ends_at: fromLocalInput($("#oEn").value),
     duration_min: +$("#oDu").value || 20, mark_per_q: +$("#oMp").value || 1, neg_mark: +$("#oNg").value || 0,
-    pass_pct: +$("#oPs").value || 40, shuffle: $("#oSh").checked, published: publish, instructions: $("#oIn").value.trim() };
+    pass_pct: +$("#oPs").value || 40, shuffle: $("#oSh").checked, published: publish, instructions: $("#oIn").value.trim(),
+    instant: $("#oInst").checked };
+  if(e.instant){ e.starts_at = e.starts_at && new Date(e.starts_at) < new Date() ? e.starts_at : new Date().toISOString(); e.ends_at = "2099-12-31T23:59:00+06:00"; }
   const fail = t => { msg.innerHTML = '<div class="err">'+t+'</div>'; msg.scrollIntoView({behavior:"smooth"}); };
   if(!e.title) return fail("পরীক্ষার নাম দাও");
   if(!e.starts_at || !e.ends_at) return fail("শুরু আর শেষের সময় দাও");
@@ -2996,7 +3013,7 @@ function cqCard(e, compact){
 }
 async function cqShareLink(id){
   const e = EXL && EXL.exams.find(x => x.cq && x.id == id); if(!e) return;
-  const text = `✍️ ${COACHING.name} অনলাইন লিখিত পরীক্ষা\n📚 ${e.title}${e.subject ? " — " + e.subject : ""}\n🗓️ ${bnWindow(e)}\n⏱️ ${BN_DIGITS(e.duration_min)} মিনিট • পূর্ণমান ${BN_DIGITS(num(e.total))}\n📷 খাতায় লিখে ছবি আপলোড — শিক্ষক খাতা দেখে নম্বর ও মন্তব্য দেবেন\n👉 `;
+  const text = `✍️ ${COACHING.name} অনলাইন লিখিত পরীক্ষা\n📚 ${e.title}${e.subject ? " — " + e.subject : ""}\n${e.instant ? "♾️ যখন খুশি দাও — জমা দিলেই রেজাল্ট" : "🗓️ " + bnWindow(e)}\n⏱️ ${BN_DIGITS(e.duration_min)} মিনিট • পূর্ণমান ${BN_DIGITS(num(e.total))}\n📷 খাতায় লিখে ছবি আপলোড — শিক্ষক খাতা দেখে নম্বর ও মন্তব্য দেবেন\n👉 `;
   if(navigator.share){ try{ await navigator.share({title:e.title, text, url:cqLink(id)}); return; }catch(err){ if(err.name === "AbortError") return; } }
   copyText(text + cqLink(id));
 }
