@@ -1107,13 +1107,15 @@ async function examDetail(id){
   try{
     const rs = await rpc("admin_exam_results",{p_token:TOKEN,p_exam:id});
     const ex = (await rpc("admin_exams",{p_token:TOKEN})).find(e=>e.id==id) || {};
-    box.innerHTML = `<table class="tbl" style="margin-top:10px"><tr><th>#</th><th>নাম</th><th>নম্বর</th><th></th></tr>` + rs.map(r=>{
-      const txt = `${COACHING.name}\n${ex.title||""}${ex.subject?" ("+ex.subject+")":""}\nনাম: ${r.name}\nরোল: ${r.roll}\nপ্রাপ্ত নম্বর: ${num(r.marks)}/${num(ex.total_marks)}\nমেরিট পজিশন: ${r.rank} (মোট ${rs.length} জন)\nসর্বোচ্চ: ${num(ex.highest)}`;
+    let hi = ex.highest; try{ const v=localStorage.getItem("bn_hi_"+id); if(v!==null && v!=="") hi=parseFloat(v); }catch(e){}
+    box.innerHTML = `<div class="row" style="margin-top:10px;gap:8px;align-items:center"><span class="muted">মেসেজে সর্বোচ্চ নম্বর:</span><input type="number" step="any" style="max-width:110px" value="${num(hi)}" onchange="setExamHi(${id},this.value)"></div>` + `<table class="tbl" style="margin-top:10px"><tr><th>#</th><th>নাম</th><th>নম্বর</th><th></th></tr>` + rs.map(r=>{
+      const txt = `${COACHING.name}\n${ex.title||""}${ex.subject?" ("+ex.subject+")":""}\nনাম: ${r.name}\nরোল: ${r.roll}\nপ্রাপ্ত নম্বর: ${num(r.marks)}/${num(ex.total_marks)}\nসর্বোচ্চ: ${num(hi)}`;
       return `<tr><td>${r.rank}</td><td>${esc(r.name)}<div class="muted" style="font-size:12px">${esc(r.roll)}</div></td><td><b>${num(r.marks)}</b></td>
       <td style="text-align:right">${waBtns(r,txt,"exam"+id+"|"+r.roll)}</td></tr>`;}).join("") + "</table>" +
       `<button class="btn sec" onclick="copyText(this.dataset.t)" data-t="${esc(rs.map(r=>r.rank+". "+r.name+" ("+r.roll+") — "+num(r.marks)).join("\n"))}">📋 পুরো মেধাক্রম কপি করো</button>`;
   }catch(ex){ box.innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
 }
+function setExamHi(id,v){ try{ if(v==="") localStorage.removeItem("bn_hi_"+id); else localStorage.setItem("bn_hi_"+id,v); }catch(e){} const b=$("#ed"+id); if(b){ b.innerHTML=""; examDetail(id); } }
 async function delExam(id){
   if(!confirm("এই পরীক্ষা আর এর সব রেজাল্ট মুছে যাবে। নিশ্চিত?")) return;
   try{ await rpc("admin_delete_exam",{p_token:TOKEN,p_exam:id}); toast("মুছে ফেলা হয়েছে"); loadExams(); }catch(ex){ toast(ex.message); }
