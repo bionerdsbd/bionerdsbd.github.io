@@ -277,6 +277,9 @@ details summary{cursor:pointer}
 .fl-lv button.on{background:var(--g2);border-color:var(--g2);color:#fff}
 .fl-lv small{display:block;font-size:11.5px;font-weight:600;opacity:.85}
 .fl-tabs button{flex:1}
+.crc .go{font-size:22px;color:var(--mute);line-height:1}
+.cr-bar{height:7px;background:#eef1f4;border-radius:9px;overflow:hidden;margin:9px 0 3px}
+.cr-bar i{display:block;height:100%;background:var(--g2);border-radius:9px}
 .fl-row{scroll-margin-top:110px;display:flex;align-items:center;gap:10px;padding:11px 2px;border-top:1px solid var(--line)}
 .fl-row.has{cursor:pointer}
 .fl-row .no{font-size:12px;color:var(--mute);min-width:56px;white-space:nowrap}
@@ -2164,11 +2167,19 @@ function exCard(e, compact){
     ${body}${st==="ended" && my && my.score!=null ? `<button class="lnkbtn" style="margin-top:8px" onclick="exPractice(${e.id})">🔁 আবার প্র্যাকটিস করো</button>`:""}</div>`;
 }
 
-/* ---------- ফ্রি পরীক্ষা: অধ্যায়ভিত্তিক লাইব্রেরি (HSC → বোটানি/জুলজি → অধ্যায়, SSC → অধ্যায়) ----------
-   অধ্যায় আসে প্রশ্নের "# অধ্যায়" ট্যাগ থেকে (oe_list → chs); অধ্যায়ের তালিকা 📦 প্যাকেজ → 📚 বিষয় ও অধ্যায় থেকে। */
-let FL = {lv:null, tab:null, ch:null}, FL_EX = [], FL_KEYS = [], FL_SCROLL = false;
+/* ---------- অধ্যায়ভিত্তিক গাছ: ফ্রি লাইব্রেরি (fl) আর কোর্সের ভেতর (cr) ----------
+   HSC → বোটানি/জুলজি → অধ্যায়, SSC → অধ্যায়। অধ্যায় আসে প্রশ্নের "# অধ্যায়" ট্যাগ থেকে (oe_list / cq_list → chs);
+   অধ্যায়ের তালিকা 📦 প্যাকেজ → 📚 বিষয় ও অধ্যায় থেকে। only = শুধু একটা ক্লাস (HSC/SSC) দেখাও। */
+const TR = {fl:{lv:null, tab:null, ch:null, ex:[], keys:[], box:"#flib", only:null},
+            cr:{lv:null, tab:null, ch:null, ex:[], keys:[], box:"#crTree", only:null, key:null}};
+const FL = TR.fl;
+let FL_SCROLL = false;
 const isLib = e => !e.cq && e.audience === "free" && !e.locked && (e.chs || []).length > 0 && (e.instant ? e.status === "live" : e.status === "ended");
 const FL_PART = {"১ম পত্র":"🌿 বোটানি", "২য় পত্র":"🐾 জুলজি"};
+/* ক্লাস: HSC'27 / HSC 1st Year / Admission → HSC; SSC'27 / Class 6–10 → SSC */
+function lvOf(s){ s = String(s || "").toUpperCase().trim();
+  if(/^SSC/.test(s) || /CLASS\s*(6|7|8|9|10)\b/.test(s)) return "SSC"; if(/^(HSC|ADMISSION)/.test(s)) return "HSC"; return null; }
+const meLv = me => !me || me.kind === "admin" ? null : (me.lv || lvOf(me.batch) || null);
 function flTree(){
   const subs = (PKG_CFG && PKG_CFG.subjects) || [], levels = [], byName = {};
   subs.forEach(sb => (sb.ch || []).forEach(c => {
@@ -2188,44 +2199,56 @@ function flPlace(e, byName){
   if(!cs.length) return "other";
   return e.chs.length > 1 ? "mix|" + byName[cs[0]].lv : cs[0];
 }
-function flFocus(id){
-  const e = FL_EX.find(x => x.id == id); if(!e) return;
+/* পরীক্ষাটা কোন ক্লাসের (প্রথম চেনা অধ্যায় থেকে) — না জানা গেলে null */
+function exLv(e, byName){ const c = (e.chs || []).find(x => byName[x]); return c ? byName[c].lv : null; }
+function trFocus(t, id){
+  const S = TR[t], e = S.ex.find(x => x.id == id); if(!e) return;
   const {byName} = flTree(), k = flPlace(e, byName), c = (e.chs || []).find(x => byName[x]);
-  if(c){ FL.lv = byName[c].lv; FL.tab = byName[c].tk; }
-  FL.ch = k;
+  if(c){ S.lv = byName[c].lv; S.tab = byName[c].tk; }
+  S.ch = k;
 }
-function flRow(key, no, list, name){
-  const i = FL_KEYS.push(key) - 1, n = (list || []).length, open = n && FL.ch === key;
-  const done = (list || []).filter(e => e.my && e.my.state === "done").length;
-  return `<div class="fl-row ${n ? "has" : ""} ${open ? "open" : ""}" id="flr${i}" ${n ? `onclick="flOpen(${i})"` : ""}>
+const flFocus = id => trFocus("fl", id);
+const exDone = e => !!(e.my && (e.my.score != null || ["done","submitted","checked","approved"].includes(e.my.state)));
+function trRow(t, key, no, list, name){
+  const S = TR[t], i = S.keys.push(key) - 1, n = (list || []).length, open = n && S.ch === key;
+  const done = (list || []).filter(exDone).length, live = (list || []).some(e => !e.locked && e.status === "live" && !e.instant);
+  return `<div class="fl-row ${n ? "has" : ""} ${open ? "open" : ""}" id="${t}r${i}" ${n ? `onclick="trOpen('${t}',${i})"` : ""}>
     <span class="no">${no}</span><span class="nm">${esc(name || key)}</span>
-    ${n ? `<span class="ct">${done ? "✓ " + BN_DIGITS(done) + "/" : ""}${BN_DIGITS(n)}টি পরীক্ষা</span><span class="ar">›</span>` : '<span class="soon">শীঘ্রই আসছে</span>'}</div>
+    ${n ? `<span class="ct">${live ? "🔴 " : ""}${done ? "✓ " + BN_DIGITS(done) + "/" : ""}${BN_DIGITS(n)}টি পরীক্ষা</span><span class="ar">›</span>` : '<span class="soon">শীঘ্রই আসছে</span>'}</div>
     ${open ? `<div class="fl-body">${list.map(e => exCard(e)).join("")}</div>` : ""}`;
 }
-function flPaint(){
-  const box = $("#flib"); if(!box) return;
-  const {levels, byName} = flTree(), bucket = {};
-  FL_EX.forEach(e => { const k = flPlace(e, byName); (bucket[k] = bucket[k] || []).push(e); });
-  FL_KEYS = [];
-  if(!levels.length){ box.innerHTML = FL_EX.map(e => exCard(e)).join(""); return; }
-  if(!FL.lv || !levels.find(l => l.k === FL.lv)) FL.lv = levels[0].k;
-  const L = levels.find(l => l.k === FL.lv);
-  if(!FL.tab || !L.tabs.find(t => t.k === FL.tab)) FL.tab = L.tabs[0].k;
-  const T = L.tabs.find(t => t.k === FL.tab);
-  const cntLv = lv => FL_EX.filter(e => { const c = (e.chs || []).find(x => byName[x]); return c && byName[c].lv === lv; }).length;
-  let h = `<div class="fl-lv">${levels.map((l, i) => `<button class="${l.k === FL.lv ? "on" : ""}" onclick="flGo(${i})">${esc(l.k)}<small>${BN_DIGITS(cntLv(l.k))}টি পরীক্ষা</small></button>`).join("")}</div>`;
-  if(L.tabs.length > 1) h += `<div class="tabs fl-tabs">${L.tabs.map((t, i) => `<button class="${t.k === FL.tab ? "on" : ""}" onclick="flTab(${i})">${esc(t.label)}</button>`).join("")}</div>`;
-  h += T.chs.map((c, i) => flRow(c, "অধ্যায় " + BN_DIGITS(i + 1), bucket[c])).join("");
-  if(bucket["mix|" + FL.lv]) h += flRow("mix|" + FL.lv, "🧩", bucket["mix|" + FL.lv], "একাধিক অধ্যায় / মডেল টেস্ট");
-  if(bucket.other) h += flRow("other", "📚", bucket.other, "অন্যান্য");
+function trPaint(t){
+  const S = TR[t], box = $(S.box); if(!box) return;
+  const {levels:all, byName} = flTree(), levels = S.only ? all.filter(l => l.k === S.only) : all, bucket = {};
+  const shown = new Set(levels.map(l => l.k));
+  S.ex.forEach(e => { let k = flPlace(e, byName);
+    if(k !== "other" && !shown.has(k.startsWith("mix|") ? k.slice(4) : byName[k].lv)) k = "other";
+    (bucket[k] = bucket[k] || []).push(e); });
+  S.keys = [];
+  if(!levels.length){ box.innerHTML = S.ex.length ? S.ex.map(e => exCard(e)).join("") : '<div class="muted" style="padding:6px 2px 12px">এখনো কোনো পরীক্ষা নেই।</div>'; return; }
+  if(!S.lv || !shown.has(S.lv)) S.lv = levels[0].k;
+  const L = levels.find(l => l.k === S.lv);
+  if(!S.tab || !L.tabs.find(x => x.k === S.tab)) S.tab = L.tabs[0].k;
+  const T = L.tabs.find(x => x.k === S.tab);
+  const cntLv = lv => S.ex.filter(e => exLv(e, byName) === lv).length;
+  const mix = bucket["mix|" + S.lv], oth = bucket.other;
+  let h = levels.length > 1 ? `<div class="fl-lv">${levels.map((l, i) => `<button class="${l.k === S.lv ? "on" : ""}" onclick="trGo('${t}',${i})">${esc(l.k)}<small>${BN_DIGITS(cntLv(l.k))}টি পরীক্ষা</small></button>`).join("")}</div>`
+    : "";
+  /* কোর্সে মডেল টেস্ট / অন্যান্য আগে — সেগুলোই বেশি থাকে */
+  if(t === "cr"){ if(mix) h += trRow(t, "mix|" + S.lv, "🧩", mix, "মডেল টেস্ট / একাধিক অধ্যায়"); if(oth) h += trRow(t, "other", "📚", oth, "অন্যান্য পরীক্ষা"); }
+  if(L.tabs.length > 1) h += `<div class="tabs fl-tabs">${L.tabs.map((x, i) => `<button class="${x.k === S.tab ? "on" : ""}" onclick="trTab('${t}',${i})">${esc(x.label)}</button>`).join("")}</div>`;
+  h += T.chs.map((c, i) => trRow(t, c, "অধ্যায় " + BN_DIGITS(i + 1), bucket[c])).join("");
+  if(t !== "cr"){ if(mix) h += trRow(t, "mix|" + S.lv, "🧩", mix, "একাধিক অধ্যায় / মডেল টেস্ট"); if(oth) h += trRow(t, "other", "📚", oth, "অন্যান্য"); }
   box.innerHTML = h;
 }
-function flGo(i){ const {levels} = flTree(); FL.lv = levels[i].k; FL.tab = null; FL.ch = null; flPaint(); }
-function flTab(i){ const {levels} = flTree(), L = levels.find(l => l.k === FL.lv); FL.tab = L.tabs[i].k; FL.ch = null; flPaint(); }
-function flOpen(i){
-  const k = FL_KEYS[i]; FL.ch = FL.ch === k ? null : k; flPaint();
-  if(FL.ch){ const el = $("#flr" + FL_KEYS.indexOf(k)); if(el) setTimeout(() => el.scrollIntoView({behavior:"smooth", block:"start"}), 60); }
+function trLevels(t){ const S = TR[t], {levels} = flTree(); return S.only ? levels.filter(l => l.k === S.only) : levels; }
+function trGo(t, i){ const S = TR[t]; S.lv = trLevels(t)[i].k; S.tab = null; S.ch = null; trPaint(t); }
+function trTab(t, i){ const S = TR[t], L = trLevels(t).find(l => l.k === S.lv); S.tab = L.tabs[i].k; S.ch = null; trPaint(t); }
+function trOpen(t, i){
+  const S = TR[t], k = S.keys[i]; S.ch = S.ch === k ? null : k; trPaint(t);
+  if(S.ch){ const el = $("#" + t + "r" + S.keys.indexOf(k)); if(el) setTimeout(() => el.scrollIntoView({behavior:"smooth", block:"start"}), 60); }
 }
+const flPaint = () => trPaint("fl");
 function openFreeLib(lv){ FL.lv = lv || FL.lv; FL.tab = null; FL.ch = null; FL_SCROLL = true; openExams(); }
 
 /* ---------- পরীক্ষার পাতা (হাব) ---------- */
@@ -2244,19 +2267,93 @@ async function stuExam(){
 }
 function exHome(){ RUN = null; if(EX_FROM === "stu"){ show("stuView"); stuTab("exam"); } else openExams(); }
 function exRefresh(){
-  if(!$("#examView").classList.contains("hidden") && ($("#exMain .exc") || $("#exMain #flib"))) return exPaintHub($("#exMain"), true);
-  if(!$("#stuView").classList.contains("hidden") && ($("#stuMain .exc") || $("#stuMain #flib"))) return exPaintHub($("#stuMain"), false);
+  const onEx = !$("#examView").classList.contains("hidden"), onStu = !$("#stuView").classList.contains("hidden");
+  if((onEx || onStu) && $("#crTree")) return crRefresh();
+  if(onEx && ($("#exMain .exc") || $("#exMain #flib") || $("#exMain .pkc"))) return exPaintHub($("#exMain"), true);
+  if(onStu && ($("#stuMain .exc") || $("#stuMain #flib") || $("#stuMain .pkc"))) return exPaintHub($("#stuMain"), false);
   if(!$("#homeView").classList.contains("hidden")) return homeExams(true);
 }
+
+/* স্টুডেন্টের কোর্সগুলো: নিজের ব্যাচের পরীক্ষা + কেনা / ব্যাচের জন্য ফ্রি প্যাকেজ */
+let COURSES = [];
+function buildCourses(r){
+  const me = r.me; COURSES = [];
+  if(!me || me.kind === "admin") return COURSES;
+  const LV = meLv(me);
+  if(me.kind === "stu") COURSES.push({k:"batch", title:"আমার ব্যাচ" + (me.batch ? " — " + me.batch : ""), lv:LV,
+    ex:r.exams.filter(e => e.audience === "batch" && !e.locked)});
+  PKGS.filter(p => p.me && ["free","active","expired"].includes(p.me.state)).forEach(p =>
+    COURSES.push({k:"p" + p.id, pkg:p, title:p.title, lv:p.lv || LV, ex:r.exams.filter(e => (e.pkgs || []).some(x => x.id == p.id))}));
+  return COURSES;
+}
+function crCardHtml(c, i){
+  const ex = c.ex, n = ex.length, done = ex.filter(exDone).length;
+  const live = ex.filter(e => !e.locked && e.status === "live" && !e.instant && !exDone(e)).length;
+  const mcq = ex.filter(e => !e.cq).length, cq = n - mcq;
+  const chip = c.pkg ? pkgStateChip(c.pkg.me) : '<span class="chip navy">🔒 শুধু ব্যাচের স্টুডেন্টদের</span>';
+  return `<div class="pkc crc" onclick="crOpen(${i})">
+    <div class="row between" style="align-items:flex-start"><b class="t">${c.pkg ? "📦" : "🎓"} ${esc(c.title)}</b><span class="go">›</span></div>
+    <div class="muted" style="font-size:13.5px;margin-top:3px">${n ? [mcq ? "🖥️ MCQ " + BN_DIGITS(mcq) + "টা" : "", cq ? "✍️ লিখিত " + BN_DIGITS(cq) + "টা" : "", "📚 অধ্যায়ভিত্তিক"].filter(Boolean).join(" • ") : "পরীক্ষাগুলো শীঘ্রই এখানে আসবে"}</div>
+    ${n ? `<div class="cr-bar"><i style="width:${Math.round(done * 100 / n)}%"></i></div><div class="muted" style="font-size:12.5px">${BN_DIGITS(done)}/${BN_DIGITS(n)}টা দিয়েছ</div>` : ""}
+    <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">${live ? `<span class="live-pill"><i></i>${BN_DIGITS(live)}টা লাইভ</span>` : ""}${chip}</div></div>`;
+}
+function crOpen(i){
+  const c = COURSES[i]; if(!c) return;
+  const stu = !$("#stuView").classList.contains("hidden"), box = stu ? $("#stuMain") : $("#exMain");
+  if(!stu){ $("#exHead").textContent = c.pkg ? "📦 আমার কোর্স" : "🎓 আমার কোর্স"; $("#exBackBtn").onclick = () => openExams(); }
+  window.scrollTo(0, 0);
+  const S = TR.cr; if(S.key !== c.k){ S.key = c.k; S.lv = null; S.tab = null; S.ch = null; }
+  S.only = c.lv || null; S.ex = c.ex.slice().sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at));
+  const now = nowSrv();
+  const hot = c.ex.filter(e => !e.locked && !e.instant && (e.status === "live" || (e.status === "upcoming" && new Date(e.starts_at).getTime() - now < 3*86400e3)));
+  const n = c.ex.length, done = c.ex.filter(exDone).length, mcq = c.ex.filter(e => !e.cq).length;
+  let h = `<button class="btn sm ghost" style="margin-bottom:10px" onclick="crBack()">← সব পরীক্ষা</button>
+    <div class="pk-hero"><span class="bd">${c.pkg ? "📦 আমার কোর্স" : "🎓 আমার কোর্স"}${c.lv ? " • " + esc(c.lv) : ""}</span><h2>${esc(c.title)}</h2>
+    <p>${c.pkg ? "এই কোর্সের সব পরীক্ষা অধ্যায় ধরে সাজানো।" : "তোমার ব্যাচের জন্য দেওয়া সব পরীক্ষা — অধ্যায় ধরে সাজানো।"}</p>
+    <div class="ex-feat">${[`📝 ${BN_DIGITS(n)}টা পরীক্ষা`, mcq ? `🖥️ MCQ ${BN_DIGITS(mcq)}টা` : "", n - mcq ? `✍️ লিখিত ${BN_DIGITS(n - mcq)}টা` : "", `✅ ${BN_DIGITS(done)}টা দিয়েছ`].filter(Boolean).map(x => `<span>${x}</span>`).join("")}</div></div>`;
+  if(c.pkg){
+    const me = c.pkg.me || {};
+    if(me.state !== "free") h += pkgStatusHtml(c.pkg);
+    h += `<button class="btn sec" style="margin:-2px 0 12px" onclick="pkgOpen(${c.pkg.id})">📅 রুটিন ও কোর্সের বিস্তারিত</button>`;
+  }
+  if(hot.length) h += `<div class="ex-sec">🔴 এখন ও সামনে</div>` + hot.map(e => exCard(e)).join("");
+  h += `<div class="ex-sec">📚 অধ্যায়ভিত্তিক পরীক্ষা <small>অধ্যায়ে চাপ দাও</small></div><div class="card flib" id="crTree"></div>`;
+  box.innerHTML = h;
+  pkgCfg().then(() => trPaint("cr"));
+}
+function crBack(){ TR.cr.key = null; if(!$("#stuView").classList.contains("hidden")) stuTab("exam"); else openExams(); }
+async function crRefresh(){
+  const k = TR.cr.key, stu = !$("#stuView").classList.contains("hidden");
+  const tmp = document.createElement("div");
+  await exPaintHub(tmp, !stu);
+  const i = COURSES.findIndex(c => c.k === k);
+  if(i >= 0 && $("#crTree")) crOpen(i);
+}
+/* প্যাকেজের পাতা থেকে "অধ্যায় ধরে দেখো" */
+async function crOpenPkg(id){
+  if(!COURSES.find(c => c.k === "p" + id)){ const tmp = document.createElement("div"); await exPaintHub(tmp, $("#stuView").classList.contains("hidden")); }
+  const i = COURSES.findIndex(c => c.k === "p" + id); if(i >= 0) crOpen(i);
+}
+
 async function exPaintHub(box, pub){
   let r;
-  try{ r = await exLoad(); }catch(ex){ box.innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; return; }
-  const now = nowSrv(), me = r.me;
+  try{ [r] = await Promise.all([exLoad(), pkgLoad().catch(() => { PKGS = []; }), pkgCfg()]); }
+  catch(ex){ box.innerHTML = '<div class="err">'+esc(ex.message)+'</div>'; return; }
+  const now = nowSrv(), me = r.me, LV = meLv(me), {byName} = flTree();
+  buildCourses(r);
+  const ownIds = new Set(COURSES.filter(c => c.pkg).map(c => c.pkg.id));
+  const inCourse = e => (e.audience === "batch" && me && me.kind === "stu") || (e.audience === "package" && (e.pkgs || []).some(p => ownIds.has(p.id)));
+  /* অন্য ক্লাসের প্যাকেজের তালা দেওয়া পরীক্ষা লুকাও */
+  const pkLv = id => { const p = PKGS.find(x => x.id == id); return p ? p.lv : null; };
+  const lvOk = e => !LV || e.audience !== "package" || !e.locked || (e.pkgs || []).some(p => !pkLv(p.id) || pkLv(p.id) === LV);
   const ex = r.exams.filter(e => !e.locked || e.status === "live" || (e.status === "upcoming" && new Date(e.starts_at).getTime() - now < 3*86400e3))
-    .filter(e => !(e.audience === "package" && e.status === "ended" && now - new Date(e.ends_at).getTime() > 60*86400e3));
-  const lib = ex.filter(isLib), rest = ex.filter(e => !isLib(e)); FL_EX = lib;
-  if(lib.length){ await pkgCfg(); if(EX_FOCUS && lib.find(e => e.id == EX_FOCUS)) flFocus(EX_FOCUS); }
-  const live = rest.filter(e=>e.status==="live"), up = rest.filter(e=>e.status==="upcoming"), done = rest.filter(e=>e.status==="ended");
+    .filter(e => !(e.audience === "package" && e.status === "ended" && now - new Date(e.ends_at).getTime() > 60*86400e3 && !inCourse(e)))
+    .filter(lvOk);
+  const lib = ex.filter(e => isLib(e) && (!LV || !exLv(e, byName) || exLv(e, byName) === LV)), rest = ex.filter(e => !isLib(e));
+  FL.ex = lib; FL.only = LV;
+  if(lib.length && EX_FOCUS && lib.find(e => e.id == EX_FOCUS)) flFocus(EX_FOCUS);
+  const live = rest.filter(e=>e.status==="live"), up = rest.filter(e=>e.status==="upcoming"), done = rest.filter(e=>e.status==="ended" && !inCourse(e));
+  const buy = PKGS.filter(p => !ownIds.has(p.id) && (!LV || !p.lv || p.lv === LV));
   let h = "";
   if(pub) h += `<div class="ex-hero"><span class="bd">🔥 BIO NERDS লাইভ পরীক্ষা</span>
     <h2>ঘরে বসেই দাও মেডিকেল স্ট্যান্ডার্ড পরীক্ষা</h2>
@@ -2265,7 +2362,7 @@ async function exPaintHub(box, pub){
   else h += `<div class="sec-title">📝 অনলাইন পরীক্ষা</div>`;
   if(me){
     h += `<div class="acct"><div class="av">${initials(me.name)}</div><div class="nm"><b>${esc(me.name)}</b>
-      <span class="muted" style="font-size:12.5px">${me.kind==="guest"?"পরীক্ষার আইডি "+esc(me.uid):me.kind==="admin"?"অ্যাডমিন (প্রিভিউ — মেরিটে গুনবে না)":"রোল "+esc(me.uid)+(me.batch?" • "+esc(me.batch):"")}</span></div>
+      <span class="muted" style="font-size:12.5px">${me.kind==="guest"?"পরীক্ষার আইডি "+esc(me.uid)+(LV?" • "+LV:""):me.kind==="admin"?"অ্যাডমিন (প্রিভিউ — মেরিটে গুনবে না)":"রোল "+esc(me.uid)+(me.batch?" • "+esc(me.batch):"")}</span></div>
       ${me.kind==="guest"?'<button class="btn sm ghost" onclick="exGuestLogout()">লগআউট</button>':""}</div>`;
   } else {
     h += `<div class="reg-card"><b>🎯 ফ্রিতে পরীক্ষা দিতে একবার রেজিস্টার করো</b>
@@ -2273,18 +2370,21 @@ async function exPaintHub(box, pub){
       <div class="ex-acts"><button class="btn orange" onclick="exAuth(exRefresh,'reg')">📝 রেজিস্টার</button><button class="btn sec" onclick="exAuth(exRefresh,'login')">🔐 লগইন</button></div></div>`;
   }
   if(live.length) h += `<div class="ex-sec">🔴 এখন লাইভ</div>` + live.map(e=>exCard(e)).join("");
-  if(lib.length) h += `<div class="ex-sec" id="flibHead">🆓 ফ্রি পরীক্ষা <small>অধ্যায়ভিত্তিক • যখন খুশি দাও</small></div><div class="card flib" id="flib"></div>`;
-  h += `<div id="pkgHub"></div>`;
   if(up.length) h += `<div class="ex-sec">⏳ আসছে</div>` + up.map(e=>exCard(e)).join("");
-  if(!live.length && !up.length && !lib.length) h += `<div class="card empty-ex"><div>📅</div><b>এই মুহূর্তে কোনো লাইভ পরীক্ষা নেই</b><br>নতুন পরীক্ষার ঘোষণা পেতে আমাদের Facebook পেজে চোখ রাখো।</div>`;
+  if(COURSES.length) h += `<div class="ex-sec">🎓 আমার কোর্স <small>অধ্যায়ভিত্তিক পরীক্ষা</small></div>` + COURSES.map((c, i) => crCardHtml(c, i)).join("");
+  if(lib.length) h += `<div class="ex-sec" id="flibHead">🆓 ফ্রি পরীক্ষা <small>${LV ? esc(LV) + " • " : ""}অধ্যায়ভিত্তিক • যখন খুশি দাও</small></div><div class="card flib" id="flib"></div>`;
+  if(buy.length) h += `<div class="ex-sec">📦 ${me && me.kind !== "admin" ? "আরও কোর্স কেনো" : "পরীক্ষার প্যাকেজ"} <small>রুটিন • নমুনা • কেনো</small></div>` + buy.map(pkgCardHtml).join("");
+  if(!live.length && !up.length && !lib.length && !COURSES.length) h += `<div class="card empty-ex"><div>📅</div><b>এই মুহূর্তে কোনো লাইভ পরীক্ষা নেই</b><br>নতুন পরীক্ষার ঘোষণা পেতে আমাদের Facebook পেজে চোখ রাখো।</div>`;
   if(done.length) h += `<div class="ex-sec">✅ আগের পরীক্ষা <small>মেরিট • সমাধান • প্র্যাকটিস</small></div>` + done.map(e=>exCard(e)).join("");
   if(pub && (!me || me.kind==="guest")) h += admCtaHtml();
   box.innerHTML = h;
   if(lib.length) flPaint();
-  pkgHub();
   if(FL_SCROLL){ FL_SCROLL = false; const fh = $("#flibHead"); if(fh) setTimeout(() => fh.scrollIntoView({behavior:"smooth", block:"start"}), 150); }
-  if(EX_FOCUS){ const el = $("#exc"+EX_FOCUS); EX_FOCUS = null;
-    if(el){ el.classList.add("focus"); setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"center"}),150); setTimeout(()=>el.classList.remove("focus"),4000); } }
+  if(EX_FOCUS){ const id = EX_FOCUS, el = $("#exc"+id);
+    if(el){ EX_FOCUS = null; el.classList.add("focus"); setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"center"}),150); setTimeout(()=>el.classList.remove("focus"),4000); }
+    else { const ci = COURSES.findIndex(c => c.ex.some(e => e.id == id && !e.cq)); EX_FOCUS = null;
+      if(ci >= 0 && box.isConnected){ const c = COURSES[ci]; TR.cr.key = c.k; TR.cr.lv = null; TR.cr.tab = null; TR.cr.ch = null;
+        crOpen(ci); trFocus("cr", id); trPaint("cr"); setTimeout(() => { const x = $("#exc"+id); if(x){ x.scrollIntoView({behavior:"smooth",block:"center"}); x.classList.add("focus"); setTimeout(()=>x.classList.remove("focus"),4000); } }, 200); } } }
 }
 function admCtaHtml(){
   return `<div class="cta-adm"><b style="font-size:16.5px">🎓 BIO NERDS-এ নিয়মিত পড়তে চাও?</b>
@@ -3836,7 +3936,7 @@ function pkgCardHtml(p){
   const kinds = p.n_mcq && p.n_cq ? "MCQ + লিখিত" : p.n_cq ? "লিখিত" : p.n_mcq ? "MCQ" : "";
   return `<div class="pkc" onclick="pkgOpen(${p.id})">
     <div class="row between" style="align-items:flex-start"><b class="t">${esc(p.title)}</b>${pkgPriceHtml(p)}</div>
-    <div class="muted" style="font-size:13.5px;margin-top:3px">${[tot ? BN_DIGITS(tot) + "টা পরীক্ষা" : "", kinds, pkgValidTxt(p)].filter(Boolean).join(" • ")}</div>
+    <div class="muted" style="font-size:13.5px;margin-top:3px">${[p.lv ? (p.lv === "SSC" ? "🏫 " : "🎓 ") + p.lv : "", tot ? BN_DIGITS(tot) + "টা পরীক্ষা" : "", kinds, pkgValidTxt(p)].filter(Boolean).join(" • ")}</div>
     <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">${pkgStateChip(me)}${(!me.state || me.state === "rejected" || me.state === "expired") && +p.n_sample ? `<span class="chip">🎁 ${BN_DIGITS(p.n_sample)}টা নমুনা পরীক্ষা ফ্রি</span>` : ""}${p.subject ? `<span class="chip navy">📚 ${esc(p.subject)}</span>` : ""}${!p.visible ? '<span class="chip" style="background:#eef1f4;color:var(--mute)">🙈 লুকানো</span>' : ""}<span class="lnkbtn" style="margin-left:auto">দেখো ›</span></div></div>`;
 }
 async function pkgLoad(){ const r = await rpc("pkg_list", {p_token: exTok()}); PKGS = r.packages || []; return r; }
@@ -3884,6 +3984,7 @@ async function pkgOpen(id){
     <div class="ex-feat">${[tot ? `📝 ${BN_DIGITS(tot)}টা পরীক্ষা` : "", +p.n_mcq ? `🖥️ MCQ ${BN_DIGITS(p.n_mcq)}টা` : "", +p.n_cq ? `✍️ লিখিত ${BN_DIGITS(p.n_cq)}টা` : "",
       +p.n_sample ? `🎁 ${BN_DIGITS(p.n_sample)}টা নমুনা ফ্রি` : "", `⏳ ${pkgValidTxt(p)}`].filter(Boolean).map(x => `<span>${x}</span>`).join("")}</div></div>`;
   h += pkgStatusHtml(p);
+  if(p.me && ["free","active","expired"].includes(p.me.state) && exs.length) h += `<button class="btn orange" style="margin:-2px 0 12px" onclick="crOpenPkg(${p.id})">📚 অধ্যায় ধরে পরীক্ষাগুলো দেখো</button>`;
   if(feats.length) h += `<div class="card"><h3>✨ যা যা পাবে</h3><ul class="pk-feat">${feats.map(f => `<li>${esc(f)}</li>`).join("")}</ul></div>`;
   if(hot.length) h += `<div class="ex-sec">🔴 এখন ও সামনে</div>` + hot.map(e => exCard(e)).join("");
   h += `<div class="ex-sec">📝 পরীক্ষাগুলো <small>${BN_DIGITS(exs.length)}টা প্রকাশিত</small></div>` + (exs.length
@@ -4193,7 +4294,7 @@ async function pkgEdit(id){
   let p = {title:"", descr:"", features:"", subject:"", price:200, old_price:null, valid_type:"date", valid_until:"", valid_days:180, n_planned:null, routine:"", batch_prices:{}, visible:false, sort:0};
   if(id){ try{ p = await rpc("pkg_admin_get", {p_token:TOKEN, p_pkg:id}); }catch(ex){ toast(ex.message); pkgAdm(); return; } }
   const subs = pkgSubjects();
-  PKE = {id:id || null, vt:p.valid_type || "date", bp:{...(p.batch_prices || {})}};
+  PKE = {id:id || null, vt:p.valid_type || "date", bp:{...(p.batch_prices || {})}, lv:p.lv || ""};
   const batches = [...new Set([...COACHING.batches, ...Object.keys(PKE.bp)])];
   window.scrollTo(0,0);
   $("#aexBody").innerHTML = `
@@ -4202,6 +4303,8 @@ async function pkgEdit(id){
     <div class="card"><h3>১. নাম ও বিবরণ</h3>
       <label>প্যাকেজের নাম</label><input id="pkT" value="${esc(p.title)}" placeholder="যেমন: HSC মডেল টেস্ট ২০২৭ — জীববিজ্ঞান">
       ${subs.length > 1 ? `<label>বিষয়</label><select id="pkS"><option value="">— একাধিক বিষয় / লিখতে চাই না —</option>${subs.map(s => `<option ${s === p.subject ? "selected" : ""}>${esc(s)}</option>`).join("")}</select>` : ""}
+      <label>কোন ক্লাসের স্টুডেন্টদের জন্য</label><div class="seg" id="pkLv">${[["HSC","🎓 HSC"],["SSC","🏫 SSC"],["","👥 সবার"]].map(([v,l]) => `<button type="button" data-v="${v}" class="${(p.lv || "") === v ? "on" : ""}">${l}</button>`).join("")}</div>
+      <div class="hint">স্টুডেন্টরা শুধু নিজের ক্লাসের প্যাকেজ দেখবে (“সবার” দিলে সবাই দেখবে)। বাইরের স্টুডেন্টদের ক্লাস আসে রেজিস্ট্রেশন থেকে।</div>
       <label>ছোট বিবরণ (ঐচ্ছিক)</label><input id="pkD" value="${esc(p.descr || "")}" placeholder="যেমন: পুরো সিলেবাসের মডেল টেস্ট, বোর্ড স্ট্যান্ডার্ড প্রশ্ন">
       <label>যা যা পাবে — প্রতি লাইনে একটা (ঐচ্ছিক)</label><textarea id="pkF" style="min-height:100px;font-family:inherit" placeholder="প্রতিটা পরীক্ষার ব্যাখ্যাসহ সমাধান&#10;সারা দেশের মেরিট লিস্ট&#10;লিখিত খাতা ২৪ ঘণ্টার মধ্যে দেখে দেওয়া">${esc(p.features || "")}</textarea>
       <label>মোট কয়টা পরীক্ষা হবে (ঐচ্ছিক)</label><input id="pkN" type="number" inputmode="numeric" min="0" value="${p.n_planned || ""}" placeholder="যেমন ৫০"></div>
@@ -4230,6 +4333,7 @@ async function pkgEdit(id){
     $("#pkVd").classList.toggle("hidden", PKE.vt !== "date"); $("#pkVn").classList.toggle("hidden", PKE.vt !== "days");
     document.querySelectorAll("#pkDC button").forEach(b => b.classList.toggle("on", +b.dataset.d === +$("#pkDays").value)); pkgPrev(); };
   document.querySelectorAll("#pkV button").forEach(b => b.onclick = () => { PKE.vt = b.dataset.v; paintV(); });
+  document.querySelectorAll("#pkLv button").forEach(b => b.onclick = () => { PKE.lv = b.dataset.v; document.querySelectorAll("#pkLv button").forEach(x => x.classList.toggle("on", x === b)); pkgPrev(); });
   document.querySelectorAll("#pkDC button").forEach(b => b.onclick = () => { $("#pkDays").value = b.dataset.d; paintV(); });
   document.querySelectorAll("#pkB select").forEach(s => s.onchange = () => { $("#pkBv" + s.dataset.i).classList.toggle("hidden", s.value !== "custom"); if(s.value === "custom") $("#pkBv" + s.dataset.i).focus(); pkgPrev(); });
   ["#pkT","#pkD","#pkF","#pkN","#pkP","#pkO","#pkU","#pkDays","#pkS","#pkVis"].forEach(s => { const el = $(s); if(el) el.addEventListener("input", () => { if(s === "#pkDays") paintV(); else pkgPrev(); }); });
@@ -4240,7 +4344,7 @@ function pkgForm(){
   const bp = {};
   document.querySelectorAll("#pkB select").forEach(s => { if(s.value === "free") bp[s.dataset.b] = 0; else if(s.value === "custom"){ const v = +$("#pkBv" + s.dataset.i).value; if(v > 0) bp[s.dataset.b] = v; } });
   const num0 = s => { const v = $(s) ? $(s).value.trim() : ""; return v === "" ? null : +BN2EN(v); };
-  return {id:PKE.id, title:$("#pkT").value.trim(), descr:$("#pkD").value.trim(), features:$("#pkF").value.trim(), subject:$("#pkS") ? $("#pkS").value : null,
+  return {id:PKE.id, title:$("#pkT").value.trim(), descr:$("#pkD").value.trim(), features:$("#pkF").value.trim(), subject:$("#pkS") ? $("#pkS").value : null, lv:PKE.lv || null,
     price:num0("#pkP"), old_price:num0("#pkO"), valid_type:PKE.vt, valid_until:$("#pkU").value || null, valid_days:num0("#pkDays"),
     n_planned:num0("#pkN"), routine:$("#pkR").value.trim(), batch_prices:bp, visible:$("#pkVis").checked, sort:num0("#pkSo") || 0};
 }
