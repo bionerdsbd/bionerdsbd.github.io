@@ -270,6 +270,23 @@ details summary{cursor:pointer}
 .reg-card b{font-size:16.5px}
 .ex-sec{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;margin:18px 2px 10px}
 .ex-sec small{margin-left:auto;font-size:12.5px;color:var(--mute);font-weight:500}
+.flib{padding:14px 14px 6px}
+#flibHead{scroll-margin-top:110px}
+.fl-lv{display:flex;gap:8px;margin-bottom:10px}
+.fl-lv button{flex:1;border:2px solid var(--line);background:#fff;border-radius:14px;padding:9px 6px;font-weight:800;font-size:17px;color:var(--mute);cursor:pointer;line-height:1.2}
+.fl-lv button.on{background:var(--g2);border-color:var(--g2);color:#fff}
+.fl-lv small{display:block;font-size:11.5px;font-weight:600;opacity:.85}
+.fl-tabs button{flex:1}
+.fl-row{scroll-margin-top:110px;display:flex;align-items:center;gap:10px;padding:11px 2px;border-top:1px solid var(--line)}
+.fl-row.has{cursor:pointer}
+.fl-row .no{font-size:12px;color:var(--mute);min-width:56px;white-space:nowrap}
+.fl-row .nm{font-weight:600;flex:1;line-height:1.3}
+.fl-row:not(.has) .nm{color:var(--mute);font-weight:500}
+.fl-row .ct{background:#fff1e9;color:var(--orange);border-radius:20px;padding:2px 9px;font-size:12px;font-weight:700;white-space:nowrap}
+.fl-row .soon{font-size:12px;color:#b0b7c0;white-space:nowrap}
+.fl-row .ar{color:var(--mute);font-size:18px;transition:transform .2s}
+.fl-row.open .ar{transform:rotate(90deg)}
+.fl-body{padding:2px 0 8px}
 .exc{background:#fff;border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(16,24,40,.07);position:relative;overflow:hidden;border:1.5px solid transparent;transition:border-color .3s}
 .exc.live{border-color:#f05a2255;box-shadow:0 6px 22px #f05a2222}
 .exc.focus{border-color:var(--gold)!important;box-shadow:0 0 0 4px #f2b63240}
@@ -2147,6 +2164,70 @@ function exCard(e, compact){
     ${body}${st==="ended" && my && my.score!=null ? `<button class="lnkbtn" style="margin-top:8px" onclick="exPractice(${e.id})">🔁 আবার প্র্যাকটিস করো</button>`:""}</div>`;
 }
 
+/* ---------- ফ্রি পরীক্ষা: অধ্যায়ভিত্তিক লাইব্রেরি (HSC → বোটানি/জুলজি → অধ্যায়, SSC → অধ্যায়) ----------
+   অধ্যায় আসে প্রশ্নের "# অধ্যায়" ট্যাগ থেকে (oe_list → chs); অধ্যায়ের তালিকা 📦 প্যাকেজ → 📚 বিষয় ও অধ্যায় থেকে। */
+let FL = {lv:null, tab:null, ch:null}, FL_EX = [], FL_KEYS = [], FL_SCROLL = false;
+const isLib = e => !e.cq && e.audience === "free" && !e.locked && (e.chs || []).length > 0 && (e.instant ? e.status === "live" : e.status === "ended");
+const FL_PART = {"১ম পত্র":"🌿 বোটানি", "২য় পত্র":"🐾 জুলজি"};
+function flTree(){
+  const subs = (PKG_CFG && PKG_CFG.subjects) || [], levels = [], byName = {};
+  subs.forEach(sb => (sb.ch || []).forEach(c => {
+    const g = (c.g || "").trim() || sb.n, lv = g.split(/\s+/)[0], part = g.slice(lv.length).trim();
+    let L = levels.find(x => x.k === lv); if(!L){ L = {k:lv, tabs:[]}; levels.push(L); }
+    const tk = sb.n + "|" + g; let T = L.tabs.find(x => x.k === tk);
+    if(!T){
+      const lab = (sb.n === "জীববিজ্ঞান" && FL_PART[part]) ? FL_PART[part] + " (" + part + ")" : ((subs.length > 1 ? sb.n + " " : "") + part).trim() || lv;
+      T = {k:tk, label:lab, chs:[]}; L.tabs.push(T);
+    }
+    T.chs.push(c.n); if(!byName[c.n]) byName[c.n] = {lv, tk};
+  }));
+  return {levels, byName};
+}
+function flPlace(e, byName){
+  const cs = (e.chs || []).filter(c => byName[c]);
+  if(!cs.length) return "other";
+  return e.chs.length > 1 ? "mix|" + byName[cs[0]].lv : cs[0];
+}
+function flFocus(id){
+  const e = FL_EX.find(x => x.id == id); if(!e) return;
+  const {byName} = flTree(), k = flPlace(e, byName), c = (e.chs || []).find(x => byName[x]);
+  if(c){ FL.lv = byName[c].lv; FL.tab = byName[c].tk; }
+  FL.ch = k;
+}
+function flRow(key, no, list, name){
+  const i = FL_KEYS.push(key) - 1, n = (list || []).length, open = n && FL.ch === key;
+  const done = (list || []).filter(e => e.my && e.my.state === "done").length;
+  return `<div class="fl-row ${n ? "has" : ""} ${open ? "open" : ""}" id="flr${i}" ${n ? `onclick="flOpen(${i})"` : ""}>
+    <span class="no">${no}</span><span class="nm">${esc(name || key)}</span>
+    ${n ? `<span class="ct">${done ? "✓ " + BN_DIGITS(done) + "/" : ""}${BN_DIGITS(n)}টি পরীক্ষা</span><span class="ar">›</span>` : '<span class="soon">শীঘ্রই আসছে</span>'}</div>
+    ${open ? `<div class="fl-body">${list.map(e => exCard(e)).join("")}</div>` : ""}`;
+}
+function flPaint(){
+  const box = $("#flib"); if(!box) return;
+  const {levels, byName} = flTree(), bucket = {};
+  FL_EX.forEach(e => { const k = flPlace(e, byName); (bucket[k] = bucket[k] || []).push(e); });
+  FL_KEYS = [];
+  if(!levels.length){ box.innerHTML = FL_EX.map(e => exCard(e)).join(""); return; }
+  if(!FL.lv || !levels.find(l => l.k === FL.lv)) FL.lv = levels[0].k;
+  const L = levels.find(l => l.k === FL.lv);
+  if(!FL.tab || !L.tabs.find(t => t.k === FL.tab)) FL.tab = L.tabs[0].k;
+  const T = L.tabs.find(t => t.k === FL.tab);
+  const cntLv = lv => FL_EX.filter(e => { const c = (e.chs || []).find(x => byName[x]); return c && byName[c].lv === lv; }).length;
+  let h = `<div class="fl-lv">${levels.map((l, i) => `<button class="${l.k === FL.lv ? "on" : ""}" onclick="flGo(${i})">${esc(l.k)}<small>${BN_DIGITS(cntLv(l.k))}টি পরীক্ষা</small></button>`).join("")}</div>`;
+  if(L.tabs.length > 1) h += `<div class="tabs fl-tabs">${L.tabs.map((t, i) => `<button class="${t.k === FL.tab ? "on" : ""}" onclick="flTab(${i})">${esc(t.label)}</button>`).join("")}</div>`;
+  h += T.chs.map((c, i) => flRow(c, "অধ্যায় " + BN_DIGITS(i + 1), bucket[c])).join("");
+  if(bucket["mix|" + FL.lv]) h += flRow("mix|" + FL.lv, "🧩", bucket["mix|" + FL.lv], "একাধিক অধ্যায় / মডেল টেস্ট");
+  if(bucket.other) h += flRow("other", "📚", bucket.other, "অন্যান্য");
+  box.innerHTML = h;
+}
+function flGo(i){ const {levels} = flTree(); FL.lv = levels[i].k; FL.tab = null; FL.ch = null; flPaint(); }
+function flTab(i){ const {levels} = flTree(), L = levels.find(l => l.k === FL.lv); FL.tab = L.tabs[i].k; FL.ch = null; flPaint(); }
+function flOpen(i){
+  const k = FL_KEYS[i]; FL.ch = FL.ch === k ? null : k; flPaint();
+  if(FL.ch){ const el = $("#flr" + FL_KEYS.indexOf(k)); if(el) setTimeout(() => el.scrollIntoView({behavior:"smooth", block:"start"}), 60); }
+}
+function openFreeLib(lv){ FL.lv = lv || FL.lv; FL.tab = null; FL.ch = null; FL_SCROLL = true; openExams(); }
+
 /* ---------- পরীক্ষার পাতা (হাব) ---------- */
 async function openExams(focus){
   EX_FROM = "pub"; if(focus) EX_FOCUS = focus;
@@ -2163,8 +2244,8 @@ async function stuExam(){
 }
 function exHome(){ RUN = null; if(EX_FROM === "stu"){ show("stuView"); stuTab("exam"); } else openExams(); }
 function exRefresh(){
-  if(!$("#examView").classList.contains("hidden") && $("#exMain .exc")) return exPaintHub($("#exMain"), true);
-  if(!$("#stuView").classList.contains("hidden") && $("#stuMain .exc")) return exPaintHub($("#stuMain"), false);
+  if(!$("#examView").classList.contains("hidden") && ($("#exMain .exc") || $("#exMain #flib"))) return exPaintHub($("#exMain"), true);
+  if(!$("#stuView").classList.contains("hidden") && ($("#stuMain .exc") || $("#stuMain #flib"))) return exPaintHub($("#stuMain"), false);
   if(!$("#homeView").classList.contains("hidden")) return homeExams(true);
 }
 async function exPaintHub(box, pub){
@@ -2173,7 +2254,9 @@ async function exPaintHub(box, pub){
   const now = nowSrv(), me = r.me;
   const ex = r.exams.filter(e => !e.locked || e.status === "live" || (e.status === "upcoming" && new Date(e.starts_at).getTime() - now < 3*86400e3))
     .filter(e => !(e.audience === "package" && e.status === "ended" && now - new Date(e.ends_at).getTime() > 60*86400e3));
-  const live = ex.filter(e=>e.status==="live"), up = ex.filter(e=>e.status==="upcoming"), done = ex.filter(e=>e.status==="ended");
+  const lib = ex.filter(isLib), rest = ex.filter(e => !isLib(e)); FL_EX = lib;
+  if(lib.length){ await pkgCfg(); if(EX_FOCUS && lib.find(e => e.id == EX_FOCUS)) flFocus(EX_FOCUS); }
+  const live = rest.filter(e=>e.status==="live"), up = rest.filter(e=>e.status==="upcoming"), done = rest.filter(e=>e.status==="ended");
   let h = "";
   if(pub) h += `<div class="ex-hero"><span class="bd">🔥 BIO NERDS লাইভ পরীক্ষা</span>
     <h2>ঘরে বসেই দাও মেডিকেল স্ট্যান্ডার্ড পরীক্ষা</h2>
@@ -2190,13 +2273,16 @@ async function exPaintHub(box, pub){
       <div class="ex-acts"><button class="btn orange" onclick="exAuth(exRefresh,'reg')">📝 রেজিস্টার</button><button class="btn sec" onclick="exAuth(exRefresh,'login')">🔐 লগইন</button></div></div>`;
   }
   if(live.length) h += `<div class="ex-sec">🔴 এখন লাইভ</div>` + live.map(e=>exCard(e)).join("");
+  if(lib.length) h += `<div class="ex-sec" id="flibHead">🆓 ফ্রি পরীক্ষা <small>অধ্যায়ভিত্তিক • যখন খুশি দাও</small></div><div class="card flib" id="flib"></div>`;
   h += `<div id="pkgHub"></div>`;
   if(up.length) h += `<div class="ex-sec">⏳ আসছে</div>` + up.map(e=>exCard(e)).join("");
-  if(!live.length && !up.length) h += `<div class="card empty-ex"><div>📅</div><b>এই মুহূর্তে কোনো লাইভ পরীক্ষা নেই</b><br>নতুন পরীক্ষার ঘোষণা পেতে আমাদের Facebook পেজে চোখ রাখো।</div>`;
+  if(!live.length && !up.length && !lib.length) h += `<div class="card empty-ex"><div>📅</div><b>এই মুহূর্তে কোনো লাইভ পরীক্ষা নেই</b><br>নতুন পরীক্ষার ঘোষণা পেতে আমাদের Facebook পেজে চোখ রাখো।</div>`;
   if(done.length) h += `<div class="ex-sec">✅ আগের পরীক্ষা <small>মেরিট • সমাধান • প্র্যাকটিস</small></div>` + done.map(e=>exCard(e)).join("");
   if(pub && (!me || me.kind==="guest")) h += admCtaHtml();
   box.innerHTML = h;
+  if(lib.length) flPaint();
   pkgHub();
+  if(FL_SCROLL){ FL_SCROLL = false; const fh = $("#flibHead"); if(fh) setTimeout(() => fh.scrollIntoView({behavior:"smooth", block:"start"}), 150); }
   if(EX_FOCUS){ const el = $("#exc"+EX_FOCUS); EX_FOCUS = null;
     if(el){ el.classList.add("focus"); setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"center"}),150); setTimeout(()=>el.classList.remove("focus"),4000); } }
 }
@@ -2547,15 +2633,22 @@ async function homeExams(force){
   const box = $("#homeExams"); if(!box) return;
   if(force || Date.now() - HOME_EX_AT > 60000){
     try{
-      const [r, pk] = await Promise.all([rpc("oe_list", {p_token:exTok()}), rpc("pkg_list", {p_token:exTok()}).catch(() => null)]);
+      const [r, pk] = await Promise.all([rpc("oe_list", {p_token:exTok()}), rpc("pkg_list", {p_token:exTok()}).catch(() => null), pkgCfg()]);
       EX_SKEW = new Date(r.now).getTime() - Date.now(); HOME_EX = r.exams; HOME_PK = pk ? (pk.packages || []) : []; HOME_EX_AT = Date.now();
     }catch(e){ return; }
   }
   const box2 = $("#homeExams"); if(!box2) return;
-  const free = HOME_EX.filter(e => e.audience === "free");
+  const free = HOME_EX.filter(e => e.audience === "free" && !isLib(e)), libs = HOME_EX.filter(isLib);
   let list = free.filter(e => e.status !== "ended").slice(0, 2);
-  if(!list.length) list = free.slice(0, 1);
+  if(!list.length && !libs.length) list = free.slice(0, 1);
   let h = list.length ? `<div class="h-sec">📝 ফ্রি লাইভ এক্সাম <small><button class="lnkbtn" onclick="openExams()">সব দেখো ›</button></small></div>` + list.map(e => exCard(e)).join("") : "";
+  if(libs.length){
+    const {levels, byName} = flTree();
+    const cnt = lv => libs.filter(e => { const c = (e.chs || []).find(x => byName[x]); return c && byName[c].lv === lv; }).length;
+    h += `<div class="h-sec">🆓 অধ্যায়ভিত্তিক ফ্রি পরীক্ষা</div><div class="reg-card"><b>📚 যখন খুশি দাও — জমা দিলেই রেজাল্ট</b>
+      <div class="muted" style="margin-top:4px">HSC বোটানি-জুলজি ও SSC জীববিজ্ঞানের অধ্যায়ভিত্তিক MCQ পরীক্ষা — নম্বর, মেরিট আর ব্যাখ্যাসহ সমাধান সাথে সাথে। এখন ${BN_DIGITS(libs.length)}টি পরীক্ষা।</div>
+      <div class="ex-acts">${levels.length ? levels.map((l, i) => `<button class="btn ${i ? "sec" : "orange"}" onclick="openFreeLib('${esc(l.k)}')">${esc(l.k)} ${cnt(l.k) ? "(" + BN_DIGITS(cnt(l.k)) + ")" : ""}</button>`).join("") : `<button class="btn orange" onclick="openFreeLib()">সব দেখো ›</button>`}</div></div>`;
+  }
   if(HOME_PK.length) h += `<div class="h-sec">📦 পরীক্ষার প্যাকেজ <small><button class="lnkbtn" onclick="openExams()">সব পরীক্ষা ›</button></small></div>` + HOME_PK.slice(0, 3).map(pkgCardHtml).join("");
   box2.innerHTML = h;
 }
@@ -4308,11 +4401,13 @@ function chapterNote(qs){
 /* ---------------- শুরু ---------------- */
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 const EX_HASH = location.hash.match(/exam=(\d+)/) || (location.hash === "#exams" ? [0, ""] : null), CQ_HASH = location.hash.match(/cq=(\d+)/), PK_HASH = location.hash.match(/pkg=(\d+)/);
-if (PK_HASH && configured()) pkgOpen(+PK_HASH[1]);
+const FL_HASH = location.hash.match(/^#free(?:=([A-Za-z]+))?/);
+if (FL_HASH && configured()) openFreeLib(FL_HASH[1] ? FL_HASH[1].toUpperCase() : null);
+else if (PK_HASH && configured()) pkgOpen(+PK_HASH[1]);
 else if (CQ_HASH && configured()) openExams("q" + CQ_HASH[1]);
 else if (EX_HASH && configured()) openExams(EX_HASH[1] ? +EX_HASH[1] : null);
 else if (TOKEN && configured()) start(); else show("homeView");
-window.addEventListener("hashchange", () => { const m = location.hash.match(/exam=(\d+)/), q = location.hash.match(/cq=(\d+)/), k = location.hash.match(/pkg=(\d+)/); if(k) pkgOpen(+k[1]); else if(m) openExams(+m[1]); else if(q) openExams("q" + q[1]); });
+window.addEventListener("hashchange", () => { const m = location.hash.match(/exam=(\d+)/), q = location.hash.match(/cq=(\d+)/), k = location.hash.match(/pkg=(\d+)/); const f = location.hash.match(/^#free(?:=([A-Za-z]+))?/); if(f) openFreeLib(f[1] ? f[1].toUpperCase() : null); else if(k) pkgOpen(+k[1]); else if(m) openExams(+m[1]); else if(q) openExams("q" + q[1]); });
 </script>
 <div id="printArea"></div>
 </body>
