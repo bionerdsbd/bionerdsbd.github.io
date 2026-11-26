@@ -215,6 +215,18 @@ details summary{cursor:pointer}
 .rt .day{min-width:92px;font-weight:600}
 .rt .tm{color:var(--ink)}
 .rt .today{background:var(--orange);color:#fff;border-radius:10px;font-size:11.5px;padding:1px 8px;font-weight:700;margin-left:auto}
+.ins{background:#fff;border-radius:20px;padding:18px 16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(16,24,40,.06);border-top:5px solid var(--g3)}
+.ins .top{display:flex;gap:14px;align-items:center}
+.ins .ph{width:92px;height:92px;border-radius:50%;flex:0 0 92px;overflow:hidden;background:var(--mint);display:grid;place-items:center;font-size:34px;font-weight:700;color:var(--g);border:3px solid var(--mint)}
+.ins .ph img{width:100%;height:100%;object-fit:cover}
+.ins .nm{font-size:19px;font-weight:700;line-height:1.3}
+.ins .tt{display:inline-block;background:var(--mint);color:var(--g2);border-radius:20px;padding:2px 10px;font-size:12.5px;font-weight:700;margin-top:4px}
+.ins .edu{margin-top:14px;border-left:3px solid var(--mint);padding-left:12px}
+.ins .edu div{position:relative;padding:3px 0;font-size:14.5px}
+.ins .edu div:before{content:"";position:absolute;left:-18px;top:11px;width:9px;height:9px;border-radius:50%;background:var(--g3)}
+.ins .bio{margin-top:12px;font-size:14.5px;color:#3a4654;white-space:pre-wrap}
+.ins .act{display:flex;gap:8px;margin-top:12px}
+.ins .act a{flex:1;text-align:center;text-decoration:none;margin:0}
 .fbw{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x mandatory;scrollbar-width:none}
 .fbw::-webkit-scrollbar{display:none}
 .fb{flex:0 0 84%;scroll-snap-align:start;background:#fff;border-radius:18px;padding:16px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
@@ -1275,6 +1287,12 @@ function paintHomeMain(h, loading){
       <div class="muted" style="text-align:center;margin-top:8px;font-size:12.5px">সপ্তাহের পরীক্ষাগুলোর গড় নম্বরের ভিত্তিতে</div>`;
   }
 
+  // Instructor
+  const insList = (s.instructors||[]).filter(x=>x && x.show!==false && x.name);
+  if(insList.length){
+    html += `<div class="h-sec">👨‍🏫 ${insList.length>1?"Instructors":"Instructor"}</div>` + insList.map(insCard).join("");
+  }
+
   // রুটিন
   if(routine.length){
     html += `<div class="h-sec">🗓️ ক্লাস রুটিন <small>আজ ${today}</small></div>` + routine.map(r=>`<div class="rt"><div class="rb">${esc(r.batch)}</div>
@@ -1304,6 +1322,15 @@ function paintHomeMain(h, loading){
   $("#hExamCta").innerHTML = `<button class="btn gold-cta" onclick="openExams()">🔥 ফ্রি অনলাইন পরীক্ষা দাও<span>সারা দেশের মেরিট লিস্ট • ব্যাখ্যাসহ সমাধান</span></button>`;
   if(!loading) homeExams();
   paintInstall();
+}
+function insCard(x){
+  const edu = String(x.edu||"").split("\n").map(l=>l.trim()).filter(Boolean);
+  const ph = String(x.phone||"").replace(/[^\d+]/g,"");
+  return `<div class="ins"><div class="top"><div class="ph">${x.photo?`<img src="${x.photo}" alt="" loading="lazy">`:esc((x.name||"?").trim().charAt(0))}</div>
+    <div style="min-width:0"><div class="nm">${esc(x.name)}</div>${x.title?`<span class="tt">${esc(x.title)}</span>`:""}</div></div>
+    ${edu.length?`<div class="edu">${edu.map(l=>`<div>${esc(l)}</div>`).join("")}</div>`:""}
+    ${x.bio?`<div class="bio">${esc(x.bio)}</div>`:""}
+    ${ph?`<div class="act"><a class="btn sm sec" href="tel:${esc(ph)}">📞 কল</a><a class="btn sm" target="_blank" rel="noopener" href="${waLink(ph,"আসসালামু আলাইকুম")}">📲 WhatsApp</a></div>`:""}</div>`;
 }
 function fmtShort(d){ const x=new Date(d); return isNaN(x)?d:x.toLocaleDateString("en-GB",{day:"numeric",month:"short"}).replace(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/,m=>({Jan:"জানু",Feb:"ফেব্রু",Mar:"মার্চ",Apr:"এপ্রিল",May:"মে",Jun:"জুন",Jul:"জুলাই",Aug:"আগস্ট",Sep:"সেপ্টে",Oct:"অক্টো",Nov:"নভে",Dec:"ডিসে"}[m])); }
 function paintInstall(){
@@ -1341,6 +1368,8 @@ async function admHome(){
       <label>YouTube চ্যানেল</label><input id="hsYt" value="${esc(s.youtube||"")}">
       <label>Facebook পেজ</label><input id="hsFb" value="${esc(s.facebook||"")}">
       <button class="btn" id="hsSave">সেভ করো</button><div id="hsMsg"></div></div>
+    <div class="sec-title">👨‍🏫 Instructor</div>
+    <div id="insAdm"></div>
     <div class="sec-title">💬 মতামত</div>
     <div class="card"><h3>➕ নিজে মতামত যোগ করো</h3><div class="muted">পুরনো স্টুডেন্ট বা অভিভাবকের মতামত (সরাসরি হোম পেজে যাবে)</div>
       <label>নাম</label><input id="afN" placeholder="যেমন: রাহাত হাসান">
@@ -1348,10 +1377,12 @@ async function admHome(){
       <label>মতামত</label><textarea id="afB" style="font-family:inherit;min-height:80px"></textarea>
       <button class="btn sec" id="afSave">যোগ করো</button></div>
     <div id="fbList"><div class="spin"></div></div>`;
+  ADM_SITE = s; paintInsAdm();
   $("#hsSave").onclick = async () => {
+    s = ADM_SITE;
     const v = {...s, admission_open:$("#hsOpen").checked, admission_text:$("#hsAdm").value.trim(), highlight:$("#hsHl").value.trim(),
       routine:$("#hsRt").value.trim(), videos:$("#hsVid").value.trim(), youtube:$("#hsYt").value.trim(), facebook:$("#hsFb").value.trim()};
-    try{ await rpc("admin_save_site",{p_token:TOKEN,p_value:v}); s=v; HOME=null; $("#hsMsg").innerHTML='<div class="ok">✅ সেভ হয়েছে — হোম পেজে এখনই দেখাবে</div>'; }
+    try{ await rpc("admin_save_site",{p_token:TOKEN,p_value:v}); s=v; ADM_SITE=v; HOME=null; $("#hsMsg").innerHTML='<div class="ok">✅ সেভ হয়েছে — হোম পেজে এখনই দেখাবে</div>'; }
     catch(ex){ $("#hsMsg").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
   };
   $("#afSave").onclick = async () => {
@@ -1360,6 +1391,70 @@ async function admHome(){
       ["#afN","#afM","#afB"].forEach(x=>$(x).value=""); HOME=null; toast("যোগ হয়েছে ✅"); loadFb(); }catch(ex){ toast(ex.message); }
   };
   loadFb();
+}
+/* ---- অ্যাডমিন: Instructor (হোম পেজের settings.instructors-এ থাকে) ---- */
+let ADM_SITE = {};
+function paintInsAdm(){
+  const box = $("#insAdm"); if(!box) return;
+  const L = ADM_SITE.instructors || [];
+  box.innerHTML = (L.length ? L.map((x,i)=>`<div class="card" style="border-left:5px solid ${x.show===false?"var(--line)":"var(--g3)"}">
+      <div class="row" style="gap:12px;align-items:center">
+        <div style="width:56px;height:56px;border-radius:50%;overflow:hidden;background:var(--mint);flex:0 0 56px;display:grid;place-items:center;font-weight:700;color:var(--g)">${x.photo?`<img src="${x.photo}" style="width:100%;height:100%;object-fit:cover">`:esc((x.name||"?").charAt(0))}</div>
+        <div style="flex:1;min-width:0"><b>${esc(x.name||"(নাম নেই)")}</b><div class="muted" style="font-size:12.5px">${esc(x.title||"")}${x.show===false?" • লুকানো":""}</div></div></div>
+      <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn sm" onclick="insEdit(${i})">✏️ এডিট</button>
+        ${i>0?`<button class="btn sm ghost" onclick="insMove(${i},-1)">▲</button>`:""}
+        ${i<L.length-1?`<button class="btn sm ghost" onclick="insMove(${i},1)">▼</button>`:""}
+        <button class="btn sm danger" onclick="insDel(${i})">🗑</button></div></div>`).join("")
+    : '<div class="card muted">এখনো কোনো Instructor যোগ করা হয়নি।</div>') +
+    `<button class="btn sec" onclick="insEdit(-1)">➕ নতুন Instructor / শিক্ষক যোগ করো</button>`;
+}
+async function insSaveAll(msg){
+  try{ await rpc("admin_save_site",{p_token:TOKEN,p_value:ADM_SITE}); HOME=null; toast(msg||"সেভ হয়েছে ✅"); paintInsAdm(); return true; }
+  catch(ex){ toast(ex.message); return false; }
+}
+function insMove(i,d){ const L=ADM_SITE.instructors; [L[i],L[i+d]]=[L[i+d],L[i]]; insSaveAll("ক্রম বদলেছে ✅"); }
+function insDel(i){ const L=ADM_SITE.instructors; if(!confirm((L[i].name||"এই শিক্ষক")+" — হোম পেজ থেকে পুরো মুছে ফেলবে? (শুধু লুকাতে চাইলে এডিটে গিয়ে টিক তুলে দাও)")) return; L.splice(i,1); insSaveAll("মুছে ফেলা হয়েছে"); }
+function insEdit(i){
+  const x = i>=0 ? {...ADM_SITE.instructors[i]} : {title:"Biology Instructor", show:true, phone:COACHING.whatsapp};
+  const sh=document.createElement("div"); sh.className="sheet"; sh.onclick=e=>{ if(e.target===sh) sh.remove(); };
+  sh.innerHTML = `<div style="max-height:88vh;overflow-y:auto"><h3>${i>=0?"✏️ Instructor এডিট":"➕ নতুন Instructor"}</h3>
+    <div style="display:flex;align-items:center;gap:14px;margin:10px 0">
+      <div id="ieP" style="width:84px;height:84px;border-radius:50%;overflow:hidden;background:var(--mint);display:grid;place-items:center;font-size:28px">👤</div>
+      <div><label class="btn sm sec" style="margin:0;display:inline-block">📷 ছবি বদলাও<input type="file" accept="image/*" id="ieF" hidden></label>
+      <button class="btn sm ghost" id="ieX" style="margin:6px 0 0">ছবি সরাও</button></div></div>
+    <label>নাম</label><input id="ieN" value="${esc(x.name||"")}" placeholder="যেমন: Md. ...">
+    <label>পদবি (নামের নিচে ছোট করে)</label><input id="ieT" value="${esc(x.title||"")}" placeholder="যেমন: Biology Instructor">
+    <label>🎓 পড়াশোনা / ডিগ্রি — প্রতি লাইনে একটা (নতুন ডিগ্রি হলে নিচে একটা লাইন যোগ করো)</label>
+    <textarea id="ieE" style="font-family:inherit;min-height:110px" placeholder="MBBS — Faridpur Medical College">${esc(x.edu||"")}</textarea>
+    <label>ছোট বার্তা / পরিচয় (ঐচ্ছিক)</label><textarea id="ieB" style="font-family:inherit;min-height:80px">${esc(x.bio||"")}</textarea>
+    <label>ফোন / WhatsApp (খালি রাখলে কল বাটন দেখাবে না)</label><input id="ieM" inputmode="tel" value="${esc(x.phone||"")}">
+    <label style="display:flex;align-items:center;gap:10px;margin-top:12px"><input type="checkbox" id="ieS" style="width:22px;height:22px" ${x.show!==false?"checked":""}> হোম পেজে দেখাও</label>
+    <button class="btn" id="ieOk">💾 সেভ করো</button><button class="btn ghost" onclick="this.closest('.sheet').remove()">বাতিল</button></div>`;
+  document.body.appendChild(sh);
+  const paintP=()=>{ sh.querySelector("#ieP").innerHTML = x.photo?`<img src="${x.photo}" style="width:100%;height:100%;object-fit:cover">`:"👤"; };
+  paintP();
+  sh.querySelector("#ieX").onclick=()=>{ x.photo=""; paintP(); };
+  sh.querySelector("#ieF").onchange=async e=>{
+    const f=e.target.files[0]; e.target.value=""; if(!f) return;
+    try{
+      const img=await loadImg(URL.createObjectURL(f));
+      const S=420, c=document.createElement("canvas"); c.width=c.height=S;
+      const m=Math.min(img.width,img.height), ctx=c.getContext("2d");
+      ctx.fillStyle="#fff"; ctx.fillRect(0,0,S,S);
+      ctx.drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,S,S);
+      let q=.85, d=c.toDataURL("image/jpeg",q); while(d.length>120000 && q>.3){ q-=.1; d=c.toDataURL("image/jpeg",q); }
+      x.photo=d; paintP();
+    }catch(ex){ toast("ছবিটা খোলা যায়নি"); }
+  };
+  sh.querySelector("#ieOk").onclick=async()=>{
+    const g=id=>sh.querySelector(id).value.trim();
+    if(!g("#ieN")){ toast("নাম লাগবে"); return; }
+    Object.assign(x,{name:g("#ieN"),title:g("#ieT"),edu:g("#ieE"),bio:g("#ieB"),phone:g("#ieM"),show:sh.querySelector("#ieS").checked});
+    const L = ADM_SITE.instructors = ADM_SITE.instructors || [];
+    if(i>=0) L[i]=x; else L.push(x);
+    if(await insSaveAll("সেভ হয়েছে ✅ হোম পেজে দেখাবে")) sh.remove();
+  };
 }
 async function loadFb(){
   try{
