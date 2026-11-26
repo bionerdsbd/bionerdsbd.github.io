@@ -227,6 +227,19 @@ details summary{cursor:pointer}
 .ins .bio{margin-top:12px;font-size:14.5px;color:#3a4654;white-space:pre-wrap}
 .ins .act{display:flex;gap:8px;margin-top:12px}
 .ins .act a{flex:1;text-align:center;text-decoration:none;margin:0}
+.suc{flex:0 0 46%;scroll-snap-align:start;background:#fff;border-radius:18px;padding:14px 10px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.06);border-bottom:4px solid var(--gold)}
+.suc .sp{width:74px;height:74px;border-radius:50%;margin:0 auto 8px;background:var(--mint);display:grid;place-items:center;font-weight:700;font-size:26px;color:var(--g);overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 2px var(--gold)}
+.suc .sp img{width:100%;height:100%;object-fit:cover}
+.suc b{display:block;font-size:14.5px;line-height:1.3}
+.suc .ac{display:inline-block;margin-top:6px;background:#fff6dd;color:#8a5a00;border-radius:12px;padding:2px 9px;font-size:12.5px;font-weight:700;line-height:1.35}
+.suc .mt{font-size:12px;color:var(--mute);margin-top:4px;line-height:1.3}
+.suc .qt{font-size:12.5px;color:#3a4654;margin-top:6px;font-style:italic}
+.faq{background:#fff;border-radius:14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.faq summary{list-style:none;padding:13px 40px 13px 16px;font-weight:600;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:"+";position:absolute;right:16px;top:9px;font-size:22px;color:var(--g3);font-weight:700}
+.faq[open] summary:after{content:"–"}
+.faq div{padding:0 16px 14px;color:#3a4654;font-size:14.5px;white-space:pre-wrap}
 .fbw{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x mandatory;scrollbar-width:none}
 .fbw::-webkit-scrollbar{display:none}
 .fb{flex:0 0 84%;scroll-snap-align:start;background:#fff;border-radius:18px;padding:16px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
@@ -1287,6 +1300,15 @@ function paintHomeMain(h, loading){
       <div class="muted" style="text-align:center;margin-top:8px;font-size:12.5px">সপ্তাহের পরীক্ষাগুলোর গড় নম্বরের ভিত্তিতে</div>`;
   }
 
+  // আমাদের সাফল্য
+  const suc = (s.success||[]).filter(x=>x && x.show!==false && x.name);
+  if(suc.length){
+    html += `<div class="h-sec">🏆 আমাদের সাফল্য</div><div class="fbw">${suc.map(x=>`<div class="suc">
+      <div class="sp">${x.photo?`<img src="${x.photo}" alt="" loading="lazy">`:esc(x.name.trim().charAt(0))}</div>
+      <b>${esc(x.name)}</b>${x.ach?`<span class="ac">🎉 ${esc(x.ach)}</span>`:""}${x.meta?`<div class="mt">${esc(x.meta)}</div>`:""}
+      ${x.quote?`<div class="qt">“${esc(x.quote)}”</div>`:""}</div>`).join("")}</div>`;
+  }
+
   // Instructor
   const insList = (s.instructors||[]).filter(x=>x && x.show!==false && x.name);
   if(insList.length){
@@ -1308,21 +1330,29 @@ function paintHomeMain(h, loading){
       <div style="min-width:0"><b>${esc(f.name||"")}</b><div class="muted" style="font-size:12.5px">${esc(f.meta||"")}</div></div></div></div>`).join("")}</div>`;
   }
 
+  // সাধারণ প্রশ্ন
+  const faq = (s.faq||[]).filter(x=>x && x.show!==false && x.q);
+  if(faq.length){
+    html += `<div class="h-sec">❓ সাধারণ প্রশ্ন</div>` + faq.map(x=>`<details class="faq"><summary>${esc(x.q)}</summary><div>${esc(x.a||"")}</div></details>`).join("");
+  }
+
   // YouTube + Facebook
   const yt = s.youtube || "https://youtube.com/@bionerds-tq4bk", fbk = s.facebook || "https://www.facebook.com/share/1DK7J9zFNW/";
   html += `<div class="h-sec">🎬 ফ্রি ক্লাস ও আপডেট</div>` +
     (vids.length?`<div class="vids">${vids.map(id=>`<a href="https://youtu.be/${id}" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy"></a>`).join("")}</div>`:"") +
     `<a class="lnk" href="${esc(yt)}" target="_blank" rel="noopener"><span class="ic" style="background:#ff0000">▶</span><div><b>YouTube — ফ্রি ক্লাস</b><span>BIO NERDS চ্যানেলে বায়োলজির ফ্রি ক্লাস দেখো</span></div><span class="ar">›</span></a>
     <a class="lnk" href="${esc(fbk)}" target="_blank" rel="noopener"><span class="ic" style="background:#1877f2;font-family:Poppins;font-weight:800">f</span><div><b>Facebook পেজ</b><span>নোটিশ, রেজাল্ট আর আপডেট সবার আগে</span></div><span class="ar">›</span></a>
-    <a class="lnk" href="${waLink(COACHING.whatsapp,"আসসালামু আলাইকুম")}" target="_blank" rel="noopener"><span class="ic" style="background:#25d366">✆</span><div><b>WhatsApp</b><span>${esc(COACHING.whatsapp)}</span></div><span class="ar">›</span></a>`;
+    <a class="lnk" href="${waLink(COACHING.whatsapp,"আসসালামু আলাইকুম")}" target="_blank" rel="noopener"><span class="ic" style="background:#25d366">✆</span><div><b>WhatsApp</b><span>${esc(COACHING.whatsapp)}</span></div><span class="ar">›</span></a>
+    <a class="lnk" href="${esc(mapsLink(s))}" target="_blank" rel="noopener"><span class="ic" style="background:#ea4335">📍</span><div><b>কোচিংয়ের লোকেশন</b><span>Google Maps-এ দেখো ও রাস্তা খুঁজে নাও</span></div><span class="ar">›</span></a>`;
 
   html += `<div id="instBox"></div>
-    <div class="h-foot"><b class="brand" style="color:var(--g)">BIO NERDS</b> — Seek For Knowledge<br>📍 ${esc(COACHING.address)}<br>📞 ${esc(COACHING.phones)}</div>`;
+    <div class="h-foot"><b class="brand" style="color:var(--g)">BIO NERDS</b> — Seek For Knowledge<br><a href="${esc(mapsLink(s))}" target="_blank" rel="noopener" style="color:inherit">📍 ${esc(COACHING.address)}</a><br>📞 ${esc(COACHING.phones)}</div>`;
   $("#homeMain").innerHTML = html;
   $("#hExamCta").innerHTML = `<button class="btn gold-cta" onclick="openExams()">🔥 ফ্রি অনলাইন পরীক্ষা দাও<span>সারা দেশের মেরিট লিস্ট • ব্যাখ্যাসহ সমাধান</span></button>`;
   if(!loading) homeExams();
   paintInstall();
 }
+function mapsLink(s){ return (s&&s.maps) || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("BIO NERDS, " + COACHING.address); }
 function insCard(x){
   const edu = String(x.edu||"").split("\n").map(l=>l.trim()).filter(Boolean);
   const ph = String(x.phone||"").replace(/[^\d+]/g,"");
@@ -1367,9 +1397,15 @@ async function admHome(){
       <textarea id="hsVid" style="font-family:inherit;min-height:80px" placeholder="https://youtu.be/...">${esc(s.videos||"")}</textarea>
       <label>YouTube চ্যানেল</label><input id="hsYt" value="${esc(s.youtube||"")}">
       <label>Facebook পেজ</label><input id="hsFb" value="${esc(s.facebook||"")}">
+      <label>📍 Google Maps লিংক (খালি রাখলে ঠিকানা দিয়ে খুঁজবে — Maps-এ কোচিং খুলে Share → Copy link দিয়ে এখানে পেস্ট করো)</label><input id="hsMap" value="${esc(s.maps||"")}" placeholder="https://maps.app.goo.gl/...">
       <button class="btn" id="hsSave">সেভ করো</button><div id="hsMsg"></div></div>
+    <div class="sec-title">🏆 আমাদের সাফল্য</div>
+    <div class="muted" style="margin:-6px 2px 10px">যোগ করলেই হোম পেজে আসবে, মুছলে বা লুকালে চলে যাবে। একটাও না থাকলে অংশটাই দেখাবে না।</div>
+    <div id="sucAdm"></div>
     <div class="sec-title">👨‍🏫 Instructor</div>
     <div id="insAdm"></div>
+    <div class="sec-title">❓ সাধারণ প্রশ্ন (FAQ)</div>
+    <div id="faqAdm"></div>
     <div class="sec-title">💬 মতামত</div>
     <div class="card"><h3>➕ নিজে মতামত যোগ করো</h3><div class="muted">পুরনো স্টুডেন্ট বা অভিভাবকের মতামত (সরাসরি হোম পেজে যাবে)</div>
       <label>নাম</label><input id="afN" placeholder="যেমন: রাহাত হাসান">
@@ -1377,11 +1413,11 @@ async function admHome(){
       <label>মতামত</label><textarea id="afB" style="font-family:inherit;min-height:80px"></textarea>
       <button class="btn sec" id="afSave">যোগ করো</button></div>
     <div id="fbList"><div class="spin"></div></div>`;
-  ADM_SITE = s; paintInsAdm();
+  ADM_SITE = s; paintInsAdm(); admList("success"); admList("faq");
   $("#hsSave").onclick = async () => {
     s = ADM_SITE;
     const v = {...s, admission_open:$("#hsOpen").checked, admission_text:$("#hsAdm").value.trim(), highlight:$("#hsHl").value.trim(),
-      routine:$("#hsRt").value.trim(), videos:$("#hsVid").value.trim(), youtube:$("#hsYt").value.trim(), facebook:$("#hsFb").value.trim()};
+      routine:$("#hsRt").value.trim(), videos:$("#hsVid").value.trim(), youtube:$("#hsYt").value.trim(), facebook:$("#hsFb").value.trim(), maps:$("#hsMap").value.trim()};
     try{ await rpc("admin_save_site",{p_token:TOKEN,p_value:v}); s=v; ADM_SITE=v; HOME=null; $("#hsMsg").innerHTML='<div class="ok">✅ সেভ হয়েছে — হোম পেজে এখনই দেখাবে</div>'; }
     catch(ex){ $("#hsMsg").innerHTML='<div class="err">'+esc(ex.message)+'</div>'; }
   };
@@ -1392,6 +1428,69 @@ async function admHome(){
   };
   loadFb();
 }
+/* ---- অ্যাডমিন: সাফল্য / FAQ — একই ধরনের তালিকা এডিটর (settings.success / settings.faq) ---- */
+const ADM_LISTS = {
+  success: {box:"#sucAdm", add:"➕ নতুন সাফল্য যোগ করো", empty:"এখনো কিছু যোগ করা হয়নি — হোম পেজে এই অংশ দেখাচ্ছে না।",
+    title:x=>x.name, sub:x=>[x.ach,x.meta].filter(Boolean).join(" • "), photo:true, need:"name",
+    fields:[["name","নাম","text","যেমন: Rahat Hasan"],["ach","সাফল্য","text","যেমন: Dhaka Medical College চান্স / HSC GPA-5"],
+            ["meta","ব্যাচ / প্রতিষ্ঠান (ঐচ্ছিক)","text","যেমন: HSC'25 • Comilla Victoria College"],["quote","তার ছোট মন্তব্য (ঐচ্ছিক)","area",""]]},
+  faq: {box:"#faqAdm", add:"➕ নতুন প্রশ্ন যোগ করো", empty:"এখনো কোনো প্রশ্ন নেই — হোম পেজে এই অংশ দেখাচ্ছে না।",
+    title:x=>x.q, sub:x=>String(x.a||"").slice(0,70), photo:false, need:"q",
+    fields:[["q","প্রশ্ন","text","যেমন: মাসিক বেতন কত?"],["a","উত্তর","area",""]]}
+};
+function admList(key){
+  const c = ADM_LISTS[key], box = $(c.box); if(!box) return;
+  const L = ADM_SITE[key] || [];
+  box.innerHTML = (L.length ? L.map((x,i)=>`<div class="card" style="border-left:5px solid ${x.show===false?"var(--line)":"var(--g3)"};padding:12px 14px">
+      <div class="row" style="gap:12px;align-items:center">
+        ${c.photo?`<div style="width:48px;height:48px;border-radius:50%;overflow:hidden;background:var(--mint);flex:0 0 48px;display:grid;place-items:center;font-weight:700;color:var(--g)">${x.photo?`<img src="${x.photo}" style="width:100%;height:100%;object-fit:cover">`:esc(String(c.title(x)||"?").charAt(0))}</div>`:""}
+        <div style="flex:1;min-width:0"><b>${esc(c.title(x)||"")}</b><div class="muted" style="font-size:12.5px">${esc(c.sub(x)||"")}${x.show===false?" • 🙈 লুকানো":""}</div></div></div>
+      <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn sm" onclick="admListEdit('${key}',${i})">✏️ এডিট</button>
+        <button class="btn sm ghost" onclick="admListShow('${key}',${i})">${x.show===false?"👁 দেখাও":"🙈 লুকাও"}</button>
+        ${i>0?`<button class="btn sm ghost" onclick="admListMove('${key}',${i},-1)">▲</button>`:""}
+        ${i<L.length-1?`<button class="btn sm ghost" onclick="admListMove('${key}',${i},1)">▼</button>`:""}
+        <button class="btn sm danger" onclick="admListDel('${key}',${i})">🗑</button></div></div>`).join("")
+    : `<div class="card muted">${c.empty}</div>`) + `<button class="btn sec" onclick="admListEdit('${key}',-1)">${c.add}</button>`;
+}
+async function admListSave(key,msg){
+  try{ await rpc("admin_save_site",{p_token:TOKEN,p_value:ADM_SITE}); HOME=null; toast(msg||"সেভ হয়েছে ✅"); admList(key); return true; }
+  catch(ex){ toast(ex.message); return false; }
+}
+function admListMove(key,i,d){ const L=ADM_SITE[key]; [L[i],L[i+d]]=[L[i+d],L[i]]; admListSave(key,"ক্রম বদলেছে ✅"); }
+function admListShow(key,i){ const x=ADM_SITE[key][i]; x.show = x.show===false; admListSave(key, x.show?"হোম পেজে দেখাচ্ছে ✅":"লুকানো হয়েছে"); }
+function admListDel(key,i){ if(!confirm("পুরো মুছে ফেলবে? (শুধু সরাতে চাইলে 🙈 লুকাও চাপো)")) return; ADM_SITE[key].splice(i,1); admListSave(key,"মুছে ফেলা হয়েছে"); }
+function admListEdit(key,i){
+  const c = ADM_LISTS[key], x = i>=0 ? {...ADM_SITE[key][i]} : {show:true};
+  const sh=document.createElement("div"); sh.className="sheet"; sh.onclick=e=>{ if(e.target===sh) sh.remove(); };
+  sh.innerHTML = `<div style="max-height:88vh;overflow-y:auto"><h3>${i>=0?"✏️ এডিট":c.add}</h3>
+    ${c.photo?`<div style="display:flex;align-items:center;gap:14px;margin:10px 0"><div id="lsP" style="width:80px;height:80px;border-radius:50%;overflow:hidden;background:var(--mint);display:grid;place-items:center;font-size:26px">👤</div>
+      <div><label class="btn sm sec" style="margin:0;display:inline-block">📷 ছবি দাও<input type="file" accept="image/*" id="lsF" hidden></label>
+      <button class="btn sm ghost" id="lsX" style="margin:6px 0 0">ছবি সরাও</button></div></div>`:""}
+    ${c.fields.map(([k,l,ty,ph])=>`<label>${l}</label>`+(ty==="area"?`<textarea data-k="${k}" style="font-family:inherit;min-height:90px" placeholder="${esc(ph)}">${esc(x[k]||"")}</textarea>`:`<input data-k="${k}" value="${esc(x[k]||"")}" placeholder="${esc(ph)}">`)).join("")}
+    <button class="btn" id="lsOk">💾 সেভ করো</button><button class="btn ghost" onclick="this.closest('.sheet').remove()">বাতিল</button></div>`;
+  document.body.appendChild(sh);
+  if(c.photo){
+    const paintP=()=>{ sh.querySelector("#lsP").innerHTML = x.photo?`<img src="${x.photo}" style="width:100%;height:100%;object-fit:cover">`:"👤"; };
+    paintP(); sh.querySelector("#lsX").onclick=()=>{ x.photo=""; paintP(); };
+    sh.querySelector("#lsF").onchange=async e=>{ const f=e.target.files[0]; e.target.value=""; if(!f) return;
+      try{ x.photo = await squarePhoto(f, 300, 70000); paintP(); }catch(ex){ toast("ছবিটা খোলা যায়নি"); } };
+  }
+  sh.querySelector("#lsOk").onclick=async()=>{
+    sh.querySelectorAll("[data-k]").forEach(el=>x[el.dataset.k]=el.value.trim());
+    if(!x[c.need]){ toast(c.fields[0][1]+" লাগবে"); return; }
+    const L = ADM_SITE[key] = ADM_SITE[key] || [];
+    if(i>=0) L[i]=x; else L.push(x);
+    if(await admListSave(key, "সেভ হয়েছে ✅ হোম পেজে দেখাবে")) sh.remove();
+  };
+}
+async function squarePhoto(f, S, max){
+  const img=await loadImg(URL.createObjectURL(f)), c=document.createElement("canvas"); c.width=c.height=S;
+  const m=Math.min(img.width,img.height), ctx=c.getContext("2d");
+  ctx.fillStyle="#fff"; ctx.fillRect(0,0,S,S); ctx.drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,S,S);
+  let q=.85, d=c.toDataURL("image/jpeg",q); while(d.length>max && q>.3){ q-=.1; d=c.toDataURL("image/jpeg",q); } return d;
+}
+
 /* ---- অ্যাডমিন: Instructor (হোম পেজের settings.instructors-এ থাকে) ---- */
 let ADM_SITE = {};
 function paintInsAdm(){
@@ -4002,7 +4101,7 @@ async function cqUnapprove(){
 /* ================================================================
    📦 পরীক্ষার প্যাকেজ (পেইড) — স্টুডেন্ট / পাবলিক
    ================================================================ */
-const PKG_METHOD = {bkash:"বিকাশ", nagad:"নগদ", cash:"ক্যাশ", gift:"উপহার (ফ্রি)"};
+const PKG_METHOD = {bkash:"বিকাশ", nagad:"নগদ", cash:"ক্যাশ", gift:"উপহার (ফ্রি)", credit:"ছাড়/ব্যালেন্স"};
 const pkgLink = id => SITE_URL + "/#pkg=" + id;
 let PKGS = [], PKG_CFG = null, PKG_CUR = null, HOME_PK = [];
 function dhakaDate(iso){ const p = bdParts(iso); return BN_DIGITS(p.d) + " " + BN_MON[p.m] + " " + BN_DIGITS(p.y); }
@@ -4041,7 +4140,8 @@ async function pkgHub(){
   const box = $("#pkgHub"); if(!box) return;
   try{ await pkgLoad(); }catch(e){ box.innerHTML = ""; return; }
   if(!$("#pkgHub")) return;
-  $("#pkgHub").innerHTML = PKGS.length ? `<div class="ex-sec">📦 পরীক্ষার প্যাকেজ <small>রুটিন • নমুনা • কেনো</small></div>` + PKGS.map(pkgCardHtml).join("") : "";
+  $("#pkgHub").innerHTML = PKGS.length ? `<div class="ex-sec">📦 পরীক্ষার প্যাকেজ <small>রুটিন • নমুনা • কেনো</small></div>` + PKGS.map(pkgCardHtml).join("") + '<div id="refCard"></div>' : "";
+  if(PKGS.length) refCard();
 }
 
 /* তালা দেওয়া পরীক্ষার কার্ডের নিচের অংশ */
@@ -4141,7 +4241,7 @@ async function pkgShare(id){
   copyText(text + pkgLink(id));
 }
 
-/* কেনা: বিকাশ/নগদে Send Money → TrxID */
+/* কেনা: কুপন/রেফার কোড → দাম → বিকাশ/নগদে Send Money → TrxID */
 function pkgBuy(id){
   const p = PKG_CUR && PKG_CUR.id == id ? PKG_CUR : PKGS.find(x => x.id == id);
   if(!p){ pkgOpen(id); return; }
@@ -4151,33 +4251,203 @@ function pkgBuy(id){
   if(me.state === "free"){ toast("তোমার ব্যাচের জন্য ফ্রি — কিনতে হবে না 🎁"); return; }
   const methods = PAY_METHODS(); let method = methods[0];
   if(!method){ toast("এখন অনলাইনে কেনা যাচ্ছে না — WhatsApp-এ যোগাযোগ করো: " + COACHING.whatsapp, 4000); return; }
+  let Q = {base: +p.my_price, final: +p.my_price, discount: 0, credit_used: 0}, code = "";
   sheet(`<h3>📦 ${esc(p.title)}</h3><div class="muted">⏳ ${pkgValidTxt(p)}</div>
-    <div class="pk-pay"><span>পাঠাতে হবে</span><b>${tk(p.my_price)}</b></div>
+    <label>🎟️ কুপন / বন্ধুর রেফার কোড (থাকলে)</label>
+    <div class="row" style="gap:8px;flex-wrap:nowrap"><input id="pbC" autocapitalize="characters" autocomplete="off" placeholder="যেমন EARLY50 বা 27001" style="flex:1" value="${esc(refSaved())}">
+      <button type="button" class="btn sm sec" id="pbCA" style="margin:0;white-space:nowrap">প্রয়োগ</button></div>
+    <div id="pbQ"></div>
+    <div id="pbPay">
     <label>কোনটা দিয়ে পাঠাবে</label>
     <div class="mbtn" id="pbM">${methods.map(m => `<button type="button" class="${m} ${m === method ? "on" : ""}" data-m="${m}">${METHOD[m]}</button>`).join("")}</div>
     <div id="pbNum"></div>
     <label>কোন নম্বর থেকে পাঠিয়েছ</label><input id="pbS" inputmode="tel" placeholder="01XXXXXXXXX" value="${esc((ROLE !== "admin" && ME && ME.phone) || "")}">
-    <label>TrxID</label><input id="pbT" autocapitalize="characters" autocomplete="off" placeholder="যেমন 8N7A6XK2QP">
+    <label>TrxID</label><input id="pbT" autocapitalize="characters" autocomplete="off" placeholder="যেমন 8N7A6XK2QP"></div>
     <div id="pbE" class="err hidden"></div>
     <button class="btn orange" id="pbGo">✅ জমা দাও</button>
     <button class="btn ghost" onclick="closeSheet()">এখন না</button>
-    <p class="hint">ঠিক ${tk(p.my_price)} পাঠাও। কোচিং থেকে TrxID মিলিয়ে নিশ্চিত করলেই প্যাকেজ চালু হবে। কোনো সমস্যা হলে WhatsApp: ${esc(COACHING.whatsapp)}</p>`);
+    <p class="hint" id="pbH"></p>`);
   const paint = () => { $("#pbNum").innerHTML = payNumHtml(method); };
   document.querySelectorAll("#pbM button").forEach(b => b.onclick = () => { method = b.dataset.m; document.querySelectorAll("#pbM button").forEach(x => x.classList.toggle("on", x === b)); paint(); });
   paint();
   const err = $("#pbE"), clr = () => err.classList.add("hidden");
+  const fail = m => { err.textContent = m; err.classList.remove("hidden"); };
+  const paintQ = (cerr) => {
+    const free = +Q.final <= 0;
+    $("#pbQ").innerHTML = `<div class="pk-pay" style="display:block">
+      ${+Q.discount || +Q.credit_used ? `<div class="row between muted" style="font-size:14px"><span>প্যাকেজের দাম</span><s>${tk(Q.base)}</s></div>` : ""}
+      ${+Q.discount ? `<div class="row between" style="font-size:14px;color:var(--g2)"><span>${esc(Q.label || "ছাড়")}</span><b>− ${tk(Q.discount)}</b></div>` : ""}
+      ${+Q.credit_used ? `<div class="row between" style="font-size:14px;color:var(--g2)"><span>💰 তোমার রেফারেল ব্যালেন্স থেকে</span><b>− ${tk(Q.credit_used)}</b></div>` : ""}
+      <div class="row between" style="margin-top:4px"><span>${free ? "পাঠাতে হবে না" : "পাঠাতে হবে"}</span><b>${tk(Q.final)}</b></div></div>
+      ${cerr ? `<div class="err" style="margin:6px 0 0">${esc(cerr)}</div>` : ""}`;
+    $("#pbPay").classList.toggle("hidden", free);
+    $("#pbGo").textContent = free ? "🎉 ফ্রিতে চালু করো" : "✅ জমা দাও";
+    $("#pbH").textContent = free ? "পুরো দাম ছাড় / ব্যালেন্সে কাটা গেছে — চাপলেই প্যাকেজ চালু হয়ে যাবে।"
+      : `ঠিক ${tk(Q.final)} পাঠাও। কোচিং থেকে TrxID মিলিয়ে নিশ্চিত করলেই প্যাকেজ চালু হবে। কোনো সমস্যা হলে WhatsApp: ${COACHING.whatsapp}`;
+  };
+  const quote = async (c, silent) => {
+    try{
+      let q = await rpc("pkg_quote", {p_token:exTok(), p_pkg:id, p_code:c || null}), e = q.err;
+      if(e){
+        q = await rpc("pkg_quote", {p_token:exTok(), p_pkg:id, p_code:null}); code = "";
+        if(silent){ e = ""; $("#pbC").value = ""; }
+      } else code = c || "";
+      Q = q; paintQ(e);
+      if(c && !e && !silent) toast("✅ কোড বসেছে — " + tk(q.discount) + " ছাড়");
+    }catch(ex){ paintQ(); }
+  };
+  paintQ(); quote(refSaved(), true);
+  $("#pbCA").onclick = () => { clr(); quote($("#pbC").value.trim().toUpperCase()); };
+  $("#pbC").onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); $("#pbCA").click(); } };
   $("#pbS").oninput = clr; $("#pbT").oninput = clr;
   $("#pbGo").onclick = async () => {
+    const typed = $("#pbC").value.trim().toUpperCase();
+    if(typed && typed !== code) return fail("কোডটা লিখেছ কিন্তু “প্রয়োগ” চাপোনি — আগে প্রয়োগ চাপো (বা ঘর খালি করো)");
+    const free = +Q.final <= 0;
     const s = $("#pbS").value.replace(/\D/g, ""), t = $("#pbT").value.trim().replace(/\s/g, "");
-    const fail = m => { err.textContent = m; err.classList.remove("hidden"); };
-    if(!/^(?:88)?01[3-9]\d{8}$/.test(s)) return fail("যে নম্বর থেকে টাকা পাঠিয়েছ সেটা লেখো (01XXXXXXXXX)");
-    if(!/^[A-Za-z0-9]{6,20}$/.test(t)) return fail("TrxID ঠিকভাবে লেখো (বিকাশ/নগদের মেসেজে যেটা আসে)");
+    if(!free){
+      if(!/^(?:88)?01[3-9]\d{8}$/.test(s)) return fail("যে নম্বর থেকে টাকা পাঠিয়েছ সেটা লেখো (01XXXXXXXXX)");
+      if(!/^[A-Za-z0-9]{6,20}$/.test(t)) return fail("TrxID ঠিকভাবে লেখো (বিকাশ/নগদের মেসেজে যেটা আসে)");
+    }
     const b = $("#pbGo"); b.disabled = true; b.textContent = "জমা হচ্ছে...";
     try{
-      await rpc("pkg_buy", {p_token:exTok(), p_pkg:id, p_method:method, p_sender:s, p_trx:t});
-      closeSheet(); toast("জমা হয়েছে ✅ যাচাইয়ের পর প্যাকেজ চালু হবে", 4000); pkgOpen(id);
-    }catch(ex){ fail(ex.message); b.disabled = false; b.textContent = "✅ জমা দাও"; }
+      const r = await rpc("pkg_buy", {p_token:exTok(), p_pkg:id, p_method:method, p_sender:s, p_trx:t, p_code:code || null});
+      if(code && code === refSaved()) refClear();
+      closeSheet(); toast(r.active ? "🎉 প্যাকেজ চালু হয়ে গেছে!" : "জমা হয়েছে ✅ যাচাইয়ের পর প্যাকেজ চালু হবে", 4000); pkgOpen(id);
+    }catch(ex){ fail(ex.message); b.disabled = false; b.textContent = free ? "🎉 ফ্রিতে চালু করো" : "✅ জমা দাও"; }
   };
+}
+
+/* ---- রেফারেল: লিংক থেকে কোড মনে রাখা, নিজের কোড শেয়ার ---- */
+function refCapture(){
+  const m = location.hash.match(/[#&]ref=([A-Za-z0-9_-]{3,20})/);
+  if(m){ try{ localStorage.setItem("bn_ref", m[1].toUpperCase()); }catch(e){} }
+}
+function refSaved(){ try{ return localStorage.getItem("bn_ref") || ""; }catch(e){ return ""; } }
+function refClear(){ try{ localStorage.removeItem("bn_ref"); }catch(e){} }
+let MYREF = null;
+async function refCard(){
+  const box = $("#refCard"); if(!box || !exTok()) return;
+  try{ MYREF = await rpc("pkg_my_ref", {p_token:exTok()}); }catch(e){ return; }
+  const R = MYREF; if(!R || !$("#refCard")) return;
+  if(!R.on && !(+R.credit > 0)){ box.innerHTML = ""; return; }
+  box.innerHTML = `<div class="card" style="border-left:5px solid var(--gold);background:linear-gradient(135deg,#fffaf0,#fff)">
+    <b style="font-size:17px">🤝 বন্ধুকে আনো, টাকা জেতো</b>
+    ${R.on ? `<div class="muted" style="font-size:13.5px;margin-top:4px">তোমার কোড দিয়ে বন্ধু প্রথম প্যাকেজ কিনলে সে পাবে <b>${tk(R.friend)} ছাড়</b>, আর তুমি পাবে <b>${tk(R.reward)}</b> — যা তোমার পরের প্যাকেজ কেনায় নিজে থেকে কেটে যাবে।</div>` : ""}
+    <div class="row between" style="margin-top:10px;align-items:center"><div><div class="muted" style="font-size:12.5px">তোমার রেফার কোড</div>
+      <b style="font-family:Poppins;font-size:22px;letter-spacing:1px">${esc(R.code)}</b></div>
+      <div style="text-align:right"><div class="muted" style="font-size:12.5px">তোমার ব্যালেন্স</div><b style="font-family:Poppins;font-size:20px;color:var(--g2)">${tk(R.credit)}</b></div></div>
+    ${+R.count || +R.waiting ? `<div class="muted" style="font-size:13px;margin-top:6px">✅ ${bnNum(R.count)} জন বন্ধু কিনেছে${+R.waiting ? ` • ⏳ ${bnNum(R.waiting)} জনের যাচাই চলছে` : ""}</div>` : ""}
+    ${R.on ? `<div class="row" style="gap:8px;margin-top:10px"><button class="btn sm" style="margin:0;flex:1" onclick="refShare()">📤 বন্ধুকে পাঠাও</button><button class="btn sm sec" style="margin:0" onclick="copyText('${esc(R.code)}')">📋 কোড কপি</button></div>` : ""}</div>`;
+}
+async function refShare(){
+  const R = MYREF; if(!R) return;
+  const url = SITE_URL + "/#exams&ref=" + R.code;
+  const text = `📚 ${COACHING.name} — জীববিজ্ঞানের অনলাইন পরীক্ষা (ফ্রি + প্যাকেজ)\nআমার রেফার কোড ${R.code} দিয়ে প্রথম প্যাকেজ কিনলে ${tk(R.friend)} ছাড় পাবে 🎁\n👉 `;
+  if(navigator.share){ try{ await navigator.share({title:COACHING.name, text, url}); return; }catch(err){ if(err.name === "AbortError") return; } }
+  copyText(text + url);
+}
+function pkgDiscHtml(o){
+  const L = [];
+  if(o.coupon) L.push(`🎟️ কুপন ${esc(o.coupon)} (−${tk(o.discount)})`);
+  if(o.ref_uid) L.push(`🤝 রেফার: ${esc(o.ref_name || o.ref_uid)} (${esc(o.ref_uid)}) — বন্ধু −${tk(o.discount)}, সে পাবে ${tk(o.ref_reward)}`);
+  if(+o.credit_used) L.push(`💰 ব্যালেন্স থেকে −${tk(o.credit_used)}`);
+  return L.length ? `<br><span style="color:var(--g2)">${L.join("<br>")}</span>${o.base_price ? `<br>আসল দাম ${tk(o.base_price)}` : ""}` : "";
+}
+
+/* ---- অ্যাডমিন: কুপন ও রেফারেল ---- */
+let CPA = {list:[], refs:[], cfg:{}};
+async function cpAdm(){
+  window.scrollTo(0,0);
+  $("#aexBody").innerHTML = '<div class="spin"></div>';
+  try{
+    const [l, r] = await Promise.all([rpc("pkg_admin_coupons", {p_token:TOKEN}), rpc("pkg_admin_refs", {p_token:TOKEN}), pkgCfg(true), PKG_ADM ? null : pkgAdmLoad()]);
+    CPA.list = l; CPA.refs = r; CPA.cfg = Object.assign({on:true, friend:20, reward:20, per:{}}, (PKG_CFG || {}).referral || {});
+  }catch(ex){ $("#aexBody").innerHTML = '<div class="err">' + esc(ex.message) + '<br>referral.sql চালানো হয়েছে তো?</div>'; return; }
+  const C = CPA.cfg, P = (PKG_ADM && PKG_ADM.packages) || [];
+  $("#aexBody").innerHTML = `<button class="btn sm ghost" style="margin-bottom:10px" onclick="pkgAdm()">← প্যাকেজ</button>
+    <div class="card"><h3>🤝 রেফারেল</h3>
+      <div class="muted" style="font-size:13px">প্রত্যেক স্টুডেন্টের রেফার কোড = তার রোল (বাইরের হলে G-আইডি)। বন্ধু প্রথমবার কেনার সময় কোড দিলে বন্ধু ছাড় পায়; টাকা নিশ্চিত করলে কোডের মালিক ব্যালেন্স পায় — তার পরের কেনায় নিজে থেকে কাটা যায়।</div>
+      <label style="display:flex;align-items:center;gap:10px;margin-top:12px"><input type="checkbox" id="rfOn" style="width:22px;height:22px" ${C.on ? "checked" : ""}> রেফারেল চালু</label>
+      <div class="row" style="gap:10px"><div style="flex:1"><label>বন্ধু ছাড় পাবে (৳)</label><input id="rfF" inputmode="numeric" value="${esc(C.friend)}"></div>
+        <div style="flex:1"><label>যে আনল সে পাবে (৳)</label><input id="rfR" inputmode="numeric" value="${esc(C.reward)}"></div></div>
+      ${P.length ? `<details style="margin-top:10px"><summary class="muted">📦 প্যাকেজভিত্তিক আলাদা পরিমাণ (খালি = উপরেরটা)</summary>
+        ${P.map(p => { const v = (C.per || {})[p.id] || {}; return `<div style="margin-top:10px"><b style="font-size:14px">${esc(p.title)}</b> <span class="muted">(${tk(p.price)})</span>
+          <div class="row" style="gap:10px"><input data-pf="${p.id}" inputmode="numeric" placeholder="বন্ধুর ছাড়" value="${esc(v.friend ?? "")}" style="flex:1"><input data-pr="${p.id}" inputmode="numeric" placeholder="যে আনল" value="${esc(v.reward ?? "")}" style="flex:1"></div></div>`; }).join("")}</details>` : ""}
+      <button class="btn" id="rfSave">সেভ করো</button></div>
+    <div class="sec-title">🎟️ কুপন / আর্লি-বার্ড কোড</div>
+    <button class="btn orange" style="margin-top:0" onclick="cpEdit()">➕ নতুন কুপন বানাও</button>
+    <div id="cpList" style="margin-top:10px"></div>
+    <div class="sec-title">🏅 কে কতজন এনেছে</div>
+    <div id="rfList"></div>
+    <div class="card"><h3>💰 ব্যালেন্স যোগ / কাটো</h3><div class="muted" style="font-size:13px">কাউকে বোনাস দিতে + লেখো। ব্যালেন্সের টাকা ক্যাশে দিয়ে দিলে − লেখো (যেমন −৪০)।</div>
+      <div class="row" style="gap:10px"><div style="flex:1"><label>রোল / G-আইডি</label><input id="adU"></div><div style="flex:1"><label>টাকা (±)</label><input id="adA" inputmode="text" placeholder="-40"></div></div>
+      <label>নোট</label><input id="adN" placeholder="যেমন: ক্যাশে দেওয়া হলো">
+      <button class="btn sec" id="adGo">সেভ করো</button></div>`;
+  $("#rfSave").onclick = async () => {
+    const per = {};
+    document.querySelectorAll("[data-pf]").forEach(el => { const id = el.dataset.pf, f = BN2EN(el.value).trim(), r = BN2EN(document.querySelector(`[data-pr="${id}"]`).value).trim();
+      if(f !== "" || r !== "") per[id] = {friend: f === "" ? "" : +f, reward: r === "" ? "" : +r}; });
+    const v = {on:$("#rfOn").checked, friend:+BN2EN($("#rfF").value) || 0, reward:+BN2EN($("#rfR").value) || 0, per};
+    try{ await rpc("pkg_admin_config_save", {p_token:TOKEN, p_key:"referral", p_value:v}); PKG_CFG.referral = v; CPA.cfg = v; toast("সেভ হয়েছে ✅"); }catch(ex){ toast(ex.message); }
+  };
+  $("#adGo").onclick = async () => {
+    const a = +BN2EN($("#adA").value).replace(/[^\d.-]/g, "");
+    if(!$("#adU").value.trim() || !a){ toast("রোল আর টাকা দুটোই লাগবে"); return; }
+    try{ const bal = await rpc("pkg_admin_credit_adj", {p_token:TOKEN, p_uid:$("#adU").value.trim(), p_amount:a, p_note:$("#adN").value}); toast("✅ নতুন ব্যালেন্স " + tk(bal)); cpAdm(); }catch(ex){ toast(ex.message); }
+  };
+  cpPaint();
+}
+function cpPaint(){
+  const P = (PKG_ADM && PKG_ADM.packages) || [];
+  const pn = ids => !ids || !ids.length ? "সব প্যাকেজ" : ids.map(i => (P.find(p => p.id == i) || {}).title || "#" + i).join(", ");
+  $("#cpList").innerHTML = CPA.list.length ? CPA.list.map(c => `<div class="card" style="padding:12px 14px;border-left:5px solid ${c.active && !c.expired ? "var(--g3)" : "var(--line)"}">
+    <div class="row between"><b style="font-family:Poppins;font-size:18px;letter-spacing:1px">${esc(c.code)}</b>
+      ${!c.active ? '<span class="chip" style="background:#eef1f4;color:var(--mute)">⏸ বন্ধ</span>' : c.expired ? '<span class="chip warn">⌛ মেয়াদ শেষ</span>' : (c.max_uses && +c.used + +c.waiting >= c.max_uses) ? '<span class="chip warn">সব শেষ</span>' : '<span class="chip">✅ চালু</span>'}</div>
+    <div style="margin-top:2px"><b>${c.kind === "pct" ? bnNum(c.value) + "% ছাড়" : tk(c.value) + " ছাড়"}</b> <span class="muted">• ${esc(pn(c.pkgs))}</span></div>
+    <div class="muted" style="font-size:13px">${[c.ends_on ? fmtDate(c.ends_on) + " পর্যন্ত" : "শেষ তারিখ নেই", c.max_uses ? "প্রথম " + bnNum(c.max_uses) + " জন" : "যত খুশি জন", c.note ? esc(c.note) : ""].filter(Boolean).join(" • ")}
+      <br>ব্যবহার: ${bnNum(c.used)} জন${+c.waiting ? ` (+${bnNum(c.waiting)} যাচাই বাকি)` : ""} • মোট ছাড় ${tk(c.given)}</div>
+    <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap"><button class="btn sm" onclick="cpEdit(${c.id})">✏️ এডিট</button>
+      <button class="btn sm ghost" onclick="cpToggle(${c.id})">${c.active ? "⏸ বন্ধ করো" : "▶ চালু করো"}</button>
+      <button class="btn sm sec" onclick="cpShare(${c.id})">📢 প্রচার</button>
+      <button class="btn sm danger" onclick="cpDel(${c.id})">🗑</button></div></div>`).join("")
+    : '<div class="card muted">এখনো কোনো কুপন নেই। যেমন: <b>EARLY50</b> — প্রথম ৩০ জন ৫০% ছাড়, ১০ ডিসেম্বর পর্যন্ত।</div>';
+  $("#rfList").innerHTML = CPA.refs.length ? `<div class="card" style="padding:6px 14px">${CPA.refs.map((r,i) => `<div style="padding:9px 0;${i ? "border-top:1px solid var(--line)" : ""}">
+      <div class="row between"><b>${esc(r.name || r.uid)} <span class="muted" style="font-weight:500">• ${esc(r.uid)}${r.batch ? " • " + esc(r.batch) : ""}</span></b><b style="color:var(--g2)">${tk(r.balance)}</b></div>
+      <div class="muted" style="font-size:12.5px">✅ ${bnNum(r.count)} জন এনেছে${+r.waiting ? ` • ⏳ ${bnNum(r.waiting)}` : ""} • আয় ${tk(r.earned)} • খরচ ${tk(r.used)}${+r.adj ? ` • সমন্বয় ${tk(r.adj)}` : ""}</div></div>`).join("")}</div>`
+    : '<div class="card muted">এখনো কেউ রেফার কোড দিয়ে কাউকে আনেনি।</div>';
+}
+function cpEdit(id){
+  const c = id ? CPA.list.find(x => x.id == id) : {kind:"tk", active:true, per_user:1};
+  const P = (PKG_ADM && PKG_ADM.packages) || [], sel = new Set((c.pkgs || []).map(String));
+  sheet(`<h3>${id ? "✏️ কুপন এডিট" : "➕ নতুন কুপন"}</h3>
+    <label>কোড (ইংরেজি অক্ষর/সংখ্যা)</label><input id="ceC" autocapitalize="characters" value="${esc(c.code || "")}" placeholder="যেমন EARLY50">
+    <label>ছাড়ের ধরন</label><div class="mbtn" id="ceK"><button type="button" data-k="tk" class="${c.kind !== "pct" ? "on" : ""}">৳ টাকা</button><button type="button" data-k="pct" class="${c.kind === "pct" ? "on" : ""}">% শতাংশ</button></div>
+    <label>কত ছাড়</label><input id="ceV" inputmode="decimal" value="${esc(c.value ?? "")}" placeholder="যেমন 50">
+    <label>শেষ তারিখ (খালি = শেষ নেই — আর্লি-বার্ডের জন্য তারিখ দাও)</label><input id="ceE" type="date" value="${esc(c.ends_on || "")}">
+    <label>কতজন ব্যবহার করতে পারবে (খালি = যত খুশি)</label><input id="ceM" inputmode="numeric" value="${esc(c.max_uses ?? "")}" placeholder="যেমন 30">
+    <label>কোন প্যাকেজে চলবে (কিছু টিক না দিলে = সব প্যাকেজ)</label>
+    ${P.map(p => `<label style="display:flex;align-items:center;gap:10px;font-weight:500;margin:6px 0"><input type="checkbox" data-cp="${p.id}" style="width:20px;height:20px" ${sel.has(String(p.id)) ? "checked" : ""}> ${esc(p.title)}</label>`).join("") || '<div class="muted">এখনো কোনো প্যাকেজ নেই</div>'}
+    <label>নোট (শুধু তুমি দেখবে)</label><input id="ceN" value="${esc(c.note || "")}" placeholder="যেমন: ফেসবুক পোস্টের জন্য">
+    <label style="display:flex;align-items:center;gap:10px;margin-top:12px"><input type="checkbox" id="ceA" style="width:22px;height:22px" ${c.active !== false ? "checked" : ""}> চালু</label>
+    <button class="btn" id="ceGo">💾 সেভ করো</button><button class="btn ghost" onclick="closeSheet()">বাতিল</button>`);
+  let kind = c.kind || "tk";
+  document.querySelectorAll("#ceK button").forEach(b => b.onclick = () => { kind = b.dataset.k; document.querySelectorAll("#ceK button").forEach(x => x.classList.toggle("on", x === b)); });
+  $("#ceGo").onclick = async () => {
+    const v = {id: id || null, code: $("#ceC").value.trim().toUpperCase(), kind, value: BN2EN($("#ceV").value).trim(), ends_on: $("#ceE").value,
+      max_uses: BN2EN($("#ceM").value).trim(), per_user: 1, active: $("#ceA").checked, note: $("#ceN").value.trim(),
+      pkgs: [...document.querySelectorAll("[data-cp]")].filter(x => x.checked).map(x => +x.dataset.cp)};
+    try{ await rpc("pkg_admin_coupon_save", {p_token:TOKEN, p_c:v}); closeSheet(); toast("সেভ হয়েছে ✅"); cpAdm(); }catch(ex){ toast(ex.message, 4000); }
+  };
+}
+async function cpToggle(id){ const c = CPA.list.find(x => x.id == id); try{ await rpc("pkg_admin_coupon_save", {p_token:TOKEN, p_c:{...c, active:!c.active}}); cpAdm(); }catch(ex){ toast(ex.message); } }
+async function cpDel(id){ const c = CPA.list.find(x => x.id == id); if(!confirm(`${c.code} কুপন মুছে ফেলবে? (আগের কেনাগুলোর হিসাব থাকবে)`)) return; try{ await rpc("pkg_admin_coupon_delete", {p_token:TOKEN, p_id:id}); cpAdm(); }catch(ex){ toast(ex.message); } }
+function cpShare(id){
+  const c = CPA.list.find(x => x.id == id), P = (PKG_ADM && PKG_ADM.packages) || [];
+  const pk = c.pkgs && c.pkgs.length === 1 ? P.find(p => p.id == c.pkgs[0]) : null;
+  const txt = `🎉 ${COACHING.name} — বিশেষ ছাড়!\n${pk ? "📦 " + pk.title + "\n" : ""}কুপন কোড: ${c.code} → ${c.kind === "pct" ? c.value + "% ছাড়" : c.value + " টাকা ছাড়"}\n${c.max_uses ? "⚡ শুধু প্রথম " + c.max_uses + " জন\n" : ""}${c.ends_on ? "⏳ " + fmtDate(c.ends_on) + " পর্যন্ত\n" : ""}👉 ${pk ? pkgLink(pk.id) : SITE_URL + "/#exams"}`;
+  sheet(`<h3>📢 প্রচারের লেখা</h3><textarea id="cpT" style="font-family:inherit;min-height:170px">${esc(txt)}</textarea>
+    <button class="btn" onclick="copyText($('#cpT').value)">📋 কপি করো</button><button class="btn ghost" onclick="closeSheet()">বন্ধ</button>`);
 }
 
 /* ================================================================
@@ -4206,7 +4476,7 @@ async function pkgAdm(){
   $("#aexBody").innerHTML = `<div id="pkReq"></div><div id="pkSum"></div>
     <button class="btn orange" style="margin-top:0" onclick="pkgEdit()">➕ নতুন প্যাকেজ বানাও</button>
     <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btn sm sec" onclick="pkgOrders()">🧾 কেনা ও মেয়াদ</button>
-      <button class="btn sm sec" onclick="pkgSubjEdit()">📚 বিষয় ও অধ্যায়</button><button class="btn sm sec" onclick="openExams()">👀 স্টুডেন্টরা যেভাবে দেখবে</button></div>
+      <button class="btn sm sec" onclick="pkgSubjEdit()">📚 বিষয় ও অধ্যায়</button><button class="btn sm sec" onclick="cpAdm()">🎟️ কুপন ও রেফারেল</button><button class="btn sm sec" onclick="openExams()">👀 স্টুডেন্টরা যেভাবে দেখবে</button></div>
     <div id="pkList" style="margin-top:14px"><div class="spin"></div></div>`;
   try{ await pkgAdmLoad(); }catch(ex){ if($("#pkList")) $("#pkList").innerHTML = '<div class="err">' + esc(ex.message) + '<br>প্যাকেজের SQL (package.sql) চালানো হয়েছে তো?</div>'; return; }
   if(!$("#pkList")) return;
@@ -4241,7 +4511,7 @@ async function pkgReqs(){
     <div class="muted" style="font-size:13px">বিকাশ/নগদ অ্যাপে TrxID আর টাকার পরিমাণ মিলিয়ে দেখো, তারপর নিশ্চিত করো। নিশ্চিত করলেই প্যাকেজ চালু হবে।</div>
     ${list.map(o => `<div style="border-top:1px solid var(--line);padding:10px 0 4px;margin-top:10px">
       <div class="row between"><b>${esc(o.name || o.uid)}</b><span class="paynum" style="border:0;padding:0;margin:0"><span class="tag ${esc(o.method)}">${PKG_METHOD[o.method] || esc(o.method)}</span></span></div>
-      <div class="muted" style="font-size:13px">${pkgWho(o)}<br>📦 ${esc(o.pkg)}<br>প্রেরক: ${esc(o.sender || "-")} • ${fmtTime(o.created_at)}</div>
+      <div class="muted" style="font-size:13px">${pkgWho(o)}<br>📦 ${esc(o.pkg)}<br>প্রেরক: ${esc(o.sender || "-")} • ${fmtTime(o.created_at)}${pkgDiscHtml(o)}</div>
       <div class="row" style="margin-top:6px;flex-wrap:wrap"><b style="font-size:21px;font-family:Poppins">${tk(o.amount)}</b>
         <span class="chip" style="cursor:pointer" onclick="copyText('${esc(o.trx)}')">TrxID ${esc(o.trx)} 📋</span></div>
       <div class="row" style="margin-top:8px"><button class="btn sm" onclick="pkgConfirm(${o.id})">✅ টাকা পেয়েছি</button><button class="btn sm danger" onclick="pkgReject(${o.id})">বাতিল</button></div></div>`).join("")}</div>`;
@@ -4335,7 +4605,7 @@ function pkgOrdRow(o){
     : `<button class="btn sm danger" onclick="pkgODel(${o.id})">🗑 মুছো</button>`;
   return `<div class="card" style="padding:12px 14px;margin-bottom:10px"><div class="row between" style="align-items:flex-start"><b>${esc(o.name || o.uid)}</b>${stc}</div>
     <div class="muted" style="font-size:13px">${pkgWho(o)}${!PKO.pkg ? "<br>📦 " + esc(o.pkg) : ""}<br>${PKG_METHOD[o.method] || esc(o.method)} ${tk(o.amount)}${o.trx ? " • TrxID " + esc(o.trx) : ""}${o.sender ? " • " + esc(o.sender) : ""} • ${fmtTime(o.created_at)}
-    ${o.status === "confirmed" ? (o.expires_at ? `<br>মেয়াদ: <b>${expTxt(o.expires_at)}</b> পর্যন্ত` : "<br>মেয়াদ: শেষ হবে না") : ""}${o.note ? `<br>📝 ${esc(o.note)}` : ""}</div>${remind}
+    ${o.status === "confirmed" ? (o.expires_at ? `<br>মেয়াদ: <b>${expTxt(o.expires_at)}</b> পর্যন্ত` : "<br>মেয়াদ: শেষ হবে না") : ""}${o.note ? `<br>📝 ${esc(o.note)}` : ""}${pkgDiscHtml(o)}</div>${remind}
     <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">${acts}</div></div>`;
 }
 async function pkgExtend(id){
@@ -4599,8 +4869,10 @@ function chapterNote(qs){
 
 /* ---------------- শুরু ---------------- */
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
-const EX_HASH = location.hash.match(/exam=(\d+)/) || (location.hash === "#exams" ? [0, ""] : null), CQ_HASH = location.hash.match(/cq=(\d+)/), PK_HASH = location.hash.match(/pkg=(\d+)/);
+const EX_HASH = location.hash.match(/exam=(\d+)/) || (/^#exams(?:&|$)/.test(location.hash) ? [0, ""] : null), CQ_HASH = location.hash.match(/cq=(\d+)/), PK_HASH = location.hash.match(/pkg=(\d+)/);
 const FL_HASH = location.hash.match(/^#free(?:=([A-Za-z]+))?/);
+refCapture();
+window.addEventListener("hashchange", refCapture);
 if (FL_HASH && configured()) openFreeLib(FL_HASH[1] ? FL_HASH[1].toUpperCase() : null);
 else if (PK_HASH && configured()) pkgOpen(+PK_HASH[1]);
 else if (CQ_HASH && configured()) openExams("q" + CQ_HASH[1]);

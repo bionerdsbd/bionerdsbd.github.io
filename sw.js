@@ -1,5 +1,5 @@
 /* BIO NERDS — অফলাইনে শুধু আগের খোলা পেজ দেখায়; সবসময় আগে নেট থেকে নতুনটা আনে */
-const C = "bn-v11";
+const C = "bn-v12";
 self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(C).then(c => c.addAll(["./", "icon-192.png", "icon-512.png"]).catch(()=>{}))); });
 self.addEventListener("activate", e => e.waitUntil(self.clients.claim()));
 self.addEventListener("fetch", e => {
