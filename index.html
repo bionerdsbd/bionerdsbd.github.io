@@ -42,21 +42,28 @@ const COACHING = {
 };
 </script>
 <style>
+/* বাংলা সংখ্যার জন্য স্পষ্ট ফন্ট (Noto Sans Bengali, শুধু ০-৯) */
+@font-face{font-family:"BN Digits";font-weight:400;font-display:block;unicode-range:U+09E6-09EF;src:url(data:font/woff2;base64,d09GMgABAAAAAAaoAA8AAAAAC0wAAAZQAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhYbIBw8BmA/U1RBVEQANBEICowAihUBNgIkAxoLGAAEIAWEKgcgG0QJUZQvUgDgR0J2inlhdEQNU4tsNCqrLt3sjnzgHFg0lpm9KyBoVOiQ1Ksa+64ApBCEY+HR1bGrahUN0WnN1gq04W7axmUaeEMUisoz0jOd5GESze2eHqiErm4UD9fU5gvk6ggjS6pC1+gaQ3AmKafAikDDANWm5NwksQWUrOamp9yEtLNthFj1CyBW2p+pNTaJgGgaM1QhknseRJKNCqpvqxdk4QH+/wEAY64klb4XfEb0iqm8k8cMI8WOiQ4qfnDciMV0OQzemrN4BNi0BQDa+k7qI47G4C5u1DQODNyI+CLiR7f2rw/gnrUBqbR0G1HIlxHBeDgGJHOo+AuC2zcOEgTfuD7IEJ5kqYBhWgS7AoQwpRMBQLvgAAvi5Wnkcx6JRnzG5eXQm9M3CQQQ0zrEyRCVuNTpWLB4gJ2fwMLz5gQ2+/KdX6qoSMwTSOmkOkoRr8QcXpRIQEPJZO5MPA5ib974F8sEGlonOdNEQIyi+Rh0K3q97H8VxK7kLLoGmWIXcxd/66demRPqR23G+TZsALGjcdvTXejwZ+9q/sDZONTlODT0yn8vcUpz8GFtnOSkoRpxeXiRAo3Ha/y5cW8Z3LMBmIeOX14zXNwKYk8qr6AhDyHocf309aTF09iz4ivbfN4wCjfeGL33ZvS6eSshDWjz8+vJgHqNw9GHiIHFONGTN0BEF+vrcb4LwReaePeAxIHn0a3idhz9HBZ1dI9TxNwjLx7kTCcgOXqI3XdPmX/9/tzFLwGIbQSVAthRfwdeQdJfeENhDxsgJXbQ4uCaPa2LHzehLbXr0lnTp7nATdyGtO6yHjl7th1+mebbcuRCzqJ9FcjGnffk3UByfbfk2Lm9HrCqQGzrwaB/8/auuJUzfaW1cWM5i3Nr/ItbHp06n1/ZgpeeT96Ghk4l/BUXKPGVB+pZCGaJqEXDNFrBsLDKbp0HRMM1GsFw/gKbgavmsG0NUsSoZiLyv421sRExaZhAqHLQ9TT2coQ2m0orohCZVG/pg5pGTCGixE51aNk+LWLgFiuVjgwhWkD6EJO8fInpqGZeU42rDQUlsmcRfVAygmsoLtBxsSyGzkx6F4+6LIX/W1h/osUypS0DLsvC0dhfGwocIljH50uwMIJtO9ItiWq/AM1mWS/PG1HsK5lkzC2dod4dcRjEv1MxsUUVkOC+elX8U2FxPYHM+a2CW8DlpnIEeqlc19UoGTAbJT2hesBL04eqJDYJmXndxA1pK4w1KGthvdiEVrPqtDrURFKzlX5xFU/n58rNAR6iZ1WOcAjfuEg6JbtaX682PUHYfi3/ngU2IJ42lUhk6agGTktMaZvWEpp8bkj/eTuSi0v4malZwscBnpNLkk6iZJ5QEXTvhShagxgrc3GSjkqOpkpY2xXBhw0slJ4rUc5rlWpnamWS1hYxaOfI+njeiGp36QRjQfm0ML8jJkpSDTxUfotvIW+ly6rtqig5vSwTgjP0Q0N5tXmyKYS/yyoqyZrp96ldQq24p1sKfomQ0bSHqGP8JWgoGHAqVMFofaPH7fE0k8tLs35Wf9Eo8Q/qqp+K3SPRnwwwS8Ou0lbX3AG/tGE+u8uEbPTKn7YD8agK8bQNC8jMjJtGXGSRiIC/cLbm009hXUOwU9JooGdl/0pCHxzHVd5+tnw5fOlzYM1WCTZOIaIrKtnHOTm1YayDTQRkYj6V6qSS87+p5rH0BkQkNnFQUy2uZULDoBbZxqf/6RRYSj+dei0ijob3g7h7OarhYCWfduKjasRbq27s6JKKAgAIcHZ7ovhaP11xtV9Zzn0AHkcOHQK8jsfrf4/89fkntxYIxWrw7574JYTkh+9Liwx/2Sygs7oZhLQooFedAtrhcUFAFGeiGRaKOvh8XST9UpGPADYgY1FoCzZiucGOek+wpyJFOITMaCyhlKTdSiJa09iI1Hos/d3X7lBnpFEmG6Nfrz7jwMSExGrBvPpEwexGGmckmNMYIw2ICuOZ2vjO+oxM7bFg6D5snFErTEowFnr1o64bL4QvbKThBEbsynqMlJ3HGUsgJLp7r6Bh+nEtxzzrMMLGRg2OuUXJebxhgsaQMCHRaGyCcVQwTTuFnsWeTXi0UrubwZ+CXzR+6I9mHezJalqvBETvwSsb+0WMA/vpwnD7yVQGT/8bKgAA) format("woff2")}
+@font-face{font-family:"BN Digits";font-weight:500;font-display:block;unicode-range:U+09E6-09EF;src:url(data:font/woff2;base64,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) format("woff2")}
+@font-face{font-family:"BN Digits";font-weight:600;font-display:block;unicode-range:U+09E6-09EF;src:url(data:font/woff2;base64,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) format("woff2")}
+@font-face{font-family:"BN Digits";font-weight:700;font-display:block;unicode-range:U+09E6-09EF;src:url(data:font/woff2;base64,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) format("woff2")}
+@font-face{font-family:"BN Digits";font-weight:800;font-display:block;unicode-range:U+09E6-09EF;src:url(data:font/woff2;base64,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) format("woff2")}
+
 :root{
   --g:#0b3d2e; --g2:#13684c; --g3:#1f9d6f; --mint:#e8f6ef; --navy:#13294b;
   --gold:#f2b632; --ink:#1b2430; --mute:#6b7685; --line:#e3e8ee; --bg:#f4f7f6; --red:#d64545;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:"Hind Siliguri",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;min-height:100vh}
+body{font-family:BN Digits,"Hind Siliguri",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;min-height:100vh}
 button,input,select,textarea{font:inherit;color:inherit}
 .hidden{display:none!important}
-.brand{font-family:Poppins,sans-serif;font-weight:800;letter-spacing:.5px}
+.brand{font-family:BN Digits,Poppins,sans-serif;font-weight:800;letter-spacing:.5px}
 
 /* login */
 #loginView{position:relative;min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(160deg,var(--g) 0%,var(--g2) 55%,var(--navy) 100%)}
 .login-top{padding:56px 24px 28px;color:#fff;text-align:center}
 .logo{width:76px;height:76px;border-radius:22px;background:#fff;display:grid;place-items:center;margin:0 auto 14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.logo span{font-family:Poppins;font-weight:800;color:var(--g);font-size:26px}
+.logo span{font-family:BN Digits,Poppins;font-weight:800;color:var(--g);font-size:26px}
 .login-top h1{font-size:30px}
 .login-top p{opacity:.85}
 .login-card{background:#fff;border-radius:26px 26px 0 0;padding:28px 22px 30px;flex:1}
@@ -105,11 +112,11 @@ nav.bottom button.on{color:var(--g2);font-weight:700}
 .hero small{opacity:.85}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
 .stat{background:#fff;border-radius:16px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.06)}
-.stat b{display:block;font-size:22px;color:var(--g2);font-family:Poppins}
+.stat b{display:block;font-size:22px;color:var(--g2);font-family:BN Digits,Poppins}
 .stat span{font-size:12.5px;color:var(--mute)}
 
 .res{border-left:5px solid var(--g3)}
-.res .big{font-family:Poppins;font-size:30px;font-weight:800;color:var(--g)}
+.res .big{font-family:BN Digits,Poppins;font-size:30px;font-weight:800;color:var(--g)}
 .res .big small{font-size:16px;color:var(--mute);font-weight:600}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px;text-align:center}
 .grid4 div{background:var(--bg);border-radius:10px;padding:6px 2px}
@@ -124,7 +131,7 @@ nav.bottom button.on{color:var(--g2);font-weight:700}
 .merit .r1{background:#ffe89a}.merit .r2{background:#e5e9ef}.merit .r3{background:#f6d3b5}
 .merit .mph{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none}
 .merit .me{background:var(--mint);border-radius:12px}
-.merit .mk{margin-left:auto;font-family:Poppins;font-weight:800;color:var(--g)}
+.merit .mk{margin-left:auto;font-family:BN Digits,Poppins;font-weight:800;color:var(--g)}
 
 .notice{border-left:5px solid var(--gold)}
 .notice p{white-space:pre-wrap;margin-top:4px}
@@ -162,7 +169,7 @@ details summary{cursor:pointer}
 .asheet{background:#fff;border-radius:24px 24px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));width:100%;max-width:640px}
 .asheet h3{font-size:20px;margin-bottom:4px}
 .paynum{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px}
-.paynum b{font-family:Poppins;font-size:17px;letter-spacing:.5px}
+.paynum b{font-family:BN Digits,Poppins;font-size:17px;letter-spacing:.5px}
 .paynum .tag{color:#fff;border-radius:8px;padding:2px 8px;font-size:12.5px;font-weight:700}
 .tag.bkash{background:#e2136e}.tag.nagad{background:#f6921e}
 .mbtn{display:flex;gap:8px}.mbtn button{flex:1;border:2px solid var(--line);background:#fff;border-radius:12px;padding:10px;font-weight:700;cursor:pointer}
@@ -175,11 +182,11 @@ details summary{cursor:pointer}
 #homeView{background:var(--bg);min-height:100vh}
 .h-top{position:sticky;top:0;z-index:6;background:#fffffff2;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 14px calc(10px);display:flex;align-items:center;gap:10px}
 .h-top img{width:40px;height:40px;border-radius:12px}
-.h-top b{flex:1;font-family:Poppins;font-weight:800;color:var(--g);font-size:17px;letter-spacing:.3px}
+.h-top b{flex:1;font-family:BN Digits,Poppins;font-weight:800;color:var(--g);font-size:17px;letter-spacing:.3px}
 .h-hero{background:radial-gradient(circle at 85% 10%,#1f9d6f55 0,transparent 45%),linear-gradient(160deg,var(--g) 0%,var(--g2) 60%,var(--navy) 100%);color:#fff;padding:26px 18px 34px;text-align:center;position:relative;overflow:hidden}
 .h-hero .hl{width:112px;height:112px;border-radius:30px;margin:0 auto 14px;background:var(--cream);box-shadow:0 14px 34px rgba(0,0,0,.3);overflow:hidden}
 .h-hero .hl img{width:100%;height:100%;object-fit:cover}
-.h-hero h1{font-family:Poppins;font-weight:800;font-size:31px;letter-spacing:.5px;line-height:1.15}
+.h-hero h1{font-family:BN Digits,Poppins;font-weight:800;font-size:31px;letter-spacing:.5px;line-height:1.15}
 .h-hero .tg{opacity:.9;margin-top:4px}
 .h-hero .addr{font-size:13.5px;opacity:.8;margin-top:8px}
 .h-cta{display:flex;gap:10px;margin-top:18px}
@@ -207,9 +214,9 @@ details summary{cursor:pointer}
 .star .md{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:24px}
 .star b{display:block;font-size:14px;line-height:1.25;word-wrap:break-word}
 .star .si{font-size:11.5px;color:var(--mute);line-height:1.3;margin-top:2px}
-.star .pc{display:inline-block;margin-top:6px;background:var(--mint);color:var(--g);font-family:Poppins;font-weight:800;font-size:13px;border-radius:12px;padding:1px 8px}
+.star .pc{display:inline-block;margin-top:6px;background:var(--mint);color:var(--g);font-family:BN Digits,Poppins;font-weight:800;font-size:13px;border-radius:12px;padding:1px 8px}
 .rt{background:#fff;border-radius:18px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(16,24,40,.06);border-left:5px solid var(--g3)}
-.rt .rb{font-family:Poppins;font-weight:800;color:var(--g);font-size:16px}
+.rt .rb{font-family:BN Digits,Poppins;font-weight:800;color:var(--g);font-size:16px}
 .rt .slot{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
 .rt .slot:last-child{border:0;padding-bottom:0}
 .rt .day{min-width:92px;font-weight:600}
@@ -329,16 +336,16 @@ details summary{cursor:pointer}
 @keyframes blink{50%{opacity:.25}}
 .ex-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px;text-align:center}
 .ex-meta div{background:var(--bg);border-radius:12px;padding:7px 2px}
-.ex-meta b{display:block;font-family:Poppins;font-size:15px;color:var(--g)}
+.ex-meta b{display:block;font-family:BN Digits,Poppins;font-size:15px;color:var(--g)}
 .ex-meta span{font-size:11.5px;color:var(--mute)}
 .cdbox{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff6f1;border:1px dashed #f5b799;border-radius:12px;padding:8px 12px;margin-top:10px;font-size:14px}
-.cdbox b{font-family:Poppins;font-weight:800;color:var(--orange);font-size:16px;white-space:nowrap}
+.cdbox b{font-family:BN Digits,Poppins;font-weight:800;color:var(--orange);font-size:16px;white-space:nowrap}
 .cdbox.g{background:var(--mint);border-color:#a9dcc4}.cdbox.g b{color:var(--g2)}
 .ex-acts{display:flex;gap:8px;margin-top:12px}
 .ex-acts .btn{margin:0}
 .btn.orange.big{font-size:17px;padding:15px}
 .mine{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--mint),#fff);border-radius:14px;padding:10px 12px;margin-top:12px}
-.mine .sc{font-family:Poppins;font-weight:800;font-size:24px;color:var(--g)}
+.mine .sc{font-family:BN Digits,Poppins;font-weight:800;font-size:24px;color:var(--g)}
 .lnkbtn{background:none;border:0;color:var(--g2);font-weight:700;font-size:14px;cursor:pointer;padding:4px 0}
 .empty-ex{text-align:center;padding:26px 16px;color:var(--mute)}
 .empty-ex div{font-size:42px;margin-bottom:6px}
@@ -360,7 +367,7 @@ details summary{cursor:pointer}
 .run-top .tt{flex:1;min-width:0}
 .run-top .tt b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15.5px}
 .run-top .tt small{opacity:.8;font-size:12.5px}
-.timer{font-family:Poppins;font-weight:800;font-size:20px;background:#fff;color:var(--g);border-radius:12px;padding:4px 12px;min-width:92px;text-align:center;letter-spacing:.5px}
+.timer{font-family:BN Digits,Poppins;font-weight:800;font-size:20px;background:#fff;color:var(--g);border-radius:12px;padding:4px 12px;min-width:92px;text-align:center;letter-spacing:.5px}
 .timer.warn{background:var(--gold);color:#3b2a00}
 .timer.danger{background:var(--red);color:#fff;animation:blink 1s infinite}
 .tbar{height:4px;background:#ffffff33;margin:10px -14px 0}
@@ -381,10 +388,10 @@ details summary{cursor:pointer}
 .op:disabled{cursor:default}
 .run-bot{position:fixed;left:0;right:0;bottom:0;z-index:8;background:#fff;border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;align-items:center}
 .run-bot .cnt{flex:1;font-size:13.5px;color:var(--mute);line-height:1.3}
-.run-bot .cnt b{font-family:Poppins;font-size:18px;color:var(--g)}
+.run-bot .cnt b{font-family:BN Digits,Poppins;font-size:18px;color:var(--g)}
 .run-bot .btn{width:auto;margin:0;padding:12px 16px}
 .pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:8px;margin:14px 0}
-.pal button{aspect-ratio:1;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:700;cursor:pointer;font-family:Poppins}
+.pal button{aspect-ratio:1;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:700;cursor:pointer;font-family:BN Digits,Poppins}
 .pal button.a{background:var(--g2);border-color:var(--g2);color:#fff}
 .netbar{background:#fff4dc;color:#7a5600;text-align:center;font-size:13px;font-weight:600;padding:5px 10px}
 .done-wrap{text-align:center;padding:30px 10px}
@@ -397,13 +404,13 @@ details summary{cursor:pointer}
 .ring{position:relative;width:150px;height:150px;margin:6px auto 8px}
 .ring svg{transform:rotate(-90deg)}
 .ring .v{position:absolute;inset:0;display:grid;place-items:center;align-content:center}
-.ring .v b{font-family:Poppins;font-size:34px;font-weight:800;line-height:1}
+.ring .v b{font-family:BN Digits,Poppins;font-size:34px;font-weight:800;line-height:1}
 .ring .v small{opacity:.8;font-size:13px;margin-top:2px}
 .pf{display:inline-block;border-radius:20px;padding:3px 12px;font-weight:800;font-size:13px}
 .pf.p{background:#4ade80;color:#053b1f}.pf.f{background:#fecaca;color:#7f1d1d}
 .rs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .rs-grid div{background:#fff;border-radius:16px;padding:12px 6px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.06)}
-.rs-grid b{display:block;font-family:Poppins;font-size:21px}
+.rs-grid b{display:block;font-family:BN Digits,Poppins;font-size:21px}
 .rs-grid span{font-size:12px;color:var(--mute)}
 .c-ok{color:#1f9d6f}.c-bad{color:var(--red)}.c-sk{color:#94650a}
 .expl{background:#f3f8ff;border-left:4px solid #5b8def;border-radius:10px;padding:10px 12px;margin-top:10px;font-size:14.5px;white-space:pre-wrap}
@@ -415,12 +422,12 @@ details summary{cursor:pointer}
 .podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end;margin-bottom:12px}
 .mrow{display:flex;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid var(--line)}
 .mrow:last-child{border:0}
-.mrow .rk{width:34px;text-align:center;font-family:Poppins;font-weight:800;color:var(--mute);flex:none}
+.mrow .rk{width:34px;text-align:center;font-family:BN Digits,Poppins;font-weight:800;color:var(--mute);flex:none}
 .mrow .av{width:38px;height:38px;border-radius:50%;background:var(--mint);color:var(--g);display:grid;place-items:center;font-weight:700;overflow:hidden;flex:none}
 .mrow .av img{width:100%;height:100%;object-fit:cover}
 .mrow .nm{flex:1;min-width:0}.mrow .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
 .mrow .nm span{font-size:12.5px;color:var(--mute);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mrow .sc{text-align:right;flex:none}.mrow .sc b{font-family:Poppins;font-weight:800;color:var(--g);display:block}.mrow .sc span{font-size:11.5px;color:var(--mute)}
+.mrow .sc{text-align:right;flex:none}.mrow .sc b{font-family:BN Digits,Poppins;font-weight:800;color:var(--g);display:block}.mrow .sc span{font-size:11.5px;color:var(--mute)}
 .mrow.me{background:var(--mint);border-radius:12px;border:0}
 .bnb{display:inline-block;background:var(--g2);color:#fff;border-radius:6px;font-size:10.5px;padding:0 5px;margin-left:4px;vertical-align:middle;font-weight:700}
 
@@ -471,7 +478,7 @@ details summary{cursor:pointer}
 .cq-g{border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:10px;background:#fff}
 .cq-g.ch{border-color:#a9dcc4;background:#f6fcf9}
 .cq-g .h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.cq-g .h .sc{margin-left:auto;font-weight:800;font-family:Poppins;font-size:16px}
+.cq-g .h .sc{margin-left:auto;font-weight:800;font-family:BN Digits,Poppins;font-size:16px}
 .cq-pin{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:6px;margin-top:8px}
 .cq-pin label{margin:0;font-size:13.5px;text-align:center}
 .cq-pin input{text-align:center;padding:10px 4px;margin-top:3px;font-size:17px;font-weight:700}
@@ -486,7 +493,7 @@ label.cq-x{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:50
 .pkc{background:#fff;border-radius:18px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 10px rgba(16,24,40,.07);cursor:pointer;border:1.5px solid #ece4f8}
 .pkc:active{transform:scale(.99)}
 .pkc .t{font-size:17px;line-height:1.3}
-.pk-price{font-family:Poppins;font-weight:800;color:var(--g2);font-size:18px;white-space:nowrap;text-align:right}
+.pk-price{font-family:BN Digits,Poppins;font-weight:800;color:var(--g2);font-size:18px;white-space:nowrap;text-align:right}
 .pk-price s{color:var(--mute);font-weight:600;font-size:13px}
 .pk-price.big{font-size:26px;text-align:left;display:block}
 .chip.pk{background:#f1e8ff;color:#5b2a9e}
@@ -502,7 +509,7 @@ label.cq-x{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:50
 .pk-row .ic{font-size:18px;width:26px;text-align:center;flex:none}
 .pk-row .m,.pk-it .m{flex:1;min-width:0}.pk-row .m b,.pk-it .m b{display:block;font-size:15px;line-height:1.35}.pk-row .m span,.pk-it .m span{font-size:12.5px;color:var(--mute)}
 .pk-row .go{color:var(--mute);font-size:20px}
-.pk-pay{display:flex;justify-content:space-between;align-items:center;background:var(--mint);border-radius:12px;padding:10px 14px;margin-top:12px}.pk-pay b{font-family:Poppins;font-size:24px;color:var(--g)}
+.pk-pay{display:flex;justify-content:space-between;align-items:center;background:var(--mint);border-radius:12px;padding:10px 14px;margin-top:12px}.pk-pay b{font-family:BN Digits,Poppins;font-size:24px;color:var(--g)}
 .pk-it{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
 .pk-smp{display:flex;align-items:center;gap:4px;margin:0;font-size:12.5px;white-space:nowrap}.pk-smp input{width:18px;height:18px}
 .pk-bp{display:flex;align-items:center;gap:8px;margin-top:6px}.pk-bp b{width:64px;flex:none;font-size:14px}.pk-bp select{flex:1;padding:9px 10px}.pk-bp input{width:90px;flex:none;padding:9px 10px}
@@ -511,7 +518,7 @@ label.cq-x{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:50
 /* ===== 📊 অধ্যায় বিশ্লেষণ ===== */
 .ana-hd{display:flex;align-items:center;gap:14px}
 .ana-ring{--p:0;--c:#1f9d6f;width:66px;height:66px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--p)*1%),#e9eef2 0)}
-.ana-ring span{width:52px;height:52px;border-radius:50%;background:#fff;display:grid;place-items:center;font-family:Poppins;font-weight:800;font-size:15px}
+.ana-ring span{width:52px;height:52px;border-radius:50%;background:#fff;display:grid;place-items:center;font-family:BN Digits,Poppins;font-weight:800;font-size:15px}
 .ana-sum{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .ana-sum span{font-size:12px;font-weight:700;border-radius:10px;padding:1px 8px}
 .ana-grp{font-size:13.5px;font-weight:700;margin:14px 0 2px;color:var(--mute)}
@@ -519,7 +526,7 @@ label.cq-x{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:50
 .ana-grp+.ana-row,.ana-list>.ana-row:first-child{border-top:0}
 .ana-row .t{display:flex;align-items:center;gap:8px}
 .ana-row .t b{flex:1;min-width:0;font-size:15px;line-height:1.3}
-.ana-row .p{font-family:Poppins;font-weight:800;font-size:15px;white-space:nowrap}
+.ana-row .p{font-family:BN Digits,Poppins;font-weight:800;font-size:15px;white-space:nowrap}
 .ana-tag{font-size:11.5px;border-radius:10px;padding:1px 8px;font-weight:700;white-space:nowrap}
 .ana-bar{height:8px;background:#eef1f4;border-radius:6px;overflow:hidden;margin-top:6px}
 .ana-bar i{display:block;height:100%;border-radius:6px}
@@ -529,7 +536,7 @@ label.cq-x{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:50
 .ana-lock .fk{filter:blur(4px);user-select:none;pointer-events:none;margin-top:8px}
 .ana-stu{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
 .ana-stu:first-child{border-top:0}
-.ana-stu .pc{font-family:Poppins;font-weight:800;min-width:46px;text-align:right}
+.ana-stu .pc{font-family:BN Digits,Poppins;font-weight:800;min-width:46px;text-align:right}
 .chpick .chps{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .chpick .chps button{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:4px 10px;font-size:13px;cursor:pointer;color:var(--ink)}
 .chpick .chps button.on{background:var(--g2);border-color:var(--g2);color:#fff}
@@ -948,7 +955,7 @@ $("#photoInput").onchange = async e => {
 function loadImg(src){ return new Promise((ok,no)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=no; i.src=src; }); }
 
 /* ---------------- ক্যানভাস: আইডি কার্ড ও রেজাল্ট কার্ড ---------------- */
-async function fontsReady(){ try{ await Promise.all([document.fonts.load('700 40px "Hind Siliguri"'),document.fonts.load('800 40px Poppins'),document.fonts.load('500 30px "Hind Siliguri"'),document.fonts.load('600 30px "Hind Siliguri"')]); }catch(e){} }
+async function fontsReady(){ try{ await Promise.all([document.fonts.load('700 40px BN Digits,"Hind Siliguri"'),document.fonts.load('800 40px BN Digits,Poppins'),document.fonts.load('500 30px BN Digits,"Hind Siliguri"'),document.fonts.load('600 30px BN Digits,"Hind Siliguri"'),document.fonts.load('500 30px "BN Digits"','০১২৩৪৫৬৭৮৯'),document.fonts.load('700 30px "BN Digits"','০১২৩৪৫৬৭৮৯'),document.fonts.load('800 30px "BN Digits"','০১২৩৪৫৬৭৮৯')]); }catch(e){} }
 function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 function fitText(ctx,text,maxW,size,weight,family){ do{ ctx.font=`${weight} ${size}px ${family}`; size-=2; }while(ctx.measureText(text).width>maxW && size>14); }
 async function drawPhoto(ctx, x, y, size, round, st=ME){
@@ -957,7 +964,7 @@ async function drawPhoto(ctx, x, y, size, round, st=ME){
   const h = round?size:size*1.2;
   if(st.photo){ const img = await loadImg(st.photo); const s=Math.min(img.width,img.height*size/h);
     ctx.drawImage(img,(img.width-s)/2,0,s,s*h/size,x,y,size,h); }
-  else { ctx.fillStyle="#dfe9e4"; ctx.fillRect(x,y,size,h); ctx.fillStyle="#13684c"; ctx.font=`700 ${size/2.4}px "Hind Siliguri"`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText((st.name||"?").trim().charAt(0),x+size/2,y+h/2); }
+  else { ctx.fillStyle="#dfe9e4"; ctx.fillRect(x,y,size,h); ctx.fillStyle="#13684c"; ctx.font=`700 ${size/2.4}px BN Digits,"Hind Siliguri"`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText((st.name||"?").trim().charAt(0),x+size/2,y+h/2); }
   ctx.restore();
 }
 async function drawId(cv, st=ME){
@@ -969,18 +976,18 @@ async function drawId(cv, st=ME){
   const g=c.createLinearGradient(0,0,W,0); g.addColorStop(0,"#0b3d2e"); g.addColorStop(1,"#13294b");
   c.fillStyle=g; c.fillRect(0,0,W,150);
   c.fillStyle="#f2b632"; c.fillRect(0,150,W,8);
-  c.fillStyle="#fff"; c.font='800 54px Poppins'; c.fillText(COACHING.name,48,84);
-  c.font='500 26px "Hind Siliguri"'; c.globalAlpha=.85; c.fillText("STUDENT ID CARD • "+COACHING.tagline,50,124); c.globalAlpha=1;
+  c.fillStyle="#fff"; c.font='800 54px BN Digits,Poppins'; c.fillText(COACHING.name,48,84);
+  c.font='500 26px BN Digits,"Hind Siliguri"'; c.globalAlpha=.85; c.fillText("STUDENT ID CARD • "+COACHING.tagline,50,124); c.globalAlpha=1;
   c.fillStyle="#13684c"; c.globalAlpha=.06; c.beginPath(); c.arc(W-60,H-40,260,0,Math.PI*2); c.fill(); c.globalAlpha=1;
   c.fillStyle="#13684c"; rr(c,44,192,236,290,22); c.fill();
   await drawPhoto(c,52,200,220,false,st);
   const x=320; c.fillStyle="#1b2430";
-  fitText(c,st.name,W-x-40,50,700,'"Hind Siliguri"'); c.fillText(st.name,x,245);
+  fitText(c,st.name,W-x-40,50,700,'BN Digits,"Hind Siliguri"'); c.fillText(st.name,x,245);
   const rows=[["রোল",st.roll],["ব্যাচ",st.batch||"-"],["প্রতিষ্ঠান",st.institution||"-"],["ক্লাস",st.class_name||"-"],["মোবাইল",st.phone||"-"]];
-  rows.forEach((r,i)=>{ const y=305+i*45; c.font='500 26px "Hind Siliguri"'; c.fillStyle="#6b7685"; c.fillText(r[0],x,y);
-    c.fillStyle="#1b2430"; fitText(c,String(r[1]),W-x-200,30,600,'"Hind Siliguri"'); c.fillText(String(r[1]),x+170,y); });
-  c.fillStyle="#13684c"; rr(c,x,512,260,54,14); c.fill(); c.fillStyle="#fff"; c.font='800 30px Poppins'; c.fillText("ROLL "+st.roll,x+22,549);
-  c.fillStyle="#e8f6ef"; c.fillRect(0,H-62,W,62); c.fillStyle="#0b3d2e"; fitText(c,COACHING.address+"  •  "+COACHING.phones,W-80,22,500,'"Hind Siliguri"'); c.fillText(COACHING.address+"  •  "+COACHING.phones,40,H-24);
+  rows.forEach((r,i)=>{ const y=305+i*45; c.font='500 26px BN Digits,"Hind Siliguri"'; c.fillStyle="#6b7685"; c.fillText(r[0],x,y);
+    c.fillStyle="#1b2430"; fitText(c,String(r[1]),W-x-200,30,600,'BN Digits,"Hind Siliguri"'); c.fillText(String(r[1]),x+170,y); });
+  c.fillStyle="#13684c"; rr(c,x,512,260,54,14); c.fill(); c.fillStyle="#fff"; c.font='800 30px BN Digits,Poppins'; c.fillText("ROLL "+st.roll,x+22,549);
+  c.fillStyle="#e8f6ef"; c.fillRect(0,H-62,W,62); c.fillStyle="#0b3d2e"; fitText(c,COACHING.address+"  •  "+COACHING.phones,W-80,22,500,'BN Digits,"Hind Siliguri"'); c.fillText(COACHING.address+"  •  "+COACHING.phones,40,H-24);
   c.restore();
 }
 async function shareResult(examId){
@@ -990,23 +997,23 @@ async function shareResult(examId){
   const g=c.createLinearGradient(0,0,W,H); g.addColorStop(0,"#0b3d2e"); g.addColorStop(.6,"#13684c"); g.addColorStop(1,"#13294b");
   c.fillStyle=g; c.fillRect(0,0,W,H);
   c.globalAlpha=.08; c.fillStyle="#fff"; c.beginPath(); c.arc(W-80,120,300,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(60,H-100,240,0,Math.PI*2); c.fill(); c.globalAlpha=1;
-  c.textAlign="center"; c.fillStyle="#fff"; c.font='800 74px Poppins'; c.fillText(COACHING.name,W/2,140);
-  c.font='600 34px "Hind Siliguri"'; c.fillStyle="#f2b632"; fitText(c,r.title+(r.subject?" • "+r.subject:""),W-120,38,600,'"Hind Siliguri"'); c.fillText(r.title+(r.subject?" • "+r.subject:""),W/2,205);
-  c.fillStyle="#ffffffcc"; c.font='500 28px "Hind Siliguri"'; c.fillText(fmtDate(r.exam_date),W/2,250);
+  c.textAlign="center"; c.fillStyle="#fff"; c.font='800 74px BN Digits,Poppins'; c.fillText(COACHING.name,W/2,140);
+  c.font='600 34px BN Digits,"Hind Siliguri"'; c.fillStyle="#f2b632"; fitText(c,r.title+(r.subject?" • "+r.subject:""),W-120,38,600,'BN Digits,"Hind Siliguri"'); c.fillText(r.title+(r.subject?" • "+r.subject:""),W/2,205);
+  c.fillStyle="#ffffffcc"; c.font='500 28px BN Digits,"Hind Siliguri"'; c.fillText(fmtDate(r.exam_date),W/2,250);
   c.fillStyle="#fff"; c.beginPath(); c.arc(W/2,420,128,0,Math.PI*2); c.fill();
   await drawPhoto(c,W/2-118,302,236,true);
-  c.fillStyle="#fff"; fitText(c,ME.name,W-120,58,700,'"Hind Siliguri"'); c.fillText(ME.name,W/2,625);
-  c.font='500 32px "Hind Siliguri"'; c.fillStyle="#ffffffcc"; c.fillText("রোল "+ME.roll+(ME.batch?" • "+ME.batch:""),W/2,675);
+  c.fillStyle="#fff"; fitText(c,ME.name,W-120,58,700,'BN Digits,"Hind Siliguri"'); c.fillText(ME.name,W/2,625);
+  c.font='500 32px BN Digits,"Hind Siliguri"'; c.fillStyle="#ffffffcc"; c.fillText("রোল "+ME.roll+(ME.batch?" • "+ME.batch:""),W/2,675);
   c.fillStyle="#fff"; rr(c,110,730,W-220,330,40); c.fill();
-  c.fillStyle="#6b7685"; c.font='600 32px "Hind Siliguri"'; c.fillText("প্রাপ্ত নম্বর",W/2-215,805); c.fillText("মেরিট পজিশন",W/2+215,805);
-  c.fillStyle="#0b3d2e"; c.font='800 104px Poppins'; c.fillText(num(r.marks),W/2-215,920); c.fillText("#"+r.rank,W/2+215,920);
-  c.fillStyle="#6b7685"; c.font='600 30px "Hind Siliguri"'; c.fillText("মোট "+num(r.total_marks)+" এর মধ্যে",W/2-215,975); c.fillText(r.participants+" জনের মধ্যে",W/2+215,975);
+  c.fillStyle="#6b7685"; c.font='600 32px BN Digits,"Hind Siliguri"'; c.fillText("প্রাপ্ত নম্বর",W/2-215,805); c.fillText("মেরিট পজিশন",W/2+215,805);
+  c.fillStyle="#0b3d2e"; c.font='800 104px BN Digits,Poppins'; c.fillText(num(r.marks),W/2-215,920); c.fillText("#"+r.rank,W/2+215,920);
+  c.fillStyle="#6b7685"; c.font='600 30px BN Digits,"Hind Siliguri"'; c.fillText("মোট "+num(r.total_marks)+" এর মধ্যে",W/2-215,975); c.fillText(r.participants+" জনের মধ্যে",W/2+215,975);
   c.fillStyle="#e3e8ee"; c.fillRect(W/2-2,770,4,230);
-  c.font='500 28px "Hind Siliguri"'; c.fillStyle="#13684c"; c.fillText("সর্বোচ্চ "+num(r.highest)+"   •   গড় "+num(r.average),W/2,1035);
-  if(r.rank<=3){ c.font='800 60px Poppins'; c.fillText(["🥇","🥈","🥉"][r.rank-1],W-170,800); }
-  c.fillStyle="#fff"; c.font='600 34px "Hind Siliguri"'; c.fillText(r.rank==1?"অভিনন্দন! ক্লাসে প্রথম 🎉":"পরিশ্রমের ফল ✨",W/2,1140);
-  c.fillStyle="#ffffffb0"; fitText(c,COACHING.address,W-100,24,500,'"Hind Siliguri"'); c.fillText(COACHING.address,W/2,1255);
-  c.font='500 24px "Hind Siliguri"'; c.fillText("📞 "+COACHING.phones,W/2,1295);
+  c.font='500 28px BN Digits,"Hind Siliguri"'; c.fillStyle="#13684c"; c.fillText("সর্বোচ্চ "+num(r.highest)+"   •   গড় "+num(r.average),W/2,1035);
+  if(r.rank<=3){ c.font='800 60px BN Digits,Poppins'; c.fillText(["🥇","🥈","🥉"][r.rank-1],W-170,800); }
+  c.fillStyle="#fff"; c.font='600 34px BN Digits,"Hind Siliguri"'; c.fillText(r.rank==1?"অভিনন্দন! ক্লাসে প্রথম 🎉":"পরিশ্রমের ফল ✨",W/2,1140);
+  c.fillStyle="#ffffffb0"; fitText(c,COACHING.address,W-100,24,500,'BN Digits,"Hind Siliguri"'); c.fillText(COACHING.address,W/2,1255);
+  c.font='500 24px BN Digits,"Hind Siliguri"'; c.fillText("📞 "+COACHING.phones,W/2,1295);
   const blob = await new Promise(ok=>cv.toBlob(ok,"image/png"));
   const file = new File([blob], `Result-${ME.roll}-${r.exam_id}.png`, {type:"image/png"});
   if(navigator.canShare && navigator.canShare({files:[file]})){
@@ -1401,7 +1408,7 @@ function paintHomeMain(h, loading){
   html += `<div class="h-sec">🎬 ফ্রি ক্লাস ও আপডেট</div>` +
     (vids.length?`<div class="vids">${vids.map(id=>`<a href="https://youtu.be/${id}" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy"></a>`).join("")}</div>`:"") +
     `<a class="lnk" href="${esc(yt)}" target="_blank" rel="noopener"><span class="ic" style="background:#ff0000">▶</span><div><b>YouTube — ফ্রি ক্লাস</b><span>BIO NERDS চ্যানেলে বায়োলজির ফ্রি ক্লাস দেখো</span></div><span class="ar">›</span></a>
-    <a class="lnk" href="${esc(fbk)}" target="_blank" rel="noopener"><span class="ic" style="background:#1877f2;font-family:Poppins;font-weight:800">f</span><div><b>Facebook পেজ</b><span>নোটিশ, রেজাল্ট আর আপডেট সবার আগে</span></div><span class="ar">›</span></a>
+    <a class="lnk" href="${esc(fbk)}" target="_blank" rel="noopener"><span class="ic" style="background:#1877f2;font-family:BN Digits,Poppins;font-weight:800">f</span><div><b>Facebook পেজ</b><span>নোটিশ, রেজাল্ট আর আপডেট সবার আগে</span></div><span class="ar">›</span></a>
     <a class="lnk" href="${waLink(COACHING.whatsapp,"আসসালামু আলাইকুম")}" target="_blank" rel="noopener"><span class="ic" style="background:#25d366">✆</span><div><b>WhatsApp</b><span>${esc(COACHING.whatsapp)}</span></div><span class="ar">›</span></a>
     <a class="lnk" href="${esc(mapsLink(s))}" target="_blank" rel="noopener"><span class="ic" style="background:#ea4335">📍</span><div><b>কোচিংয়ের লোকেশন</b><span>Google Maps-এ দেখো ও রাস্তা খুঁজে নাও</span></div><span class="ar">›</span></a>`;
 
@@ -1776,7 +1783,7 @@ async function stuAttCard(){
     const a = await rpc("my_attendance",{p_token:TOKEN}); const el = $("#attCard"); if(!el || !a.total) return;
     const pct = Math.round(a.present/a.total*100);
     el.innerHTML = `<div class="card"><div class="row between"><h3 style="margin:0">📅 আমার উপস্থিতি</h3>
-      <b style="font-family:Poppins;font-size:22px;color:${pct<75?"var(--red)":"var(--g2)"}">${pct}%</b></div>
+      <b style="font-family:BN Digits,Poppins;font-size:22px;color:${pct<75?"var(--red)":"var(--g2)"}">${pct}%</b></div>
       <div class="muted">${BN_DIGITS(a.total)}টা ক্লাসের মধ্যে ${BN_DIGITS(a.present)}টায় উপস্থিত ছিলে${pct<75?" — নিয়মিত ক্লাসে আসো!":""}</div>
       <div class="dots">${(a.recent||[]).slice().reverse().map(r=>`<span class="${r.present?"":"x"}" title="${fmtDate(r.att_date)}: ${r.present?"উপস্থিত":"অনুপস্থিত"}"></span>`).join("")}</div>
       <div class="muted" style="font-size:12px;margin-top:4px">শেষ ${BN_DIGITS((a.recent||[]).length)}টা ক্লাস — সবুজ = উপস্থিত, লাল = অনুপস্থিত</div></div>`;
@@ -2007,26 +2014,26 @@ async function drawReceipt(cv, p){
   const g=c.createLinearGradient(0,0,W,0); g.addColorStop(0,"#0b3d2e"); g.addColorStop(1,"#13294b");
   c.fillStyle=g; c.fillRect(0,0,W,140); c.fillStyle="#f2b632"; c.fillRect(0,140,W,7);
   try{ const lg = await loadImg("icon-192.png"); c.save(); c.beginPath(); c.arc(92,70,46,0,Math.PI*2); c.fillStyle="#fff"; c.fill(); c.clip(); c.drawImage(lg,46,24,92,92); c.restore(); }catch(e){}
-  c.fillStyle="#fff"; c.font='800 46px Poppins'; c.fillText(COACHING.name,160,72);
-  c.font='500 24px "Hind Siliguri"'; c.globalAlpha=.85; c.fillText("MONEY RECEIPT • টাকা প্রাপ্তির রসিদ",162,112); c.globalAlpha=1;
-  c.textAlign="right"; c.font='700 24px Poppins'; c.fillText(p.receipt_no||"",W-40,66);
-  c.font='500 22px "Hind Siliguri"'; c.fillText(fmtDate(p.paid_on),W-40,104); c.textAlign="left";
+  c.fillStyle="#fff"; c.font='800 46px BN Digits,Poppins'; c.fillText(COACHING.name,160,72);
+  c.font='500 24px BN Digits,"Hind Siliguri"'; c.globalAlpha=.85; c.fillText("MONEY RECEIPT • টাকা প্রাপ্তির রসিদ",162,112); c.globalAlpha=1;
+  c.textAlign="right"; c.font='700 24px BN Digits,Poppins'; c.fillText(p.receipt_no||"",W-40,66);
+  c.font='500 22px BN Digits,"Hind Siliguri"'; c.fillText(fmtDate(p.paid_on),W-40,104); c.textAlign="left";
   let y=210;
   rows.forEach(([k,v])=>{
-    c.fillStyle="#6b7685"; c.font='500 25px "Hind Siliguri"'; c.fillText(k,50,y);
-    c.fillStyle="#1b2430"; fitText(c,String(v),W-260,30,600,'"Hind Siliguri"'); c.fillText(String(v),200,y);
+    c.fillStyle="#6b7685"; c.font='500 25px BN Digits,"Hind Siliguri"'; c.fillText(k,50,y);
+    c.fillStyle="#1b2430"; fitText(c,String(v),W-260,30,600,'BN Digits,"Hind Siliguri"'); c.fillText(String(v),200,y);
     c.strokeStyle="#e3e8ee"; c.lineWidth=2; c.beginPath(); c.moveTo(50,y+20); c.lineTo(W-50,y+20); c.stroke();
     y+=70;
   });
   c.fillStyle="#e8f6ef"; rr(c,50,y-8,430,110,20); c.fill();
-  c.fillStyle="#6b7685"; c.font='500 22px "Hind Siliguri"'; c.fillText("মোট পরিশোধ",74,y+26);
-  c.fillStyle="#0b3d2e"; c.font='800 48px "Hind Siliguri"'; c.fillText(tk(p.amount),74,y+80);
+  c.fillStyle="#6b7685"; c.font='500 22px BN Digits,"Hind Siliguri"'; c.fillText("মোট পরিশোধ",74,y+26);
+  c.fillStyle="#0b3d2e"; c.font='800 48px BN Digits,"Hind Siliguri"'; c.fillText(tk(p.amount),74,y+80);
   c.save(); c.translate(W-190,y+46); c.rotate(-0.12);
   c.strokeStyle="#1f9d6f"; c.lineWidth=5; rr(c,-140,-46,280,92,16); c.stroke();
-  c.fillStyle="#1f9d6f"; c.textAlign="center"; c.font='800 34px Poppins'; c.fillText("PAID ✓",0,-2);
-  c.font='600 22px "Hind Siliguri"'; c.fillText("পরিশোধিত",0,32); c.restore();
+  c.fillStyle="#1f9d6f"; c.textAlign="center"; c.font='800 34px BN Digits,Poppins'; c.fillText("PAID ✓",0,-2);
+  c.font='600 22px BN Digits,"Hind Siliguri"'; c.fillText("পরিশোধিত",0,32); c.restore();
   c.fillStyle="#e8f6ef"; c.fillRect(0,H-64,W,64); c.fillStyle="#0b3d2e"; c.textAlign="left";
-  const foot = COACHING.address+"  •  "+COACHING.phones; fitText(c,foot,W-80,21,500,'"Hind Siliguri"'); c.fillText(foot,40,H-26);
+  const foot = COACHING.address+"  •  "+COACHING.phones; fitText(c,foot,W-80,21,500,'BN Digits,"Hind Siliguri"'); c.fillText(foot,40,H-26);
 }
 async function downloadReceipt(p){ const cv=document.createElement("canvas"); await drawReceipt(cv,p); cv.toBlob(b=>downloadBlob(b,"Receipt-"+p.receipt_no+".png"),"image/png"); }
 
@@ -2134,7 +2141,7 @@ async function loadPayReqs(){
     ${list.map(q=>`<div style="border-top:1px solid var(--line);padding:10px 0 4px;margin-top:10px">
       <div class="row between"><b>${esc(q.name||q.roll)}</b><span class="paynum" style="border:0;padding:0;margin:0"><span class="tag ${esc(q.method)}">${METHOD[q.method]||q.method}</span></span></div>
       <div class="muted" style="font-size:13px">রোল ${esc(q.roll)} • ${esc(q.batch||"")}<br>${esc(payFor(q))}<br>প্রেরক: ${esc(q.sender||"-")} • ${fmtTime(q.created_at)}</div>
-      <div class="row" style="margin-top:6px;flex-wrap:wrap"><b style="font-size:21px;font-family:Poppins">${tk(q.amount)}</b>
+      <div class="row" style="margin-top:6px;flex-wrap:wrap"><b style="font-size:21px;font-family:BN Digits,Poppins">${tk(q.amount)}</b>
         <span class="chip" style="cursor:pointer" onclick="copyText('${esc(q.trx_id)}')">TrxID ${esc(q.trx_id)} 📋</span></div>
       <div class="row" style="margin-top:8px"><button class="btn sm" onclick="confirmReq(${q.id})">✅ টাকা পেয়েছি</button><button class="btn sm danger" onclick="rejectReq(${q.id})">বাতিল</button></div></div>`).join("")}</div>`;
 }
@@ -2900,7 +2907,7 @@ async function exResult(id){
     <div class="rs-hero"><div style="font-weight:700">${esc(e.title)}</div><div style="opacity:.8;font-size:13.5px">${esc(e.subject||"")}</div>
       ${ringHtml(pct, BN_DIGITS(num(r.score)), "/ "+BN_DIGITS(num(e.total))+" নম্বর")}
       <span class="pf ${pass?"p":"f"}">${pass?"🎉 পাস":"আরও চেষ্টা লাগবে"} • ${BN_DIGITS(Math.round(pct))}%</span>
-      <div style="margin-top:12px;font-size:15px"><b style="font-size:26px;font-family:Poppins">#${BN_DIGITS(r.rank)}</b><br>${BN_DIGITS(r.participants)} জনের মধ্যে মেরিট পজিশন</div></div>
+      <div style="margin-top:12px;font-size:15px"><b style="font-size:26px;font-family:BN Digits,Poppins">#${BN_DIGITS(r.rank)}</b><br>${BN_DIGITS(r.participants)} জনের মধ্যে মেরিট পজিশন</div></div>
     <div class="rs-grid">
       <div><b class="c-ok">${BN_DIGITS(r.correct)}</b><span>সঠিক</span></div><div><b class="c-bad">${BN_DIGITS(r.wrong)}</b><span>ভুল</span></div><div><b class="c-sk">${BN_DIGITS(r.skipped)}</b><span>উত্তর দাওনি</span></div>
       <div><b>${BN_DIGITS(num(r.highest))}</b><span>সর্বোচ্চ</span></div><div><b>${BN_DIGITS(num(r.average))}</b><span>গড়</span></div><div><b>${secTxt(r.secs)}</b><span>সময় লেগেছে</span></div></div>
@@ -2957,24 +2964,24 @@ async function exShareCard(){
   c.fillStyle = g; c.fillRect(0,0,W,H);
   c.globalAlpha = .07; c.fillStyle = "#fff"; c.beginPath(); c.arc(W-60,140,320,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(40,H-80,260,0,Math.PI*2); c.fill(); c.globalAlpha = 1;
   try{ const lg = await loadImg("icon-192.png"); c.save(); rr(c,W/2-60,48,120,120,30); c.clip(); c.drawImage(lg,W/2-60,48,120,120); c.restore(); }catch(err){}
-  c.textAlign = "center"; c.fillStyle = "#fff"; c.font = '800 66px Poppins'; c.fillText(COACHING.name, W/2, 240);
+  c.textAlign = "center"; c.fillStyle = "#fff"; c.font = '800 66px BN Digits,Poppins'; c.fillText(COACHING.name, W/2, 240);
   c.fillStyle = "#f2b632"; rr(c, W/2-210, 270, 420, 56, 28); c.fill();
-  c.fillStyle = "#3b2a00"; c.font = '700 30px "Hind Siliguri"'; c.fillText(e.audience==="free" ? "ফ্রি লাইভ এক্সাম" : "অনলাইন পরীক্ষা", W/2, 309);
-  c.fillStyle = "#fff"; fitText(c, e.title, W-140, 46, 700, '"Hind Siliguri"'); c.fillText(e.title, W/2, 400);
-  if(e.subject){ c.fillStyle = "#ffffffcc"; fitText(c, e.subject, W-160, 32, 500, '"Hind Siliguri"'); c.fillText(e.subject, W/2, 450); }
+  c.fillStyle = "#3b2a00"; c.font = '700 30px BN Digits,"Hind Siliguri"'; c.fillText(e.audience==="free" ? "ফ্রি লাইভ এক্সাম" : "অনলাইন পরীক্ষা", W/2, 309);
+  c.fillStyle = "#fff"; fitText(c, e.title, W-140, 46, 700, 'BN Digits,"Hind Siliguri"'); c.fillText(e.title, W/2, 400);
+  if(e.subject){ c.fillStyle = "#ffffffcc"; fitText(c, e.subject, W-160, 32, 500, 'BN Digits,"Hind Siliguri"'); c.fillText(e.subject, W/2, 450); }
   const st = r.me.kind === "stu" && ME && ME.roll === r.me.uid ? ME : {name:r.me.name};
   c.fillStyle = "#fff"; c.beginPath(); c.arc(W/2, 590, 98, 0, Math.PI*2); c.fill();
   await drawPhoto(c, W/2-90, 500, 180, true, st);
-  c.fillStyle = "#fff"; fitText(c, r.me.name, W-140, 54, 700, '"Hind Siliguri"'); c.fillText(r.me.name, W/2, 750);
-  if(r.me.inst){ c.fillStyle = "#ffffffbb"; fitText(c, r.me.inst, W-160, 30, 500, '"Hind Siliguri"'); c.fillText(r.me.inst, W/2, 798); }
+  c.fillStyle = "#fff"; fitText(c, r.me.name, W-140, 54, 700, 'BN Digits,"Hind Siliguri"'); c.fillText(r.me.name, W/2, 750);
+  if(r.me.inst){ c.fillStyle = "#ffffffbb"; fitText(c, r.me.inst, W-160, 30, 500, 'BN Digits,"Hind Siliguri"'); c.fillText(r.me.inst, W/2, 798); }
   c.fillStyle = "#fff"; rr(c, 100, 840, W-200, 270, 40); c.fill();
-  c.fillStyle = "#6b7685"; c.font = '600 30px "Hind Siliguri"'; c.fillText("প্রাপ্ত নম্বর", W/2-220, 905); c.fillText("মেরিট পজিশন", W/2+220, 905);
-  c.fillStyle = "#0b3d2e"; c.font = '800 96px Poppins'; c.fillText(num(r.score), W/2-220, 1010); c.fillText("#"+r.rank, W/2+220, 1010);
-  c.fillStyle = "#6b7685"; c.font = '600 28px "Hind Siliguri"'; c.fillText("মোট "+num(e.total)+" এর মধ্যে", W/2-220, 1060); c.fillText(r.participants+" জনের মধ্যে", W/2+220, 1060);
+  c.fillStyle = "#6b7685"; c.font = '600 30px BN Digits,"Hind Siliguri"'; c.fillText("প্রাপ্ত নম্বর", W/2-220, 905); c.fillText("মেরিট পজিশন", W/2+220, 905);
+  c.fillStyle = "#0b3d2e"; c.font = '800 96px BN Digits,Poppins'; c.fillText(num(r.score), W/2-220, 1010); c.fillText("#"+r.rank, W/2+220, 1010);
+  c.fillStyle = "#6b7685"; c.font = '600 28px BN Digits,"Hind Siliguri"'; c.fillText("মোট "+num(e.total)+" এর মধ্যে", W/2-220, 1060); c.fillText(r.participants+" জনের মধ্যে", W/2+220, 1060);
   c.fillStyle = "#e3e8ee"; c.fillRect(W/2-2, 870, 4, 210);
-  c.fillStyle = "#fff"; c.font = '600 32px "Hind Siliguri"'; c.fillText(r.rank===1 ? "🏆 প্রথম স্থান! অভিনন্দন 🎉" : r.rank<=10 ? "🌟 টপ ১০-এ জায়গা করে নিয়েছি!" : "✨ নিজেকে যাচাই করলাম", W/2, 1180);
-  c.fillStyle = "#f2b632"; c.font = '700 30px "Hind Siliguri"'; c.fillText("তুমিও ফ্রি পরীক্ষা দাও 👉 bionerdsbd.github.io", W/2, 1260);
-  c.fillStyle = "#ffffffaa"; c.font = '500 24px "Hind Siliguri"'; c.fillText("📞 "+COACHING.phones, W/2, 1305);
+  c.fillStyle = "#fff"; c.font = '600 32px BN Digits,"Hind Siliguri"'; c.fillText(r.rank===1 ? "🏆 প্রথম স্থান! অভিনন্দন 🎉" : r.rank<=10 ? "🌟 টপ ১০-এ জায়গা করে নিয়েছি!" : "✨ নিজেকে যাচাই করলাম", W/2, 1180);
+  c.fillStyle = "#f2b632"; c.font = '700 30px BN Digits,"Hind Siliguri"'; c.fillText("তুমিও ফ্রি পরীক্ষা দাও 👉 bionerdsbd.github.io", W/2, 1260);
+  c.fillStyle = "#ffffffaa"; c.font = '500 24px BN Digits,"Hind Siliguri"'; c.fillText("📞 "+COACHING.phones, W/2, 1305);
   const blob = await new Promise(ok => cv.toBlob(ok, "image/png"));
   const file = new File([blob], "BIO-NERDS-Result-"+e.id+".png", {type:"image/png"});
   if(navigator.canShare && navigator.canShare({files:[file]})){
@@ -3696,7 +3703,7 @@ function cqBreakHtml(e, qs, marks, chosen){
     return `<div class="ex-sec" style="font-size:16px">${esc(s.t)}</div>` + L.map(q => {
       const p = calc.per[q.k], m = marks[q.k] || {};
       return `<div class="qc" style="padding:12px 14px"><div class="qn" style="font-size:14px;color:var(--ink)">${s.type === "short" ? "প্রশ্ন " + BN_DIGITS(q.no) : "সৃজনশীল " + BN_DIGITS(q.no)}
-          <span class="dn" style="font-family:Poppins;font-size:16px;color:${p.counted ? "var(--g2)" : "var(--mute)"}">${BN_DIGITS(num(p.sc))} / ${BN_DIGITS(num(p.max))}</span></div>
+          <span class="dn" style="font-family:BN Digits,Poppins;font-size:16px;color:${p.counted ? "var(--g2)" : "var(--mute)"}">${BN_DIGITS(num(p.sc))} / ${BN_DIGITS(num(p.max))}</span></div>
         ${s.type === "short" ? "" : `<div class="muted" style="font-size:13.5px">${q.parts.map((pt,i) => `${esc(pt.l)} ${BN_DIGITS(num(m.p && m.p[i] != null && m.p[i] !== "" ? Math.min(+m.p[i], +pt.m) : 0))}/${BN_DIGITS(num(pt.m))}`).join(" • ")}</div>`}
         ${p.counted ? "" : `<div class="tag sk" style="display:inline-block;margin-top:6px">গোনা হয়নি — ${p.x ? "অতিরিক্ত উত্তর" : "বিভাগে প্রয়োজনের বেশি উত্তর"}</div>`}
         ${m.c ? `<div class="expl" style="background:#fff8ea;border-left-color:var(--gold)">✍️ ${esc(m.c)}</div>` : ""}</div>`;
@@ -3721,7 +3728,7 @@ async function cqResult(id){
     <div class="rs-hero"><div style="font-weight:700">${esc(e.title)}</div><div style="opacity:.8;font-size:13.5px">${esc(e.subject||"")} • লিখিত</div>
       ${ringHtml(pct, BN_DIGITS(num(r.score)), "/ " + BN_DIGITS(num(total)) + " নম্বর")}
       <span class="pf ${pass ? "p" : "f"}">${pass ? "🎉 পাস" : "আরও চেষ্টা লাগবে"} • ${BN_DIGITS(Math.round(pct))}%</span>
-      ${r.rank ? `<div style="margin-top:12px;font-size:15px"><b style="font-size:26px;font-family:Poppins">#${BN_DIGITS(r.rank)}</b><br>${BN_DIGITS(r.participants)} জনের মধ্যে মেরিট পজিশন</div>`
+      ${r.rank ? `<div style="margin-top:12px;font-size:15px"><b style="font-size:26px;font-family:BN Digits,Poppins">#${BN_DIGITS(r.rank)}</b><br>${BN_DIGITS(r.participants)} জনের মধ্যে মেরিট পজিশন</div>`
         : `<div style="margin-top:10px;font-size:13.5px;opacity:.85">পরীক্ষা শেষ হলে মেরিট পজিশন দেখাবে</div>`}</div>
     ${r.rank ? `<div class="rs-grid"><div><b>${BN_DIGITS(num(r.highest))}</b><span>সর্বোচ্চ</span></div><div><b>${BN_DIGITS(num(r.average))}</b><span>গড়</span></div><div><b>${BN_DIGITS(r.participants)}</b><span>জন</span></div></div>` : ""}
     ${r.remark ? `<div class="card" style="border-left:4px solid var(--gold)"><b>👨‍🏫 শিক্ষকের মন্তব্য</b><div style="white-space:pre-wrap;margin-top:4px">${esc(r.remark)}</div></div>` : ""}
@@ -4055,7 +4062,7 @@ function cqScriptsPaint(){
       <td><b>${esc(a.name || "")}</b> ${a.kind === "guest" ? '<span class="chip org" style="font-size:11px">বাইরের</span>' : a.kind === "admin" ? '<span class="chip" style="font-size:11px">অ্যাডমিন</span>' : ""}
         <div class="muted" style="font-size:12px">${esc(a.uid)} • ${esc(a.inst || a.batch || "")}</div>
         <div style="margin-top:3px">${CQ_STL[a.status] || ""}${a.graded_by === "claude" && a.status !== "approved" ? ' <span class="chip navy">🤖 Claude</span>' : ""} <span class="muted" style="font-size:12px">📄 ${BN_DIGITS(a.npages)}</span></div></td>
-      <td style="text-align:right;white-space:nowrap">${a.score != null ? `<b style="font-family:Poppins">${BN_DIGITS(num(a.score))}</b><span class="muted">/${BN_DIGITS(num(total))}</span><br>` : ""}
+      <td style="text-align:right;white-space:nowrap">${a.score != null ? `<b style="font-family:BN Digits,Poppins">${BN_DIGITS(num(a.score))}</b><span class="muted">/${BN_DIGITS(num(total))}</span><br>` : ""}
         ${a.npages ? `<button class="btn sm ${a.status === "submitted" ? "" : "sec"}" style="margin-top:4px" onclick="cqGrade('${esc(a.uid)}')">${a.status === "submitted" ? "✍️ দেখো" : "খোলো"}</button>` : ""}
         ${["writing","upload","nosub","submitted"].includes(a.status) ? `<button class="btn sm ghost" style="margin-top:4px" title="আপলোডের সময় বাড়াও" onclick="cqExtend('${esc(a.uid)}')">⏰</button>` : ""}
         <button class="btn sm ghost" style="margin-top:4px" title="খাতা মুছে আবার দেওয়ার সুযোগ" onclick="cqReset('${esc(a.uid)}')">♻️</button>
@@ -4119,7 +4126,7 @@ function cqMarksPaint(){
           <label class="cq-x"><input type="checkbox" ${m.x ? "checked" : ""} onchange="cqgX(${q.k},this.checked)"> অতিরিক্ত উত্তর — গুনবে না</label></div>`; }).join("");
     }).join("")}
     <label>সার্বিক মন্তব্য (স্টুডেন্ট দেখবে)</label><textarea id="cqRm" style="font-family:inherit;min-height:80px" placeholder="যেমন: হাতের লেখা পরিষ্কার, তবে চিত্র আরও দিতে হবে।">${esc(s.remark || "")}</textarea>
-    <div class="cq-bar"><div class="row"><span class="muted">মোট নম্বর</span><b id="cqTotB" style="margin-left:auto;font-family:Poppins;font-size:20px"></b></div>
+    <div class="cq-bar"><div class="row"><span class="muted">মোট নম্বর</span><b id="cqTotB" style="margin-left:auto;font-family:BN Digits,Poppins;font-size:20px"></b></div>
       <div id="cqWarn"></div>
       <div class="row" style="gap:8px;margin-top:8px"><button class="btn sec" style="margin:0" onclick="cqgSave('checked')">💾 সেভ</button><button class="btn" style="margin:0" onclick="cqgSave('approved')">✅ সেভ ও অনুমোদন</button></div>
       ${s.status === "approved" ? `<button class="btn ghost" style="margin-top:8px" onclick="cqUnapprove()">↩️ অনুমোদন তুলে নাও (স্টুডেন্ট আর দেখবে না)</button>` : ""}
@@ -4397,8 +4404,8 @@ async function refCard(){
     <b style="font-size:17px">🤝 বন্ধুকে আনো, টাকা জেতো</b>
     ${R.on ? `<div class="muted" style="font-size:13.5px;margin-top:4px">তোমার কোড দিয়ে বন্ধু প্রথম প্যাকেজ কিনলে সে পাবে <b>${tk(R.friend)} ছাড়</b>, আর তুমি পাবে <b>${tk(R.reward)}</b> — যা তোমার পরের প্যাকেজ কেনায় নিজে থেকে কেটে যাবে।</div>` : ""}
     <div class="row between" style="margin-top:10px;align-items:center"><div><div class="muted" style="font-size:12.5px">তোমার রেফার কোড</div>
-      <b style="font-family:Poppins;font-size:22px;letter-spacing:1px">${esc(R.code)}</b></div>
-      <div style="text-align:right"><div class="muted" style="font-size:12.5px">তোমার ব্যালেন্স</div><b style="font-family:Poppins;font-size:20px;color:var(--g2)">${tk(R.credit)}</b></div></div>
+      <b style="font-family:BN Digits,Poppins;font-size:22px;letter-spacing:1px">${esc(R.code)}</b></div>
+      <div style="text-align:right"><div class="muted" style="font-size:12.5px">তোমার ব্যালেন্স</div><b style="font-family:BN Digits,Poppins;font-size:20px;color:var(--g2)">${tk(R.credit)}</b></div></div>
     ${+R.count || +R.waiting ? `<div class="muted" style="font-size:13px;margin-top:6px">✅ ${bnNum(R.count)} জন বন্ধু কিনেছে${+R.waiting ? ` • ⏳ ${bnNum(R.waiting)} জনের যাচাই চলছে` : ""}</div>` : ""}
     ${R.on ? `<div class="row" style="gap:8px;margin-top:10px"><button class="btn sm" style="margin:0;flex:1" onclick="refShare()">📤 বন্ধুকে পাঠাও</button><button class="btn sm sec" style="margin:0" onclick="copyText('${esc(R.code)}')">📋 কোড কপি</button></div>` : ""}</div>`;
 }
@@ -4464,7 +4471,7 @@ function cpPaint(){
   const P = (PKG_ADM && PKG_ADM.packages) || [];
   const pn = ids => !ids || !ids.length ? "সব প্যাকেজ" : ids.map(i => (P.find(p => p.id == i) || {}).title || "#" + i).join(", ");
   $("#cpList").innerHTML = CPA.list.length ? CPA.list.map(c => `<div class="card" style="padding:12px 14px;border-left:5px solid ${c.active && !c.expired ? "var(--g3)" : "var(--line)"}">
-    <div class="row between"><b style="font-family:Poppins;font-size:18px;letter-spacing:1px">${esc(c.code)}</b>
+    <div class="row between"><b style="font-family:BN Digits,Poppins;font-size:18px;letter-spacing:1px">${esc(c.code)}</b>
       ${!c.active ? '<span class="chip" style="background:#eef1f4;color:var(--mute)">⏸ বন্ধ</span>' : c.expired ? '<span class="chip warn">⌛ মেয়াদ শেষ</span>' : (c.max_uses && +c.used + +c.waiting >= c.max_uses) ? '<span class="chip warn">সব শেষ</span>' : '<span class="chip">✅ চালু</span>'}</div>
     <div style="margin-top:2px"><b>${c.kind === "pct" ? bnNum(c.value) + "% ছাড়" : tk(c.value) + " ছাড়"}</b> <span class="muted">• ${esc(pn(c.pkgs))}</span></div>
     <div class="muted" style="font-size:13px">${[c.ends_on ? fmtDate(c.ends_on) + " পর্যন্ত" : "শেষ তারিখ নেই", c.max_uses ? "প্রথম " + bnNum(c.max_uses) + " জন" : "যত খুশি জন", c.note ? esc(c.note) : ""].filter(Boolean).join(" • ")}
@@ -4574,7 +4581,7 @@ async function pkgReqs(){
     ${list.map(o => `<div style="border-top:1px solid var(--line);padding:10px 0 4px;margin-top:10px">
       <div class="row between"><b>${esc(o.name || o.uid)}</b><span class="paynum" style="border:0;padding:0;margin:0"><span class="tag ${esc(o.method)}">${PKG_METHOD[o.method] || esc(o.method)}</span></span></div>
       <div class="muted" style="font-size:13px">${pkgWho(o)}<br>📦 ${esc(o.pkg)}<br>প্রেরক: ${esc(o.sender || "-")} • ${fmtTime(o.created_at)}${pkgDiscHtml(o)}</div>
-      <div class="row" style="margin-top:6px;flex-wrap:wrap"><b style="font-size:21px;font-family:Poppins">${tk(o.amount)}</b>
+      <div class="row" style="margin-top:6px;flex-wrap:wrap"><b style="font-size:21px;font-family:BN Digits,Poppins">${tk(o.amount)}</b>
         <span class="chip" style="cursor:pointer" onclick="copyText('${esc(o.trx)}')">TrxID ${esc(o.trx)} 📋</span></div>
       <div class="row" style="margin-top:8px"><button class="btn sm" onclick="pkgConfirm(${o.id})">✅ টাকা পেয়েছি</button><button class="btn sm danger" onclick="pkgReject(${o.id})">বাতিল</button></div></div>`).join("")}</div>`;
 }
