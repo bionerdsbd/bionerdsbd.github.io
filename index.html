@@ -5188,7 +5188,8 @@ async function dqAdm(){
   catch(e){ box.innerHTML = '<div class="err">🧠 আজকের প্রশ্ন: ' + esc(e.message) + '<br>daily-question.sql চালানো হয়েছে তো?</div>'; return; }
   pkgCfg().then(dqAdmPaint); dqAdmPaint(); dqWarnRefresh();
 }
-function dqAddDays(n){ const d = new Date(DQA.day + "T00:00:00+06:00"); d.setDate(d.getDate() + n); return d; }
+function dqStart(){ const st = (DQA.cfg || {}).start; return st && st > DQA.day ? st : null; }
+function dqAddDays(n){ const d = new Date((dqStart() || DQA.day) + "T00:00:00+06:00"); d.setDate(d.getDate() + n - (dqStart() ? 1 : 0)); return d; }
 function dqAdmPaint(){
   const box = $("#dqAdm"); if(!box || !DQA) return;
   const L = DQA[DQA_LV] || {left:0, total:0, queue:[], history:[]}, cfg = DQA.cfg || {}, t = L.today;
@@ -5206,7 +5207,7 @@ function dqAdmPaint(){
       <div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn sm sec" onclick="dqEdit(${+t.id})">✏️ এডিট</button>
       ${L.left ? `<button class="btn sm ghost" onclick="dqSkip()">⏭️ আজ এটা না — পরেরটা দেখাও</button>` : ""}
       <button class="btn sm ghost" onclick="HOME=null;show('homeView')">দেখো ↗</button></div></div>`;
-  } else h += `<div class="muted" style="margin-top:10px">${cfg.on === false ? "বন্ধ আছে।" : `${DQA_LV}-এর কোনো প্রশ্ন নেই — নিচে পেস্ট করো, আজ থেকেই দেখাবে।`}</div>`;
+  } else h += `<div class="muted" style="margin-top:10px">${cfg.on === false ? "বন্ধ আছে।" : dqStart() ? `🗓️ ${fmtDate(dqStart())} থেকে শুরু হবে — তার আগে হোম পেজে দেখাবে না।` : `${DQA_LV}-এর কোনো প্রশ্ন নেই — নিচে পেস্ট করো, আজ থেকেই দেখাবে।`}</div>`;
   h += `<div class="hint" style="font-weight:700">📦 লাইনে আছে ${BN_DIGITS(L.left)}টা প্রশ্ন${L.left ? ` — ${fmtDate(dqAddDays(L.left))} পর্যন্ত চলবে` : ""}</div></div>`;
 
   h += `<div class="card"><h3>➕ ${DQA_LV}-এর জন্য প্রশ্ন যোগ করো</h3>
@@ -5218,7 +5219,7 @@ function dqAdmPaint(){
     ${L.queue.length ? L.queue.map((q, i) => `<div class="dq-q"><div class="muted" style="font-size:12.5px">${BN_DIGITS(i + 1)}. ${fmtDate(dqAddDays(i + 1))}${q.ch ? " • " + esc(q.ch) : ""}</div>
       <div style="font-size:14.5px;white-space:pre-line">${esc(q.q.length > 160 ? q.q.slice(0, 160) + "…" : q.q)}</div>
       <div class="muted" style="font-size:12.5px">উত্তর: ${LET[q.ans]}. ${esc(q.opts[q.ans] || "")}${q.img ? " • 🖼️" : ""}</div>
-      <div class="acts"><button onclick="dqMove(${+q.id},'top')" title="কালকেই">⤒ কাল</button><button onclick="dqMove(${+q.id},'up')">▲</button><button onclick="dqMove(${+q.id},'down')">▼</button>
+      <div class="acts"><button onclick="dqMove(${+q.id},'top')" title="সবার আগে">⤒ সবার আগে</button><button onclick="dqMove(${+q.id},'up')">▲</button><button onclick="dqMove(${+q.id},'down')">▼</button>
       <button onclick="dqEdit(${+q.id})">✏️</button><button onclick="dqDel(${+q.id})">🗑</button></div></div>`).join("") : '<div class="muted" style="margin-top:8px">লাইনে কোনো প্রশ্ন নেই।</div>'}</details>`;
 
   h += `<details class="card"><summary style="cursor:pointer"><b>🗓️ আগের দিনগুলো</b></summary>
@@ -5228,6 +5229,7 @@ function dqAdmPaint(){
     <label style="display:flex;align-items:center;gap:10px;margin-top:12px"><input type="checkbox" id="dqOn" style="width:22px;height:22px" ${cfg.on !== false ? "checked" : ""}> হোম পেজে আজকের প্রশ্ন দেখাও</label>
     <label style="display:flex;align-items:center;gap:10px;margin-top:10px"><input type="checkbox" id="dqRc" style="width:22px;height:22px" ${cfg.recycle !== false ? "checked" : ""}> প্রশ্ন শেষ হয়ে গেলে পুরনোগুলো আবার ঘুরিয়ে দেখাও</label>
     <label>কত দিনের কম প্রশ্ন থাকলে সতর্ক করবে</label><input id="dqWd" type="number" inputmode="numeric" value="${esc(cfg.warn_days ?? 7)}">
+    <label>শুরুর তারিখ (ঐচ্ছিক — এর আগে কোনো প্রশ্ন দেখাবে না)</label><input id="dqSt" type="date" value="${esc(cfg.start || "")}">
     <button class="btn" onclick="dqCfgSave()">💾 সেভ করো</button></details>`;
   box.innerHTML = h;
   const tx = $("#dqTx"); tx.oninput = dqPrev; dqPrev();
@@ -5260,7 +5262,7 @@ async function dqSkip(){
   try{ await rpc("dq_admin_skip", {p_token:TOKEN, p_lv:DQA_LV}); DQ = null; toast("পরের প্রশ্ন দেখানো হচ্ছে ✅"); dqAdm(); }catch(e){ toast(e.message); }
 }
 async function dqCfgSave(){
-  const v = {on:$("#dqOn").checked, recycle:$("#dqRc").checked, warn_days:+$("#dqWd").value || 0};
+  const v = {on:$("#dqOn").checked, recycle:$("#dqRc").checked, warn_days:+$("#dqWd").value || 0, start:$("#dqSt").value || null};
   try{ await rpc("dq_admin_cfg", {p_token:TOKEN, p_value:v}); toast("সেভ হয়েছে ✅"); DQ = null; HOME = null; dqAdm(); }catch(e){ toast(e.message); }
 }
 let DQ_ED = null;
