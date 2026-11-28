@@ -2432,7 +2432,8 @@ function exCard(e, compact){
    HSC → বোটানি/জুলজি → অধ্যায়, SSC → অধ্যায়। অধ্যায় আসে প্রশ্নের "# অধ্যায়" ট্যাগ থেকে (oe_list / cq_list → chs);
    অধ্যায়ের তালিকা 📦 প্যাকেজ → 📚 বিষয় ও অধ্যায় থেকে। only = শুধু একটা ক্লাস (HSC/SSC) দেখাও। */
 const TR = {fl:{lv:null, tab:null, ch:null, ex:[], keys:[], box:"#flib", only:null},
-            cr:{lv:null, tab:null, ch:null, ex:[], keys:[], box:"#crTree", only:null, key:null}};
+            cr:{lv:null, tab:null, ch:null, ex:[], keys:[], box:"#crTree", only:null, key:null},
+            ad:{lv:null, tab:null, ch:null, ex:[], keys:[], box:"#oeTree", only:null, card:e => oeCard(e)}};
 const FL = TR.fl;
 let FL_SCROLL = false;
 const isLib = e => !e.cq && e.audience === "free" && !e.locked && (e.chs || []).length > 0 && (e.instant ? e.status === "live" : e.status === "ended");
@@ -2476,7 +2477,7 @@ function trRow(t, key, no, list, name){
   return `<div class="fl-row ${n ? "has" : ""} ${open ? "open" : ""}" id="${t}r${i}" ${n ? `onclick="trOpen('${t}',${i})"` : ""}>
     <span class="no">${no}</span><span class="nm">${esc(name || key)}</span>
     ${n ? `<span class="ct">${live ? "🔴 " : ""}${done ? "✓ " + BN_DIGITS(done) + "/" : ""}${BN_DIGITS(n)}টি পরীক্ষা</span><span class="ar">›</span>` : '<span class="soon">শীঘ্রই আসছে</span>'}</div>
-    ${open ? `<div class="fl-body">${list.map(e => exCard(e)).join("")}</div>` : ""}`;
+    ${open ? `<div class="fl-body">${list.map(e => (S.card || exCard)(e)).join("")}</div>` : ""}`;
 }
 function trPaint(t){
   const S = TR[t], box = $(S.box); if(!box) return;
@@ -2486,7 +2487,7 @@ function trPaint(t){
     if(k !== "other" && !shown.has(k.startsWith("mix|") ? k.slice(4) : byName[k].lv)) k = "other";
     (bucket[k] = bucket[k] || []).push(e); });
   S.keys = [];
-  if(!levels.length){ box.innerHTML = S.ex.length ? S.ex.map(e => exCard(e)).join("") : '<div class="muted" style="padding:6px 2px 12px">এখনো কোনো পরীক্ষা নেই।</div>'; return; }
+  if(!levels.length){ box.innerHTML = S.ex.length ? S.ex.map(e => (S.card || exCard)(e)).join("") : '<div class="muted" style="padding:6px 2px 12px">এখনো কোনো পরীক্ষা নেই।</div>'; return; }
   if(!S.lv || !shown.has(S.lv)) S.lv = levels[0].k;
   const L = levels.find(l => l.k === S.lv);
   if(!S.tab || !L.tabs.find(x => x.k === S.tab)) S.tab = L.tabs[0].k;
@@ -3045,27 +3046,63 @@ function admExams(noBody){
 }
 const OE_ST = {draft:'<span class="chip" style="background:#eef1f4;color:var(--mute)">📝 খসড়া</span>', upcoming:'<span class="chip warn">⏳ আসছে</span>',
   live:'<span class="live-pill"><i></i>লাইভ</span>', ended:'<span class="chip">✅ শেষ</span>'};
-let OE_LIST = [];
-async function oeAdm(){
-  $("#aexBody").innerHTML = `<button class="btn orange" style="margin-top:0" onclick="oeEdit()">➕ নতুন অনলাইন পরীক্ষা বানাও</button>
-    <p class="hint">টিপস: প্রশ্নের PDF বা লেখা Claude-কে দিয়ে “পোর্টালে পরীক্ষা বানাও” বললে সরাসরি এখানে চলে আসবে।</p>
-    <button class="btn sec" onclick="openExams()">👀 স্টুডেন্টরা যেভাবে দেখবে</button>
-    <div id="oeList" style="margin-top:14px"><div class="spin"></div></div>`;
-  try{
-    [OE_LIST] = await Promise.all([rpc("oe_admin_list", {p_token:TOKEN}), pkgLinksLoad()]);
-    $("#oeList").innerHTML = OE_LIST.length ? OE_LIST.map(e => `<div class="card">
+let OE_LIST = [], OE_FOLDER = null;
+/* ফ্রি লাইব্রেরির পরীক্ষা (সবসময় খোলা বা শেষ হওয়া ফ্রি) — এগুলো ক্লাস ধরে ফোল্ডারে যায় */
+const oeIsLib = e => e.audience === "free" && e.status !== "draft" && (e.instant || e.status === "ended");
+function oeCard(e){
+  return `<div class="card">
       <div class="row" style="gap:6px;flex-wrap:wrap">${OE_ST[e.status]}${admAudChip(e,"mcq")}</div>
       <b style="display:block;font-size:17px;margin-top:6px">${esc(e.title)}</b><div class="muted">${esc(e.subject||"")}</div>
-      <div class="muted" style="margin-top:4px">🗓️ ${bnWindow(e)}</div>
+      <div class="muted" style="margin-top:4px">${e.instant ? "♾️ সবসময় খোলা" : "🗓️ " + bnWindow(e)}</div>
       <div class="grid4"><div><b>${BN_DIGITS(e.n)}</b><span>প্রশ্ন</span></div><div><b>${BN_DIGITS(e.duration_min)}</b><span>মিনিট</span></div><div><b>${BN_DIGITS(e.participants)}</b><span>জন দিয়েছে</span></div><div><b>${BN_DIGITS(e.guests)}</b><span>বাইরের</span></div></div>
       <div class="row" style="gap:6px;margin-top:12px;flex-wrap:wrap">
         <button class="btn sm" onclick="oeResults(${e.id})">📊 ফলাফল</button>
         <button class="btn sm sec" onclick="oeEdit(${e.id})">✏️ এডিট</button>
         <button class="btn sm sec" onclick="oePromo(${e.id})">📢 প্রচার</button>
         <button class="btn sm sec" onclick="oeEdit(${e.id},true)">📑 কপি</button>
-        <button class="btn sm danger" onclick="oeDel(${e.id})">🗑</button></div></div>`).join("")
-      : '<div class="card muted">এখনো কোনো অনলাইন পরীক্ষা নেই। উপরের বাটন চেপে প্রথম পরীক্ষাটা বানাও।</div>';
-  }catch(ex){ $("#oeList").innerHTML = '<div class="err">'+esc(ex.message)+'<br>অনলাইন পরীক্ষার SQL (online-exam.sql) চালানো হয়েছে তো?</div>'; }
+        <button class="btn sm danger" onclick="oeDel(${e.id})">🗑</button></div></div>`;
+}
+async function oeAdm(){
+  $("#aexBody").innerHTML = '<div class="spin"></div>';
+  try{
+    [OE_LIST] = await Promise.all([rpc("oe_admin_list", {p_token:TOKEN}), pkgLinksLoad(), pkgCfg()]);
+  }catch(ex){ $("#aexBody").innerHTML = '<div class="err">'+esc(ex.message)+'<br>অনলাইন পরীক্ষার SQL (online-exam.sql) চালানো হয়েছে তো?</div>'; return; }
+  oePaint();
+}
+function oeFolder(k){ OE_FOLDER = k; const S = TR.ad; S.lv = null; S.tab = null; S.ch = null; oePaint(); window.scrollTo(0, 0); }
+function oePaint(){
+  const box = $("#aexBody"); if(!box) return;
+  const {levels, byName} = flTree();
+  const lib = OE_LIST.filter(oeIsLib).sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at) || a.id - b.id);
+  const rest = OE_LIST.filter(e => !oeIsLib(e));
+  const ofLv = lv => lib.filter(e => exLv(e, byName) === lv), other = lib.filter(e => !exLv(e, byName));
+  /* ফোল্ডারের ভেতরে */
+  if(OE_FOLDER){
+    const isOther = OE_FOLDER === "__other", list = isOther ? other : ofLv(OE_FOLDER);
+    box.innerHTML = `<button class="btn ghost" style="margin-top:0" onclick="oeFolder(null)">‹ সব অনলাইন পরীক্ষা</button>
+      <h3 style="margin:8px 2px 2px">🆓 ${isOther ? "অন্যান্য ফ্রি পরীক্ষা" : esc(OE_FOLDER) + " ফ্রি পরীক্ষা"}</h3>
+      <div class="muted" style="margin:0 2px 12px">${BN_DIGITS(list.length)}টি পরীক্ষা${isOther ? "" : " • অধ্যায়ে চাপ দিলে পরীক্ষাগুলো খুলবে"}</div>
+      ${isOther ? (list.map(oeCard).join("") || '<div class="card muted">কিছু নেই।</div>') : '<div id="oeTree"></div>'}`;
+    if(!isOther){ const S = TR.ad; S.only = OE_FOLDER; S.ex = list; trPaint("ad"); }
+    return;
+  }
+  /* মূল পাতা */
+  const bar = (k, name, list) => {
+    const live = list.filter(e => e.instant || e.status === "live").length, ppl = list.reduce((s, e) => s + (+e.participants || 0), 0);
+    return `<div class="card" style="cursor:pointer;display:flex;align-items:center;gap:12px" onclick="oeFolder('${k}')">
+      <div style="font-size:28px">🆓</div>
+      <div style="flex:1"><b style="font-size:17px">${esc(name)}</b>
+        <div class="muted">${BN_DIGITS(list.length)}টি পরীক্ষা${live ? " • ♾️ " + BN_DIGITS(live) + "টি খোলা" : ""} • 👥 ${BN_DIGITS(ppl)} বার দেওয়া হয়েছে</div></div>
+      <div style="font-size:22px;color:var(--mute)">›</div></div>`;
+  };
+  let bars = levels.map(l => { const L = ofLv(l.k); return L.length ? bar(l.k, l.k + " ফ্রি পরীক্ষা", L) : ""; }).join("");
+  if(other.length) bars += bar("__other", "অন্যান্য ফ্রি পরীক্ষা (অধ্যায় দেওয়া নেই)", other);
+  box.innerHTML = `<button class="btn orange" style="margin-top:0" onclick="oeEdit()">➕ নতুন অনলাইন পরীক্ষা বানাও</button>
+    <p class="hint">টিপস: প্রশ্নের PDF বা লেখা Claude-কে দিয়ে “পোর্টালে পরীক্ষা বানাও” বললে সরাসরি এখানে চলে আসবে।</p>
+    <button class="btn sec" onclick="openExams()">👀 স্টুডেন্টরা যেভাবে দেখবে</button>
+    <div style="margin-top:14px">${bars}</div>
+    ${rest.length ? `<h3 style="margin:16px 2px 8px">📋 ব্যাচ, প্যাকেজ ও লাইভ পরীক্ষা</h3>${rest.map(oeCard).join("")}` : ""}
+    ${!OE_LIST.length ? '<div class="card muted">এখনো কোনো অনলাইন পরীক্ষা নেই। উপরের বাটন চেপে প্রথম পরীক্ষাটা বানাও।</div>' : ""}`;
 }
 function oePromo(id){
   const e = OE_LIST.find(x=>x.id==id); if(!e) return;
